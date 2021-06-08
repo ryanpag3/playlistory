@@ -31,7 +31,7 @@ jobs:
         working-directory: ./api
         run: yarn install
       - name: run tests
-        run: yarn test --json --outputFile="jest.results.json"
+        run: yarn test --json --outputFile=/home/runner/work/_actions/mattallty/jest-github-action/v1/dist/jest.results.json
         working-directory: ./api
       - name: run tests
         uses: mattallty/jest-github-action@v1
