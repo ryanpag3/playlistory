@@ -8,7 +8,7 @@ it('should start the server', async () => {
         expect(isInit).toBeTruthy();
         await server.server.close();
     } catch (e) {
-        logger.error(e);
+        console.log(e);
         throw e;
     }
 }, 5000);
