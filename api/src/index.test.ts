@@ -5,4 +5,4 @@ it('should start the server', async () => {
     const isInit = server.isServerReady();
     expect(isInit).toBeTruthy();
     await server.server.close();
-});
+}, 5000);
