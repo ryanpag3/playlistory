@@ -31,7 +31,9 @@ jobs:
         working-directory: ./api
         run: yarn install
       - name: run tests
-        working-directory: ./api
-        run: yarn test
+        uses: mattallty/jest-github-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
       
