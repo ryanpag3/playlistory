@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 import Fastify from 'fastify';
+import setup from './setup';
 import logger from './util/logger';
 
 export const server = Fastify({});
@@ -8,6 +9,7 @@ const port = process.env.API_PORT || 3000;
 let isInit = false;
 
 const startServer = async () => {
+    await setup(server);
     await server.listen(port);
 };
 
