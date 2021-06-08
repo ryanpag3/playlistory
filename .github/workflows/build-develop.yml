@@ -29,11 +29,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '14.x'
-      - name: install dependencies
-        working-directory: ./api
-        run: yarn install
       - name: run tests
-        run: yarn test
+        run: |
+          yarn install
+          yarn test
         working-directory: ./api
 
 
