@@ -33,15 +33,8 @@ jobs:
         working-directory: ./api
         run: yarn install
       - name: run tests
-        run: yarn test --json --outputFile=/home/runner/work/_actions/mattallty/jest-github-action/v1/dist/jest.results.json
+        run: yarn test
         working-directory: ./api
-        continue-on-error: true
-      - name: run tests
-        uses: mattallty/jest-github-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          test-command: "echo done"
 
 
       
