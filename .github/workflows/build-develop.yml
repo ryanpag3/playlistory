@@ -35,6 +35,7 @@ jobs:
       - name: run tests
         run: yarn test --json --outputFile=/home/runner/work/_actions/mattallty/jest-github-action/v1/dist/jest.results.json
         working-directory: ./api
+        continue-on-error: true
       - name: run tests
         uses: mattallty/jest-github-action@v1
         env:
