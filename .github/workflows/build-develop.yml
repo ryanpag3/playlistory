@@ -35,7 +35,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          test-command: "yarn test"
+          test-command: "yarn test --outputFile=jest.results.json"
           working_directory: "api"
 
 
