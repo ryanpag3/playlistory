@@ -31,12 +31,15 @@ jobs:
         working-directory: ./api
         run: yarn install
       - name: run tests
+        run: yarn test --json --outputFile="jest.results.json"
+        working-directory: ./api
+      - name: run tests
         uses: mattallty/jest-github-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          test-command: "yarn test --outputFile=jest.results.json"
-          working_directory: "api"
+          test-command: "echo done"
+          working_directory: ./api
 
 
       
