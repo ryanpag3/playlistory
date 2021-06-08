@@ -32,11 +32,11 @@ jobs:
         run: yarn install
       - name: run tests
         uses: mattallty/jest-github-action@v1
-        working-directory: ./api
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           test-command: "yarn test"
+          working-directory: "api"
 
 
       
