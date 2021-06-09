@@ -1,6 +1,7 @@
 require('dotenv').config({
-    path: './.env.test'
+    path: '.env.test'
 });
+
 
 import execa from 'execa';
 import logger from './src/util/logger';
@@ -10,7 +11,7 @@ import prisma from './src/util/prisma';
 beforeAll(async () => {
     const stdout = await execa.command('prisma migrate dev')
     logger.debug(stdout);
-})
+}, 10000);
 
 afterEach(async () => {
     for (const {
