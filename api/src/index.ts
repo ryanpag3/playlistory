@@ -4,9 +4,10 @@ import Fastify from 'fastify';
 import setup from './setup';
 import logger from './util/logger';
 
+process.on('SIGTERM', () => process.exit())
+
 export const server = Fastify({});
 const port = process.env.API_PORT || 3000;
-let isInit = false;
 
 const startServer = async () => {
     await setup(server);
@@ -21,9 +22,4 @@ server.ready(err => {
     const address = server.server.address();
     const host = typeof address === 'string' ? address : address?.address;
     logger.info(`API server has been started on port ${port}`);
-    isInit = true;
 });
-
-export const isServerReady = () => {
-    return isInit;
-}

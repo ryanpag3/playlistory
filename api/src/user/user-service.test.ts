@@ -1,3 +1,4 @@
+import logger from '../util/logger';
 import { getRandomString } from '../util/test-helper'
 import { create } from './user-service';
 
@@ -44,7 +45,7 @@ it('should throw an error if an email is already in use.', async () => {
     let username = getRandomString();
     const password = getRandomString();
     const email = getRandomString();
-    await create({
+    const first = await create({
         username,
         password,
         email
