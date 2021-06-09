@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import SwaggerConfig from './constant/openapi';
+import SwaggerConfig from './util/openapi';
 
 
 export default async (server: FastifyInstance) => {

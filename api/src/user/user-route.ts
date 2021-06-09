@@ -1,4 +1,4 @@
-import * as UserController from '../controller/user-controller';
+import * as UserController from './user-controller';
 
 const routes = [
     {

@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import logger from '../util/logger';
-import * as UserService from '../service/user-service';
+import * as UserService from './user-service';
 // import * as AuthService from '../service/auth-service';
 
 /**

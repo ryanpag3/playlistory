@@ -20,7 +20,7 @@ server.ready(err => {
     // TODO: swagger
     const address = server.server.address();
     const host = typeof address === 'string' ? address : address?.address;
-    logger.info(`API server has been started on address ${host} and port ${port}`);
+    logger.info(`API server has been started on port ${port}`);
     isInit = true;
 });
 
