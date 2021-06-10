@@ -1,17 +1,24 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import {
   BrowserRouter as Router,
   Switch,
   Route
 } from 'react-router-dom';
-
+import GlobalStyle from './GlobalStyle';
 import Login from './screens/Login';
+import SignUp from './screens/SignUp';
 
 function App() {
   return (
-    <Router>
-      <Route path="/login" children={<Login/>}/>
-    </Router>
+    <Fragment>
+      <Router>
+        <Switch>
+          <Route path="/login" children={<Login/>}/>
+          <Route path="/sign-up" children={<SignUp/>}/>
+        </Switch>
+      </Router>
+    </Fragment>
+
   );
 }
 
