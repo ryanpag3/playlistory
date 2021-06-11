@@ -14,7 +14,7 @@ function App() {
       <Router>
         <Switch>
           <Route path="/login" children={<Login/>}/>
-          <Route path="/sign-up" children={<SignUp/>}/>
+          <Route path="/" children={<SignUp/>}/>
         </Switch>
       </Router>
     </Fragment>
