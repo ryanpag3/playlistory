@@ -10,9 +10,6 @@ const routes = [
             body: {
                 type: 'object',
                 properties: {
-                    username: {
-                        type: 'string'
-                    },
                     email: {
                         type: 'string'
                     },

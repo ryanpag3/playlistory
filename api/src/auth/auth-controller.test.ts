@@ -5,7 +5,6 @@ it('should sign in successfully', async () => {
         method: 'POST',
         url: '/user',
         payload: {
-            username: 'ryan',
             password: 'ryan',
             email: 'ryan'
         }
@@ -15,7 +14,7 @@ it('should sign in successfully', async () => {
         method: 'POST',
         url: '/sign-in',
         payload: {
-            username: 'ryan',
+            email: 'ryan',
             password: 'ryan'
         }
     });

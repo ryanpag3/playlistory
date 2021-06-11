@@ -12,9 +12,8 @@ generator client {
 
 model User {
   id                  String   @id @default(uuid())
-  username            String   @unique @db.VarChar(25)
-  password            String
   email               String   @unique
+  password            String
   emailConfirmed      Boolean  @default(false)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt

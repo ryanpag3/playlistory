@@ -10,7 +10,7 @@ export const createUser = async (request: FastifyRequest, reply: FastifyReply) =
     try {
         const { body } = request;
         const user = await UserService.create(body as any);
-        const token = AuthService.createJWT(user.username);
+        const token = AuthService.createJWT(user.email);
         reply
             .cookie('playlistory-token', token, { httpOnly: true })
             .send();

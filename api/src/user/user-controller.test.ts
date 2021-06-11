@@ -4,7 +4,6 @@ it('should create a user successfully', async () => {
         method: 'POST',
         url: '/user',
         payload: {
-            username: 'ryan',
             password: 'ryan',
             email: 'ryan'
         }

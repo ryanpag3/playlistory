@@ -3,10 +3,10 @@ import prisma from '../util/prisma';
 import { createJWT, validateJWT, validatePassword } from './auth-service';
 
 it ('should create and validate a valid JWT', async () => {
-    const username = 'ryan';
-    const token = createJWT(username);
-    const resolvedUsername = validateJWT(token);
-    expect(username).toBe(resolvedUsername);
+    const email = 'ryan';
+    const token = createJWT(email);
+    const resolvedEmail = validateJWT(token);
+    expect(email).toBe(resolvedEmail);
 });
 
 it('should throw an error when an invalid JWT is provided', () => {
@@ -15,7 +15,6 @@ it('should throw an error when an invalid JWT is provided', () => {
 
 it('should return true if a valid password', async () => {
     const payload = {
-        username: 'ryan',
         password: 'ryan',
         email: 'ryan'
     }
@@ -26,7 +25,7 @@ it('should return true if a valid password', async () => {
     });
     const user = await prisma.user.findUnique({
         where: {
-            username: payload.username
+            email: payload.email
         }
     });
     // @ts-ignore
