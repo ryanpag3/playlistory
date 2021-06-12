@@ -1,5 +1,7 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components';
+import Button from '../../components/Button';
 import Input from '../../components/Input';
 import colors from '../../constants/colors';
 
@@ -7,16 +9,35 @@ const SignUpForm = () => {
     const [email, setEmail] = useState();
     const [confirmEmail, setConfirmEmail] = useState();
     const [password, setPassword] = useState();
-    const [error, setError] = useState();
+    const [error, setError] = useState(undefined as any);
 
     useEffect(() => {
-        console.log('fuck')
-        if (email !== confirmEmail) {
+        if (email !== confirmEmail && (email && confirmEmail)) {
             setError('Emails must match.' as any);
         } else {
             setError(undefined as any);
         }
-    }, [ email, confirmEmail ]);
+    }, [email, confirmEmail]);
+
+    async function submitSignUp() {
+        try {
+            if (!email) {
+                return setError(`Email is a required field.`);
+            } else if (!confirmEmail) {
+                return setError(`Email confirmation is a required field.`);
+            } else if (!password) {
+                return setError(`Password is a required field.`);
+            }
+
+            const res = await axios.post('/user', {
+                email,
+                password
+            });
+            console.log(res);
+        } catch (e) {
+            console.error(e);
+        }
+    }
 
     return (
         <Container>
@@ -39,11 +60,13 @@ const SignUpForm = () => {
                 type="password"
             />
             <SubmitContainer>
-                <SubmitButton>
-                    Submit
+                <SubmitButton
+                    onClick={submitSignUp}
+                >
+                    Sign Up
                 </SubmitButton>
                 <LoginAnchor>
-                    Login
+                    Login Instead
                 </LoginAnchor>
             </SubmitContainer>
             {
@@ -59,7 +82,6 @@ const Container = styled.div`
     flex-direction: column;
     background-color: ${colors.PRIMARY_ACCENT};
     width: 300px;
-    height: 375px;
     border-radius: 30px;
     align-items: center;
 `;
@@ -76,6 +98,7 @@ const Title = styled.h1`
 
 const StyledInput = styled(Input)`
     margin-top: 10px;
+    width: 80%;
 `;
 
 const EmailInput = styled(StyledInput)`
@@ -96,22 +119,23 @@ const SubmitContainer = styled.div`
     flex-direction: column;
 `;
 
-const SubmitButton = styled.button`
+const SubmitButton = styled(Button)`
     margin-top: 20px;
-    font-size: 16px;
-    padding: 8px;
-    border-radius: 10px;
-    border: none;
     background-color: ${colors.SECONDARY_ACCENT};
-    min-width: 100px;
+    min-width: 125px;
 `;
 
 const LoginAnchor = styled.a`
     margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
 `;
 
-const ErrorMsg = styled.h2`
-    color: red;
+const ErrorMsg = styled.div`
+    color: ${colors.ERROR_RED};
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 14px;
 `;
 
 export default SignUpForm
