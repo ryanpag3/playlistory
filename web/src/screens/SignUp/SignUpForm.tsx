@@ -134,7 +134,7 @@ const SubmitButton = styled(Button)`
 const LoginAnchor = styled.a`
     margin-top: 20px;
     margin-bottom: 20px;
-    font-size: 14px;
+    font-size: 16px;
 `;
 
 const ErrorMsg = styled.div`

@@ -13,6 +13,7 @@ export const createUser = async (request: FastifyRequest, reply: FastifyReply) =
         const token = AuthService.createJWT(user.email);
         reply
             .cookie('playlistory-token', token, { httpOnly: true })
+            .cookie('token-exists', 'true', { httpOnly: false })
             .send();
     } catch (e) {
         if (e.message.toLowerCase().includes('unique constraint')) {
