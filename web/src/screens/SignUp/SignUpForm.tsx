@@ -33,12 +33,11 @@ const SignUpForm = () => {
                 email,
                 password
             });
-            console.log(res.status);
+            
             if (res.status === 200) {
                 console.log('success');
             }
         } catch (e) {
-            console.error(e);
             if (e.response.status === 409) {
                 return setError(`Email already in use.`);
             }
@@ -57,7 +56,7 @@ const SignUpForm = () => {
                 }}
             />
             <ConfirmEmailInput
-                placeholder="confirm email"
+                placeholder="email... again"
                 onChange={(t) => setConfirmEmail(t.target.value)}
             />
             <PasswordInput

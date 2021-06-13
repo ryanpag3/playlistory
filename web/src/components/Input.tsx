@@ -21,6 +21,7 @@ const StyledInput = styled.input`
     padding: 8px;
     padding-left: 12px;
     color: ${colors.DARK};
+    background-color: ${colors.LIGHT};
     outline: none;
 `;
 

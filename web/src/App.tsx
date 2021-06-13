@@ -18,7 +18,6 @@ function App() {
             if (cookies.get(CookieNames.TOKEN_EXISTS)) {
               console.log('hello there');
             } else {
-              console.log(JSON.stringify(cookies.getAll()));
               console.log('noooo!')
             }
             return <SignUp/>;
