@@ -24,4 +24,4 @@ const StyledInput = styled.input`
     outline: none;
 `;
 
-export default Input
+export default Input;

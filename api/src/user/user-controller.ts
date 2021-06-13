@@ -15,7 +15,11 @@ export const createUser = async (request: FastifyRequest, reply: FastifyReply) =
             .cookie('playlistory-token', token, { httpOnly: true })
             .send();
     } catch (e) {
+        if (e.message.toLowerCase().includes('unique constraint')) {
+            reply.code(409).send(`User already exists.`);
+            return;
+        }
         logger.error(`An error occured while creating user.`, e);
-        throw e;
+        reply.code(500).send();
     }
 }
