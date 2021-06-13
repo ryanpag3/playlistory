@@ -4,10 +4,10 @@ import {
   Switch,
   Route
 } from 'react-router-dom';
-import cookiesNames from './constants/cookies-names';
 import Login from './screens/Login';
 import SignUp from './screens/SignUp';
 import cookies from './util/cookies';
+import CookieNames from 'shared/src/CookieNames';
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
       <Router>
         <Switch>
           <Route path="/" render={() => {
-            if (cookies.get(cookiesNames.TOKEN_EXISTS)) {
+            if (cookies.get(CookieNames.TOKEN_EXISTS)) {
               console.log('hello there');
             } else {
               console.log(JSON.stringify(cookies.getAll()));
