@@ -11,7 +11,9 @@ const AccountLink = () => {
             platformName: 'Spotify',
             onClickLink: async () => {
                 const data = await getCredentials();
-                console.log(JSON.stringify(data));
+                // @ts-ignore
+                const oauthUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${data.clientId}&scope=${encodeURIComponent(data.scopes.join(" "))}&redirect_uri=${encodeURIComponent(process.env.REACT_APP_SPOTIFY_REDIRECT_URI)}`;
+                window.open(oauthUrl, 'newWindow', 'height=500,width=300');
             },
             onClickUnlink: async () => {
                 console.log('farty');
