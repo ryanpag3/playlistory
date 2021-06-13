@@ -20,7 +20,7 @@ function App() {
             } else {
               console.log('noooo!')
             }
-            return <SignUpLogin/>;
+            return <SignUpLogin formType="login"/>;
           }}/>
           <Route path="/sign-up" children={<SignUpLogin/>}/>
           <Route path="/login" children={<Login/>}/>

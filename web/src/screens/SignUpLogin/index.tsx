@@ -3,10 +3,12 @@ import styled from 'styled-components';
 import Screen from '../../components/Screen';
 import SignUpLoginForm from './SignUpLoginForm';
 
-const SignUpLogin = () => {
+const SignUpLogin = (props: {
+    formType?: string;
+}) => {
     return (
         <StyledScreen>
-            <SignUpLoginForm/>
+            <SignUpLoginForm { ...props }/>
         </StyledScreen>
     )
 }
