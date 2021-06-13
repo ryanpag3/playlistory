@@ -1,13 +1,17 @@
 require('dotenv').config();
 
 import Fastify from 'fastify';
+import setup from './setup';
 import logger from './util/logger';
 
+
+
 export const server = Fastify({});
-const port = process.env.API_PORT || 3000;
-let isInit = false;
+// we spawn instances of the server for testing, setting to 0 avoids port collissions on concurrency
+const port = process.env.NODE_ENV === 'test' ? 0 : process.env.API_PORT || 3000;
 
 const startServer = async () => {
+    await setup(server);
     await server.listen(port);
 };
 
@@ -18,10 +22,11 @@ server.ready(err => {
     // TODO: swagger
     const address = server.server.address();
     const host = typeof address === 'string' ? address : address?.address;
-    logger.info(`API server has been started on address ${host} and port ${port}`);
-    isInit = true;
+    logger.info(`API server has been started on port ${server.server.address()}`);
 });
 
-export const isServerReady = () => {
-    return isInit;
-}
+process.on('SIGTERM', async () => {
+    logger.info('shutting down');
+    await server.close();
+    process.exit();
+})

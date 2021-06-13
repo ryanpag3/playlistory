@@ -29,19 +29,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '14.x'
-      - name: install dependencies
-        working-directory: ./api
-        run: yarn install
       - name: run tests
-        run: yarn test --json --outputFile=/home/runner/work/_actions/mattallty/jest-github-action/v1/dist/jest.results.json
+        run: |
+          yarn install
+          yarn test
         working-directory: ./api
-      - name: run tests
-        uses: mattallty/jest-github-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          test-command: "echo done"
-          working_directory: ./api
 
 
       
