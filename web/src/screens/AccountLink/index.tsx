@@ -2,17 +2,22 @@ import React from 'react'
 import styled from 'styled-components'
 import Screen from '../../components/Screen';
 import colors from '../../constants/colors';
+import { getCredentials } from '../../util/spotify';
 import AccountBox from './AccountBox';
 
 const AccountLink = () => {
     const Boxes = [
         {
             platformName: 'Spotify',
-            onClick: () => {
-
+            onClickLink: async () => {
+                const data = await getCredentials();
+                console.log(JSON.stringify(data));
+            },
+            onClickUnlink: async () => {
+                console.log('farty');
             }
         }
-    ]
+    ];
 
     return (
         <StyledScreen>
@@ -22,7 +27,7 @@ const AccountLink = () => {
             </InfoContainer>
             <AccountBoxContainer>
                 {
-                    Boxes.map(b => <AccountBox { ...b }/>)
+                    Boxes.map(b => <AccountBox key={b.platformName} { ...b }/>)
                 }
             </AccountBoxContainer>
             <ComingSoonMsg>

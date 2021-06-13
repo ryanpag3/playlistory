@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import logger from '../util/logger';
 import prisma from '../util/prisma';
-import { createJWT, validatePassword } from './auth-service';
+import { createJWT, parseEmailFromJWT, validatePassword } from './auth-service';
 
 export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
     const { body: { email, password }}: any = request;
@@ -24,4 +24,22 @@ export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
     }
     const token = createJWT(user.email);
     reply.cookie('playlistory-token', token, { httpOnly: true }).send();
+}
+
+export const verifyJWT = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        const email = await parseEmailFromJWT(request);
+        const user = await prisma.user.findUnique({
+            where: {
+                email
+            }
+        });
+        if (!user) throw new Error(`User not found.`);
+        // @ts-ignore
+        request.user = user;
+        logger.debug(`${user.email} validated successfully.`);
+    } catch (e) {
+        logger.error(e);
+        reply.code(500).send();
+    }
 }

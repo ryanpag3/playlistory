@@ -6,7 +6,8 @@ import colors from '../../constants/colors';
 
 const AccountBox = (props: {
     platformName: string;
-    onClick: () => void;
+    onClickLink: () => void;
+    onClickUnlink: () => void;
 }) => {
     const [isLinked, setIsLinked] = useState(false);
 
@@ -19,6 +20,14 @@ const AccountBox = (props: {
         }
     }
 
+    function onClick() {
+        if (isLinked) {
+            return props.onClickUnlink();
+        } else {
+            return props.onClickLink();
+        }
+    }
+
     return (
         <Container>
             <IconContainer>
@@ -27,7 +36,9 @@ const AccountBox = (props: {
             <PlatformName>
                 {props.platformName}
             </PlatformName>
-            <LinkingButton>
+            <LinkingButton
+                onClick={onClick}
+            >
                 { isLinked ? `Unlink` : `Link` }
             </LinkingButton>
         </Container>
@@ -43,6 +54,7 @@ const Container = styled.div`
     width: 10em;
     height: 12em;
     border-radius: 1em;
+    padding: .5em;
 `;
 
 const IconContainer = styled.div`
@@ -60,8 +72,8 @@ const PlatformName = styled.div`
 
 const LinkingButton = styled(Button)`
     background-color: ${colors.PRIMARY_ACCENT};
-    padding-left: 2em;
-    padding-right: 2em;
+    padding-left: 2.5em;
+    padding-right: 2.5em;
     margin-bottom: .5em;
     font-weight: bold;
 `;
