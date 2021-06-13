@@ -5,7 +5,7 @@ import {
   Route
 } from 'react-router-dom';
 import Login from './screens/Login';
-import SignUp from './screens/SignUp';
+import SignUpLogin from './screens/SignUpLogin';
 import cookies from './util/cookies';
 import CookieNames from 'shared/src/CookieNames';
 
@@ -20,9 +20,9 @@ function App() {
             } else {
               console.log('noooo!')
             }
-            return <SignUp/>;
+            return <SignUpLogin/>;
           }}/>
-          <Route path="/sign-up" children={<SignUp/>}/>
+          <Route path="/sign-up" children={<SignUpLogin/>}/>
           <Route path="/login" children={<Login/>}/>
         </Switch>
       </Router>

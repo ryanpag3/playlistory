@@ -5,7 +5,10 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import colors from '../../constants/colors';
 
-const SignUpForm = () => {
+const SignUpLoginForm = (props: {
+    formType?: string;
+}) => {
+    const [formType, setFormType] = useState(props.formType || 'sign-up');
     const [email, setEmail] = useState();
     const [confirmEmail, setConfirmEmail] = useState();
     const [password, setPassword] = useState();
@@ -18,6 +21,14 @@ const SignUpForm = () => {
             setError(undefined as any);
         }
     }, [email, confirmEmail]);
+
+    async function submit() {
+        if (formType === 'sign-up') {
+            return submitSignUp();
+        } else {
+            return submitLogin();
+        }
+    }
 
     async function submitSignUp() {
         try {
@@ -33,7 +44,7 @@ const SignUpForm = () => {
                 email,
                 password
             });
-            
+
             if (res.status === 200) {
                 console.log('success');
             }
@@ -41,6 +52,38 @@ const SignUpForm = () => {
             if (e.response.status === 409) {
                 return setError(`Email already in use.`);
             }
+        }
+    }
+
+    async function submitLogin() {
+        try {
+            if (!email) {
+                return setError(`Email is a required field.`);
+            } else if (!password) {
+                return setError(`Password is a required field.`);
+            }
+
+            const res = await axios.post('/sign-in', {
+                email,
+                password
+            });
+
+            if (res.status === 200) {
+                console.log('success');
+            }
+        } catch (e) {
+            if (e.response.status === 409) {
+                return setError(`Email already in use.`);
+            }
+            console.error(e);
+        }
+    }
+
+    function toggleFormType() {
+        if (formType === 'sign-up') {
+            setFormType('login');
+        } else {
+            setFormType('sign-up');
         }
     }
 
@@ -55,10 +98,13 @@ const SignUpForm = () => {
                     setEmail(t.target.value);
                 }}
             />
-            <ConfirmEmailInput
-                placeholder="email... again"
-                onChange={(t) => setConfirmEmail(t.target.value)}
-            />
+            {
+                formType === 'sign-up' &&
+                <ConfirmEmailInput
+                    placeholder="email... again"
+                    onChange={(t) => setConfirmEmail(t.target.value)}
+                />
+            }
             <PasswordInput
                 placeholder="password"
                 onChange={(t) => setPassword(t.target.value)}
@@ -66,12 +112,14 @@ const SignUpForm = () => {
             />
             <SubmitContainer>
                 <SubmitButton
-                    onClick={submitSignUp}
+                    onClick={submit}
                 >
-                    Sign Up
+                    {formType === 'sign-up' ? `Sign Up` : `Login`}
                 </SubmitButton>
-                <LoginAnchor>
-                    Login Instead
+                <LoginAnchor
+                    onClick={toggleFormType}
+                >
+                    {formType === 'sign-up' ? `Login Instead` : `Sign-In Instead`}
                 </LoginAnchor>
             </SubmitContainer>
             {
@@ -143,4 +191,4 @@ const ErrorMsg = styled.div`
     font-size: 14px;
 `;
 
-export default SignUpForm
+export default SignUpLoginForm

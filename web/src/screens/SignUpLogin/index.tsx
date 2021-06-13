@@ -1,13 +1,12 @@
 import React from 'react'
 import styled from 'styled-components';
-
 import Screen from '../../components/Screen';
-import SignUpForm from './SignUpForm';
+import SignUpLoginForm from './SignUpLoginForm';
 
-const SignUp = () => {
+const SignUpLogin = () => {
     return (
         <StyledScreen>
-            <SignUpForm/>
+            <SignUpLoginForm/>
         </StyledScreen>
     )
 }
@@ -17,4 +16,4 @@ const StyledScreen = styled(Screen)`
     justify-content: center;
 `;
 
-export default SignUp
+export default SignUpLogin
