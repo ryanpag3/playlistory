@@ -21,7 +21,9 @@ const AccountBox = (props: {
 
     return (
         <Container>
-            <Icon/>
+            <IconContainer>
+                <Icon/>
+            </IconContainer>
             <PlatformName>
                 {props.platformName}
             </PlatformName>
@@ -34,18 +36,34 @@ const AccountBox = (props: {
 
 const Container = styled.div`
     display: flex;
+    align-items: center;
+    justify-content: center;
     flex-direction: column;
-    background-color: ${colors.LIGHT};
+    background-color: ${colors.MEDIUM};
+    width: 10em;
+    height: 12em;
+    border-radius: 1em;
+`;
+
+const IconContainer = styled.div`
+    flex-grow: 1;
+    padding-top: .3em;
 `;
 
 const SpotifyIcon = styled(FaSpotify)`
-
+    font-size: 6em;
 `;
 
-const PlatformName = styled.div``;
+const PlatformName = styled.div`
+    padding: .5em;
+`;
 
 const LinkingButton = styled(Button)`
-
+    background-color: ${colors.PRIMARY_ACCENT};
+    padding-left: 2em;
+    padding-right: 2em;
+    margin-bottom: .5em;
+    font-weight: bold;
 `;
 
 export default AccountBox;

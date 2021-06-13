@@ -25,6 +25,9 @@ const AccountLink = () => {
                     Boxes.map(b => <AccountBox { ...b }/>)
                 }
             </AccountBoxContainer>
+            <ComingSoonMsg>
+                More services coming soon...
+            </ComingSoonMsg>
         </StyledScreen>
     )
 }
@@ -51,6 +54,15 @@ const PageDescription = styled.div`
 
 const AccountBoxContainer = styled.div`
     display: flex;
+    padding-top: 2em;
+`;
+
+const ComingSoonMsg = styled.div`
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a7a7a7;
 `;
 
 export default AccountLink
