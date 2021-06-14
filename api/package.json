@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "watch": "tsnd src/index.ts",
-    "test": "jest --forceExit --runInBand",
+    "test": "jest --forceExit --runInBand --coverage",
     "migrate": "npx prisma migrate dev"
   },
   "dependencies": {
