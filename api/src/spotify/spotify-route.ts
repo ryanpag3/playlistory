@@ -24,6 +24,25 @@ const routes = [
             // @ts-ignore
             server.validateJWT
         ])
+    },
+    {
+        method: 'POST',
+        url: '/spotify',
+        schema: {
+            description: 'Finalize Spotify user authentication & authorization.',
+            response: {
+                200: {
+                    type: 'string',
+                    description: 'success'
+                }
+            }
+        },
+        handler: SpotifyController.finalizeAuth,
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ])
     }
 ];
 

@@ -23,7 +23,7 @@ const AccountLink = () => {
                     if (w.closed) {
                         clearInterval(timer);
                         console.log('closed');
-                        // check authentication status
+                        // redirect to dashboard
                     }
                 }, 250);
             },

@@ -1,5 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import logger from '../util/logger'
+import prisma from '../util/prisma';
+import SpotifyApi from '../util/spotify-api';
 
 export const getCredentials = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
@@ -17,6 +19,27 @@ export const getCredentials = async (request: FastifyRequest, reply: FastifyRepl
                 'playlist-modify-public'
             ]
         }, null, 4));
+    } catch (e) {
+        logger.error(e);
+        reply.code(500).send();
+    }
+}
+
+export const finalizeAuth = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        const res = await SpotifyApi.exchangeAuthCodes(request.body.token);
+        const user = await prisma.user.update({
+            where: {
+                // @ts-ignore
+                email: request.user.email
+            },
+            data: {
+                spotifyRefreshToken: res.refreshToken
+            }
+        });
+        logger.debug(user);
+        reply.code(200).send();
     } catch (e) {
         logger.error(e);
         reply.code(500).send();
