@@ -7,6 +7,7 @@ import colors from '../../constants/colors';
 import { useQuery } from '../../util/query';
 import { getCredentials } from '../../util/spotify';
 import AccountBox from './AccountBox';
+import NavBar from '../../components/NavBar';
 
 const AccountLink = () => {
     const query = useQuery();
@@ -49,6 +50,7 @@ const AccountLink = () => {
 
     return (
         <StyledScreen>
+            <NavBar/>
             <InfoContainer>
                 <PageTitle>Link Accounts</PageTitle>
                 <PageDescription>You must link a music account to use Playlistory.</PageDescription>
