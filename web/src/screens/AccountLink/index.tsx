@@ -1,4 +1,5 @@
 import React from 'react'
+import { Redirect, useHistory } from 'react-router';
 import styled from 'styled-components'
 import Screen from '../../components/Screen';
 import colors from '../../constants/colors';
@@ -8,6 +9,7 @@ import AccountBox from './AccountBox';
 
 const AccountLink = () => {
     const query = useQuery();
+    const history = useHistory();
 
     console.log(query);
 
@@ -24,6 +26,7 @@ const AccountLink = () => {
                         clearInterval(timer);
                         console.log('closed');
                         // redirect to dashboard
+                        history.push('/');
                     }
                 }, 250);
             },
