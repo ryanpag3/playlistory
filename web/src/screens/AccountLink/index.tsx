@@ -8,6 +8,7 @@ import { useQuery } from '../../util/query';
 import { getCredentials } from '../../util/spotify';
 import AccountBox from './AccountBox';
 import NavBar from '../../components/NavBar';
+import axios from 'axios';
 
 const AccountLink = () => {
     const query = useQuery();
@@ -43,7 +44,12 @@ const AccountLink = () => {
                 }, 250);
             },
             onClickUnlink: async () => {
-                console.log('farty');
+                try {
+                    const res = await axios.delete(`/spotify`);
+                    Boxes[0].isLinked = false;
+                } catch (e) {
+                    // noop
+                }
             }
         }
     ];

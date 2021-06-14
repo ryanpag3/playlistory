@@ -30,7 +30,7 @@ export const finalizeAuth = async (request: FastifyRequest, reply: FastifyReply)
     try {
         // @ts-ignore
         const res = await SpotifyApi.exchangeAuthCodes(request.body.token);
-        const user = await prisma.user.update({
+        await prisma.user.update({
             where: {
                 // @ts-ignore
                 email: request.user.email
@@ -39,7 +39,6 @@ export const finalizeAuth = async (request: FastifyRequest, reply: FastifyReply)
                 spotifyRefreshToken: res.refreshToken
             }
         });
-        logger.debug(user);
         reply.code(200).send();
     } catch (e) {
         logger.error(e);
@@ -53,6 +52,26 @@ export const isAuthenticated = async (request: FastifyRequest, reply: FastifyRep
         const { user } = request;
         const spotifyApi = new SpotifyApi(user.spotifyRefreshToken);
         await spotifyApi.getMe();
+        reply.code(200).send(true);
+    } catch (e) {
+        logger.error(e);
+        reply.code(500).send();
+    }
+}
+
+export const logoutSpotifyUser = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        const { user } = request;
+        await prisma.user.update({
+            where: {
+                email: user.email
+            },
+            data: {
+                spotifyRefreshToken: null
+            }
+        });
+        logger.debug(`Spotify account removed from user ${user.email}`);
         reply.code(200).send(true);
     } catch (e) {
         logger.error(e);

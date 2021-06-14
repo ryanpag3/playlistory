@@ -45,6 +45,25 @@ const routes = [
         ])
     },
     {
+        method: 'DELETE',
+        url: '/spotify',
+        schema: {
+            description: 'De-authenticate a spotify user.',
+            response: {
+                200: {
+                    type: 'boolean',
+                    descript: 'User has been de-authenticated.'
+                }
+            }
+        },
+        handler: SpotifyController.logoutSpotifyUser,
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ])
+    },
+    {
         method: 'GET',
         url: '/spotify/is-auth',
         schema: {
