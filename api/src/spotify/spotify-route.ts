@@ -43,6 +43,25 @@ const routes = [
             // @ts-ignore
             server.validateJWT
         ])
+    },
+    {
+        method: 'GET',
+        url: '/spotify/is-auth',
+        schema: {
+            description: 'Get if user is authenticated with Spotify.',
+            response: {
+                200: {
+                    type: 'boolean',
+                    description: 'User is authenticated.'
+                }
+            }
+        },
+        handler: SpotifyController.isAuthenticated,
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ])
     }
 ];
 

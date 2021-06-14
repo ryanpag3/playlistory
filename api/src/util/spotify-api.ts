@@ -1,5 +1,6 @@
 import axios from 'axios';
 import moment from 'moment';
+import logger from './logger';
 
 export default class SpotifyApi {
     private refreshToken: string;
@@ -52,6 +53,12 @@ export default class SpotifyApi {
         };
     }
 
+    getAuthHeader() {
+        return {
+            Authorization: 'Bearer ' + this.accessToken,
+        };
+    }
+
     async refreshAccessToken() {
         const { data } = await axios(
             `https://accounts.spotify.com/api/token`,
@@ -71,6 +78,21 @@ export default class SpotifyApi {
         expiresOn.add(data.expires_in, 'seconds');
         this.accessToken = data.access_token;
         this.expiresOn = expiresOn;
+    }
+
+    async getMe() {
+        await this.refreshAccessToken();
+        const { data } = await axios(
+            `https://api.spotify.com/v1/me`,
+            {
+                method: 'GET',
+                headers: {
+                    ...this.getAuthHeader()
+                }
+            }
+        );
+
+        return data;
     }
 }
 

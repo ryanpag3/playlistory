@@ -16,7 +16,8 @@ export const getCredentials = async (request: FastifyRequest, reply: FastifyRepl
                 'playlist-read-private',
                 'playlist-modify-private',
                 'playlist-modify-private',
-                'playlist-modify-public'
+                'playlist-modify-public',
+                'user-read-private'
             ]
         }, null, 4));
     } catch (e) {
@@ -40,6 +41,19 @@ export const finalizeAuth = async (request: FastifyRequest, reply: FastifyReply)
         });
         logger.debug(user);
         reply.code(200).send();
+    } catch (e) {
+        logger.error(e);
+        reply.code(500).send();
+    }
+}
+
+export const isAuthenticated = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        const { user } = request;
+        const spotifyApi = new SpotifyApi(user.spotifyRefreshToken);
+        await spotifyApi.getMe();
+        reply.code(200).send(true);
     } catch (e) {
         logger.error(e);
         reply.code(500).send();

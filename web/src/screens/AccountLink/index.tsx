@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Redirect, useHistory } from 'react-router';
+import useAxios from 'axios-hooks';
 import styled from 'styled-components'
 import Screen from '../../components/Screen';
 import colors from '../../constants/colors';
@@ -10,12 +11,22 @@ import AccountBox from './AccountBox';
 const AccountLink = () => {
     const query = useQuery();
     const history = useHistory();
+    const [spotifyIsAuthReq, refetch] = useAxios({
+        url: '/spotify/is-auth',
+        method: 'GET'
+    });
 
-    console.log(query);
+    useEffect(() => {
+        console.log(spotifyIsAuthReq.loading);
+        console.log(spotifyIsAuthReq.data);
+        console.log(spotifyIsAuthReq.error);
+    }, [spotifyIsAuthReq])
 
     const Boxes = [
         {
             platformName: 'Spotify',
+            isLinked: spotifyIsAuthReq.data === true ? true : false,
+            isLoading: spotifyIsAuthReq.loading === true ? true : false,
             onClickLink: async () => {
                 const data = await getCredentials();
                 // @ts-ignore

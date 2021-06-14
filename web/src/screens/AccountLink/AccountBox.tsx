@@ -1,20 +1,27 @@
-import React, { useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { FaSpotify } from 'react-icons/fa';
 import styled from 'styled-components';
+import { CircularProgress } from '@material-ui/core';
 import Button from '../../components/Button';
 import colors from '../../constants/colors';
 
 const AccountBox = (props: {
     platformName: string;
+    isLinked: boolean;
+    isLoading: boolean;
     onClickLink: () => Promise<void>;
     onClickUnlink: () => Promise<void>;
 }) => {
-    const [isLinked, setIsLinked] = useState(false);
+    const [isLinked, setIsLinked] = useState(props.isLinked);
+
+    useEffect(() => {
+        setIsLinked(props.isLinked);
+    }, [props.isLinked])
 
     function Icon() {
-        switch(props.platformName.toLowerCase()) {
+        switch (props.platformName.toLowerCase()) {
             case 'spotify':
-                return <SpotifyIcon/>;
+                return <SpotifyIcon />;
             default:
                 return null;
         }
@@ -35,7 +42,7 @@ const AccountBox = (props: {
     return (
         <Container>
             <IconContainer>
-                <Icon/>
+                <Icon />
             </IconContainer>
             <PlatformName>
                 {props.platformName}
@@ -43,7 +50,13 @@ const AccountBox = (props: {
             <LinkingButton
                 onClick={onClick}
             >
-                { isLinked ? `Unlink` : `Link` }
+                {
+                    props.isLoading ?
+                        <StyledProgress size={25}/> :
+                        <Fragment>
+                            {(isLinked) ? `Unlink` : `Link`}
+                        </Fragment>
+                }
             </LinkingButton>
         </Container>
     )
@@ -80,6 +93,10 @@ const LinkingButton = styled(Button)`
     padding-right: 2.5em;
     margin-bottom: .5em;
     font-weight: bold;
+    min-width: 9em;
+    min-height: 3em;
 `;
+
+const StyledProgress = styled(CircularProgress)``;
 
 export default AccountBox;

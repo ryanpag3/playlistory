@@ -1,11 +1,17 @@
 import React from 'react'
+import styled from 'styled-components'
+import Screen from '../../components/Screen'
 
 const Home = () => {
     return (
-        <div>
+        <StyledScreen>
             Home
-        </div>
+        </StyledScreen>
     )
-}
+};
 
-export default Home
+const StyledScreen = styled(Screen)`
+
+`;
+
+export default Home;
