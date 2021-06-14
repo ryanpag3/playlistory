@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import { FaSpotify } from 'react-icons/fa';
 import styled from 'styled-components';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress, Card } from '@material-ui/core';
 import Button from '../../components/Button';
 import colors from '../../constants/colors';
 
@@ -40,7 +40,7 @@ const AccountBox = (props: {
     }
 
     return (
-        <Container>
+        <Container raised={true} variant="outlined">
             <IconContainer>
                 <Icon />
             </IconContainer>
@@ -62,7 +62,7 @@ const AccountBox = (props: {
     )
 }
 
-const Container = styled.div`
+const Container = styled(Card)`
     display: flex;
     align-items: center;
     justify-content: center;
