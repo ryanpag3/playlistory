@@ -9,12 +9,14 @@ import SignUpLogin from './screens/SignUpLogin';
 import cookies from './util/cookies';
 import CookieNames from 'shared/src/CookieNames';
 import AccountLink from './screens/AccountLink';
+import SpotifyRedirect from './screens/SpotifyRedirect';
 
 function App() {
   return (
     <Fragment>
       <Router>
         <Switch>
+          <Route path="/spotify" children={<SpotifyRedirect/>}/>
           <Route path="/sign-up" children={<SignUpLogin/>}/>
           <Route path="/login" children={<Login/>}/>
           <Route path="/accounts" children={<AccountLink/>}/>

@@ -6,8 +6,8 @@ import colors from '../../constants/colors';
 
 const AccountBox = (props: {
     platformName: string;
-    onClickLink: () => void;
-    onClickUnlink: () => void;
+    onClickLink: () => Promise<void>;
+    onClickUnlink: () => Promise<void>;
 }) => {
     const [isLinked, setIsLinked] = useState(false);
 
@@ -20,11 +20,15 @@ const AccountBox = (props: {
         }
     }
 
-    function onClick() {
+    async function onClick() {
         if (isLinked) {
-            return props.onClickUnlink();
+            const res = await props.onClickUnlink();
+            setIsLinked(false);
+            return res;
         } else {
-            return props.onClickLink();
+            const res = await props.onClickLink();
+            setIsLinked(true);
+            return res;
         }
     }
 

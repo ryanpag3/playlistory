@@ -2,10 +2,15 @@ import React from 'react'
 import styled from 'styled-components'
 import Screen from '../../components/Screen';
 import colors from '../../constants/colors';
+import { useQuery } from '../../util/query';
 import { getCredentials } from '../../util/spotify';
 import AccountBox from './AccountBox';
 
 const AccountLink = () => {
+    const query = useQuery();
+
+    console.log(query);
+
     const Boxes = [
         {
             platformName: 'Spotify',
@@ -13,7 +18,14 @@ const AccountLink = () => {
                 const data = await getCredentials();
                 // @ts-ignore
                 const oauthUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${data.clientId}&scope=${encodeURIComponent(data.scopes.join(" "))}&redirect_uri=${encodeURIComponent(process.env.REACT_APP_SPOTIFY_REDIRECT_URI)}`;
-                window.open(oauthUrl, 'newWindow', 'height=500,width=300');
+                const w: any = window.open(oauthUrl, 'newWindow', 'height=500,width=300');
+                const timer = setInterval(() => {
+                    if (w.closed) {
+                        clearInterval(timer);
+                        console.log('closed');
+                        // check authentication status
+                    }
+                }, 250);
             },
             onClickUnlink: async () => {
                 console.log('farty');
@@ -29,7 +41,7 @@ const AccountLink = () => {
             </InfoContainer>
             <AccountBoxContainer>
                 {
-                    Boxes.map(b => <AccountBox key={b.platformName} { ...b }/>)
+                    Boxes.map(b => <AccountBox key={b.platformName} {...b} />)
                 }
             </AccountBoxContainer>
             <ComingSoonMsg>
