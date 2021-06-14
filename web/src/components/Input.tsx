@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react'
 import styled from 'styled-components';
+import { TextField } from '@material-ui/core';
 import colors from '../constants/colors';
 
 const Input = (props: {
@@ -9,20 +10,23 @@ const Input = (props: {
 }) => {
     return (
         <Fragment>
-            <StyledInput {...props }/>
+            <StyledInput {...props } label={props.placeholder}/>
         </Fragment>
     )
 }
 
-const StyledInput = styled.input`
+const StyledInput = styled(TextField)`
     border: none;
-    border-radius: 20px;
+    /* border-radius: 20px; */
     font-size: 16px;
-    padding: 8px;
-    padding-left: 12px;
-    color: ${colors.DARK};
-    background-color: ${colors.LIGHT};
-    outline: none;
+
+    .MuiInput-root {
+        color: white;
+    }
+
+    .MuiInput-underline {
+        border-bottom: 2px solid white;
+    }
 `;
 
 export default Input;

@@ -1,10 +1,12 @@
-require('dotenv').config();
+const dotenv = require('dotenv');
+dotenv.config();
+dotenv.config({
+    path: '.env.private'
+});
 
 import Fastify from 'fastify';
 import setup from './setup';
 import logger from './util/logger';
-
-
 
 export const server = Fastify({});
 // we spawn instances of the server for testing, setting to 0 avoids port collissions on concurrency

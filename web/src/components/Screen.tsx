@@ -18,4 +18,4 @@ const Container = styled.div`
     background-color: ${colors.DARK};
 `;
 
-export default Screen
+export default Screen;

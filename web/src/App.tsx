@@ -8,22 +8,26 @@ import Login from './screens/Login';
 import SignUpLogin from './screens/SignUpLogin';
 import cookies from './util/cookies';
 import CookieNames from 'shared/src/CookieNames';
+import AccountLink from './screens/AccountLink';
+import SpotifyRedirect from './screens/SpotifyRedirect';
+import Home from './screens/Home';
 
 function App() {
   return (
     <Fragment>
       <Router>
         <Switch>
+          <Route path="/spotify" children={<SpotifyRedirect/>}/>
+          <Route path="/sign-up" children={<SignUpLogin formType="sign-up"/>}/>
+          <Route path="/login" children={<SignUpLogin formType="login"/>}/>
+          <Route path="/accounts" children={<AccountLink/>}/>
           <Route path="/" render={() => {
             if (cookies.get(CookieNames.TOKEN_EXISTS)) {
-              console.log('hello there');
+              return <Home/>
             } else {
-              console.log('noooo!')
+              return <SignUpLogin formType="login"/>;
             }
-            return <SignUpLogin formType="login"/>;
           }}/>
-          <Route path="/sign-up" children={<SignUpLogin/>}/>
-          <Route path="/login" children={<Login/>}/>
         </Switch>
       </Router>
     </Fragment>
