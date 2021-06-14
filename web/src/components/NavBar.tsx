@@ -4,6 +4,7 @@ import { AppBar, IconButton, Link, List, ListItem, ListItemText, SwipeableDrawer
 import { FaBars } from 'react-icons/fa';
 import colors from '../constants/colors';
 import { useHistory } from 'react-router';
+import axios from 'axios';
 
 const NavBar = () => {
     const history = useHistory();
@@ -19,6 +20,15 @@ const NavBar = () => {
             return;
         }
         history.push(path);
+    }
+
+    async function logout() {
+        try {
+            await axios.post('/logout');
+            history.replace('/login');
+        } catch (e) {
+            // noop
+        }
     }
 
     return (
@@ -53,7 +63,7 @@ const NavBar = () => {
                                 </StyledListItemText>
                             </ListItem>
                             <ListItem button
-                                onClick={() => navToRoute('/')}
+                                onClick={() => logout()}
                             >
                                 <StyledListItemText>
                                     Sign Out

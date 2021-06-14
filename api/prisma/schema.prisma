@@ -11,11 +11,21 @@ generator client {
 }
 
 model User {
-  id                  String   @id @default(uuid())
-  email               String   @unique
-  password            String
-  emailConfirmed      Boolean  @default(false)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  spotifyRefreshToken String?
+  id                    String                  @id @default(uuid())
+  email                 String                  @unique
+  password              String
+  emailConfirmed        Boolean                 @default(false)
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  spotifyRefreshToken   String?
+  JsonWebTokenBlacklist JsonWebTokenBlacklist[]
+}
+
+model JsonWebTokenBlacklist {
+  id          String @id @default(uuid())
+  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdById String
+  token       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
