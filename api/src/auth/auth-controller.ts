@@ -1,4 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
+import CookieNames from 'shared/src/CookieNames';
 import logger from '../util/logger';
 import prisma from '../util/prisma';
 import { createJWT, parseEmailFromJWT, validatePassword } from './auth-service';
@@ -32,12 +33,34 @@ export const verifyJWT = async (request: FastifyRequest, reply: FastifyReply) =>
         const user = await prisma.user.findUnique({
             where: {
                 email
+            },
+            include: {
+                JsonWebTokenBlacklist: { }
             }
         });
         if (!user) throw new Error(`User not found.`);
         // @ts-ignore
         request.user = user;
+        logger.debug(user);
         logger.debug(`${user.email} validated successfully.`);
+    } catch (e) {
+        logger.error(e);
+        reply.code(401).send();
+    }
+}
+
+export const logout = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        const token = request.cookies[CookieNames.PLAYLISTORY_TOKEN];
+        await prisma.jsonWebTokenBlacklist.create({
+            data: {
+                token,
+                // @ts-ignore
+                createdById: request.user.id
+            }
+        });
+        reply.clearCookie(CookieNames.PLAYLISTORY_TOKEN);
+        reply.code(200).send();
     } catch (e) {
         logger.error(e);
         reply.code(500).send();

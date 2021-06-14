@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -8,6 +9,7 @@ import colors from '../../constants/colors';
 const SignUpLoginForm = (props: {
     formType?: string;
 }) => {
+    const history = useHistory();
     const [formType, setFormType] = useState(props.formType || 'sign-up');
     const [email, setEmail] = useState();
     const [confirmEmail, setConfirmEmail] = useState();
@@ -69,7 +71,7 @@ const SignUpLoginForm = (props: {
             });
 
             if (res.status === 200) {
-                console.log('success');
+                history.push('/');
             }
         } catch (e) {
             if (e.response.status === 409) {

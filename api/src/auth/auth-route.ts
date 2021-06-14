@@ -1,3 +1,4 @@
+import { server } from '..';
 import * as AuthController from './auth-controller';
 
 const routes = [
@@ -26,6 +27,25 @@ const routes = [
             }
         },
         handler: AuthController.signIn
+    },
+    {
+        method: 'POST',
+        url: '/logout',
+        schema: {
+            description: 'Log out of the user session.',
+            response: {
+                200: {
+                    type: 'boolean',
+                    description: 'User was logged out.'
+                }
+            }
+        },
+        handler: AuthController.logout,
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ])
     }
 ];
 

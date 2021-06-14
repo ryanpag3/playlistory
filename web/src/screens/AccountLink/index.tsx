@@ -9,6 +9,7 @@ import { getCredentials } from '../../util/spotify';
 import AccountBox from './AccountBox';
 import NavBar from '../../components/NavBar';
 import axios from 'axios';
+import { handleError } from '../../util/axios-error-handler';
 
 const AccountLink = () => {
     const query = useQuery();
@@ -23,6 +24,12 @@ const AccountLink = () => {
         console.log(spotifyIsAuthReq.data);
         console.log(spotifyIsAuthReq.error);
     }, [spotifyIsAuthReq])
+
+    useEffect(() => {
+        if (!spotifyIsAuthReq.error)
+            return;
+        handleError(history, spotifyIsAuthReq.error);
+    }, [spotifyIsAuthReq.error]);
 
     const Boxes = [
         {

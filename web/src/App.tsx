@@ -4,7 +4,6 @@ import {
   Switch,
   Route
 } from 'react-router-dom';
-import Login from './screens/Login';
 import SignUpLogin from './screens/SignUpLogin';
 import cookies from './util/cookies';
 import CookieNames from 'shared/src/CookieNames';
