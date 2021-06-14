@@ -1,6 +1,7 @@
 import axios from 'axios';
 import moment from 'moment';
 import logger from './logger';
+import { GetMyPlaylistsResult, Me } from './spotify-api-types';
 
 export default class SpotifyApi {
     private refreshToken: string;
@@ -80,7 +81,7 @@ export default class SpotifyApi {
         this.expiresOn = expiresOn;
     }
 
-    async getMe() {
+    async getMe(): Promise<Me> {
         await this.refreshAccessToken();
         const { data } = await axios(
             `https://api.spotify.com/v1/me`,
@@ -92,6 +93,24 @@ export default class SpotifyApi {
             }
         );
 
+        return data;
+    }
+
+    async getMyPlaylists(offset: number = 0, limit: number = 50): Promise<GetMyPlaylistsResult> {
+        await this.refreshAccessToken();
+        const { data } = await axios(
+            `https://api.spotify.com/v1/me/playlists`,
+            {
+                method: 'GET',
+                headers: {
+                    ...this.getAuthHeader()
+                },
+                params: {
+                    offset,
+                    limit
+                }
+            }
+        );
         return data;
     }
 }

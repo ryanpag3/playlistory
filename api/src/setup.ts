@@ -22,8 +22,8 @@ export default async (server: FastifyInstance) => {
     });
 
     /* AUTH */
-    await server.register(require('fastify-auth'));
     server.decorate('validateJWT', AuthController.verifyJWT);
+    await server.register(require('fastify-auth'));
 
     // this must be called locally to ensure the server instance is properly decorated
     const routes = require('./route').default;
