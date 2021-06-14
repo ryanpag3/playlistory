@@ -41,7 +41,6 @@ export const verifyJWT = async (request: FastifyRequest, reply: FastifyReply) =>
         if (!user) throw new Error(`User not found.`);
         // @ts-ignore
         request.user = user;
-        logger.debug(user);
         logger.debug(`${user.email} validated successfully.`);
     } catch (e) {
         logger.error(e);
