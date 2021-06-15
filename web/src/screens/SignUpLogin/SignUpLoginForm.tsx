@@ -71,6 +71,7 @@ const SignUpLoginForm = (props: {
             });
 
             if (res.status === 200) {
+                console.log('we gucci');
                 history.push('/');
             }
         } catch (e) {

@@ -24,7 +24,8 @@ export const signIn = async (request: FastifyRequest, reply: FastifyReply) => {
         return reply.code(401).send(invalidMsg);
     }
     const token = createJWT(user.email);
-    reply.cookie('playlistory-token', token, { httpOnly: true }).send();
+    reply.cookie(CookieNames.TOKEN_EXISTS, 'true', { httpOnly: false });
+    reply.cookie(CookieNames.PLAYLISTORY_TOKEN, token, { httpOnly: true }).send();
 }
 
 export const verifyJWT = async (request: FastifyRequest, reply: FastifyReply) => {
