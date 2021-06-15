@@ -54,6 +54,17 @@ const PlaylistList = (props: any) => {
                 loader={<h4>loading...</h4>}
             >
                 <ChildContainer>
+                    <ListHeader>
+                        <NameText>
+                            Playlist Name
+                        </NameText>
+                        <TotalTracks>
+                            Total Tracks
+                        </TotalTracks>
+                        <LastBackupText>
+                            Last Backed Up
+                        </LastBackupText>
+                    </ListHeader>
                     {loadedData.map((d: any, index: number) => <PlaylistRow key={index} { ...d }/>)}
                 </ChildContainer>
             </InfiniteScroll>
@@ -67,8 +78,38 @@ const Container = styled.div`
 `;
 
 const ChildContainer = styled.div`
-    min-width: 50vw;
+    min-width: 700px;
+    max-width: 50vw;
     flex-grow: 1;
+`;
+
+const ListHeader = styled.div`
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    background-color: ${colors.SECONDARY_ACCENT};
+    border-bottom: 2px solid ${colors.DARK};
+`;
+
+const ListHeaderText = styled.div`
+    font-weight: bold;
+    padding-bottom: .2em;
+    padding-top: .2em;
+`;
+
+const NameText = styled(ListHeaderText)`
+    padding-left: 3.5em;
+    min-width: 50%;
+`;
+
+const TotalTracks = styled(ListHeaderText)`
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+`;
+
+const LastBackupText = styled(ListHeaderText)`
+    padding-right: 3.5em;
 `;
 
 export default PlaylistList
