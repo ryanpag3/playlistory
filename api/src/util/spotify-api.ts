@@ -97,6 +97,7 @@ export default class SpotifyApi {
     }
 
     async getMyPlaylists(offset: number = 0, limit: number = 50): Promise<GetMyPlaylistsResult> {
+        logger.info(`offset ${offset} limit ${limit}`);
         await this.refreshAccessToken();
         const { data } = await axios(
             `https://api.spotify.com/v1/me/playlists`,

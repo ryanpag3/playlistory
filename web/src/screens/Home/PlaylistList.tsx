@@ -23,7 +23,8 @@ const PlaylistList = (props: any) => {
     const history = useHistory();
 
     useEffect(() => {
-        if (data === undefined || data.length === undefined)
+        if (data === undefined || 
+                data.length === undefined)
             return;
 
         if (data.length === 0) {
@@ -33,7 +34,11 @@ const PlaylistList = (props: any) => {
         }
 
         setLoadedData([...loadedData, ...data] as any);
-    }, [offset, data]);
+    }, [data]);
+
+    useEffect(() => {
+        console.log(`loaded data is now ${loadedData.length}`);
+    }, [ loadedData ]);
 
     async function navToPlaylistPage(playlist: any) {
         console.log(`/playlist/${playlist.id}`)
