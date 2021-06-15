@@ -4,10 +4,19 @@ import React, { Fragment } from 'react'
 import styled from 'styled-components';
 import { FaEllipsisH } from 'react-icons/fa';
 import colors from '../../constants/colors';
+import { useHistory } from 'react-router-dom';
 
 const PlaylistRow = (props: any) => {
+    const history = useHistory();
+    
+    function goToPlaylistScreen() {
+        history.push(`/playlist/${props.id}`, { ...props });
+    }
+
     return (
-        <ParentContainer>
+        <ParentContainer
+            onClick={goToPlaylistScreen}
+        >
             <Container>
                 <ImageContainer>
                     <Image src={props.imageUrl} />
@@ -27,7 +36,6 @@ const PlaylistRow = (props: any) => {
                     </MenuButton>
                 </MenuContainer>
             </Container>
-            {/* <StyledDivider /> */}
         </ParentContainer>
     )
 }
