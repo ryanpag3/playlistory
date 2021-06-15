@@ -10,6 +10,7 @@ const PlaylistList = (props: any) => {
     const limit = 50;
     const [offset, setOffset] = useState(0);
     const [loadedData, setLoadedData] = useState([]);
+    const [hasMore, setHasMore] = useState(true);
     const [{ data, loading, error }, refetch] = useAxios({
         url: '/me/playlists',
         method: 'GET',
@@ -22,8 +23,15 @@ const PlaylistList = (props: any) => {
     const history = useHistory();
 
     useEffect(() => {
-        if (!data || !data.length)
+        if (data === undefined || data.length === undefined)
             return;
+
+        if (data.length === 0) {
+            console.log('setting hasMore to false');
+            setHasMore(false);
+            return;
+        }
+
         setLoadedData([...loadedData, ...data] as any);
     }, [offset, data]);
 
@@ -42,7 +50,7 @@ const PlaylistList = (props: any) => {
             <InfiniteScroll
                 dataLength={loadedData.length}
                 next={fetchMoreData}
-                hasMore={true}
+                hasMore={hasMore}
                 loader={<h4>loading...</h4>}
             >
                 <ChildContainer>
