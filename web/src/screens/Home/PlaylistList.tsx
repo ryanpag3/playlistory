@@ -88,13 +88,13 @@ const ListHeader = styled.div`
     flex-direction: row;
     width: 100%;
     background-color: ${colors.SECONDARY_ACCENT};
-    border-bottom: 2px solid ${colors.DARK};
+    border-bottom: .3em solid ${colors.MEDIUM};
 `;
 
 const ListHeaderText = styled.div`
     font-weight: bold;
-    padding-bottom: .2em;
-    padding-top: .2em;
+    padding-bottom: .3em;
+    padding-top: .3em;
 `;
 
 const NameText = styled(ListHeaderText)`

@@ -58,6 +58,8 @@ const Container = styled.div`
 
 const ImageContainer = styled.div`
     padding-left: .5em;
+    display: flex;
+    justify-content: center;
 `;
 
 const Image = styled.img`
