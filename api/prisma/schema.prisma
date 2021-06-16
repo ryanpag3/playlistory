@@ -38,7 +38,8 @@ model JsonWebTokenBlacklist {
 
 model Backup {
   id          String   @id @default(uuid())
-  manifest    Json
+  name        String
+  manifest    Json?
   createdBy   User     @relation(fields: [createdById], references: [id])
   createdById String
   playlist    Playlist @relation(fields: [playlistId], references: [id])
