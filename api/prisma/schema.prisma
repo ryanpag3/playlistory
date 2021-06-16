@@ -10,6 +10,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum Platform {
+  SPOTIFY
+}
+
 model User {
   id                    String                  @id @default(uuid())
   email                 String                  @unique
@@ -19,13 +23,43 @@ model User {
   updatedAt             DateTime                @updatedAt
   spotifyRefreshToken   String?
   JsonWebTokenBlacklist JsonWebTokenBlacklist[]
+  backups               Backup[]
+  playlists             Playlist[]
 }
 
 model JsonWebTokenBlacklist {
-  id          String @id @default(uuid())
-  createdBy   User   @relation(fields: [createdById], references: [id])
+  id          String   @id @default(uuid())
+  createdBy   User     @relation(fields: [createdById], references: [id])
   createdById String
   token       String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Backup {
+  id          String   @id @default(uuid())
+  manifest    Json
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById String
+  playlist    Playlist @relation(fields: [playlistId], references: [id])
+  playlistId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Playlist {
+  id          String   @id @default(uuid())
+  platform    Platform
+  playlistId  String
+  name        String?
+  description String
+  imageUrl    String?
+  contentHash String
+  followers   Int
+  trackIds    Json
+  backup      Backup?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById String
 }
