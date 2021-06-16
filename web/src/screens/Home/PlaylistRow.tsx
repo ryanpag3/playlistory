@@ -45,6 +45,7 @@ const ParentContainer = styled.div`
     flex-direction: column;
     width: 100%;
     margin-bottom: .25em;
+    cursor: pointer;
 `;
 
 const Container = styled.div`
@@ -54,6 +55,11 @@ const Container = styled.div`
     padding-bottom: .1em;
     background-color: ${colors.LIGHT};
     width: 100%;
+
+    &:hover {
+        background-color: ${colors.MEDIUM};
+        /* color: white; */
+    }
 `;
 
 const ImageContainer = styled.div`
@@ -117,6 +123,7 @@ const MenuButton = styled(Button)`
 
 const MenuIcon = styled(FaEllipsisH)`
     font-size: 20px;
+    color: ${colors.MEDIUM_DARK};
 `;
 
 const StyledDivider = styled(Divider)`
