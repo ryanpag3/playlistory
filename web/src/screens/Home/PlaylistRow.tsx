@@ -72,6 +72,7 @@ const Image = styled.img`
     width: 2.5em;
     height: 2.5em;
     border-radius: 1.5em;
+    object-fit: cover;
 `;
 
 const NameContainer = styled.div`

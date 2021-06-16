@@ -28,6 +28,7 @@ const getMySpotifyPlaylists = async (user: User, offset: number = 0, limit: numb
 const getNormalSpotifyMyPlaylistResult = (result: GetMyPlaylistsResult): Playlist[] => {
     return result.items.map(item => {
         return {
+            platform: Platforms.SPOTIFY,
             id: item.id,
             name: item.name,
             description: item.description,
