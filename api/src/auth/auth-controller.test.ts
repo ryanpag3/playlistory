@@ -1,4 +1,4 @@
-import { server } from '..';
+import { server } from '../index';
 
 it('should sign in successfully', async () => {
     let response = await server.inject({

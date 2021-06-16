@@ -1,4 +1,4 @@
-import { server } from '..';
+import { server } from '../index';
 it('should create a user successfully', async () => {
     const response = await server.inject({
         method: 'POST',

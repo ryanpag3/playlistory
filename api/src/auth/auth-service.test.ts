@@ -1,4 +1,4 @@
-import { server } from '..';
+import { server } from '../index';
 import prisma from '../util/prisma';
 import { createJWT, validateJWT, validatePassword } from './auth-service';
 

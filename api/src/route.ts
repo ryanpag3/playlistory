@@ -12,7 +12,7 @@ fs
     return fs.readdirSync(fullpath)
         .filter((file: string) => file.endsWith('route.ts'))
         .forEach((file: string) => {
-            logger.info(`including routes from ${file}`);
+            logger.debug(`including routes from ${file}`);
             routes = [...routes, ...require(path.join(fullpath, file)).default ]
         })
 });

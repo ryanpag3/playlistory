@@ -1,5 +1,5 @@
 import * as MusicController from './music-controller';
-import { server } from '..';
+import { server } from '../index';
 
 const routes = [
     {

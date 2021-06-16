@@ -1,5 +1,5 @@
+import { server } from '../index';
 import * as BackupController from './backup-controller';
-import { server } from '..';
 
 const routes = [
     {
@@ -29,7 +29,7 @@ const routes = [
         // @ts-ignore
         preHandler: server.auth([
             // @ts-ignore
-            server.verifyJWT
+            server.validateJWT
         ]),
         handler: BackupController.backup
     },
