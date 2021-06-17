@@ -8,7 +8,7 @@ export const createBackup = async (user: User, opts: {
     playlistName: string;
     playlistDescription: string;
     contentHash: string;
-    trackIds: string[];
+    tracks: string[];
     followers: number;
     imageUrl: string;
     createdById: string;
@@ -22,7 +22,7 @@ export const createBackup = async (user: User, opts: {
             imageUrl: opts.imageUrl,
             contentHash: opts.contentHash,
             followers: opts.followers,
-            trackIds: opts.trackIds,
+            tracks: opts.tracks,
             createdById: user.id
         }
     })
@@ -45,6 +45,9 @@ export const getMostRecentBackup = async (playlistId: string) => {
             playlist: {
                 playlistId
             }
+        },
+        include: {
+            playlist: true
         },
         orderBy: [
             {

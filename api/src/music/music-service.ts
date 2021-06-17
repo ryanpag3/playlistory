@@ -1,8 +1,8 @@
-import { User } from '@prisma/client';
+import { Platform, User } from '@prisma/client';
 import Platforms from 'shared/src/Platforms';
 import logger from '../util/logger';
 import SpotifyApi from '../util/spotify-api';
-import { GetMyPlaylistsResult } from '../util/spotify-api-types';
+import { GetMyPlaylistsResult, SpotifyPlaylist } from '../util/spotify-api-types';
 import { Playlist } from './music-types';
 
 export const getMyPlaylists = async (user: User, offset: number = 0, limit: number = 50, platform: string): Promise<Playlist[]> => {
@@ -47,3 +47,37 @@ const getNormalSpotifyMyPlaylistResult = (result: GetMyPlaylistsResult): Playlis
         }
     });
 }
+
+export const getPlaylist = async (user: User, platform: Platform, id: string) => {
+    let playlist;
+    switch (platform) {
+        case Platform.SPOTIFY:
+            const spotifyApi = new SpotifyApi(user.spotifyRefreshToken);
+            playlist = normalizeSpotifyPlaylist(await spotifyApi.getPlaylistAndTracks(id))
+            break;
+    }
+    return playlist;
+}
+
+const normalizeSpotifyPlaylist = (spotifyPlaylist: SpotifyPlaylist): Playlist => {
+    return {
+        platform: Platforms.SPOTIFY,
+        id: spotifyPlaylist.id,
+        name: spotifyPlaylist.name,
+        description: spotifyPlaylist.description,
+        url: spotifyPlaylist.external_urls.spotify,
+        uri: spotifyPlaylist.uri,
+        imageUrl: spotifyPlaylist.images[0]?.url,
+        owner: {
+            id: spotifyPlaylist.owner.id,
+            name: spotifyPlaylist.owner.display_name as any
+        },
+        snapshotId: spotifyPlaylist.snapshot_id,
+        tracks: {
+            items: spotifyPlaylist.tracks.items as any,
+            total: spotifyPlaylist.tracks.total
+        },
+        followers: spotifyPlaylist.followers.total
+    }
+}
+

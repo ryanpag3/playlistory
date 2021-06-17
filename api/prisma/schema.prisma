@@ -56,8 +56,8 @@ model Playlist {
   description String
   imageUrl    String?
   contentHash String
-  followers   Int
-  trackIds    Json
+  followers   Int?
+  tracks      Json
   backup      Backup?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

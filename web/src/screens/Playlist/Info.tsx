@@ -3,9 +3,20 @@ import styled from 'styled-components';
 import { IoMdPerson } from 'react-icons/io';
 import { Button } from '@material-ui/core';
 import colors from '../../constants/colors';
+import axios from 'axios';
 
 const Info = (props: any) => {
     console.log(props)
+
+    async function submitBackup() {
+        const res = await axios.post('/backup', {
+            playlistId: props.id,
+            backupName: 'hello there',
+            platform: props.platform
+        });
+        console.log(res);
+    }
+
     return (
         <Container>
 
@@ -29,7 +40,9 @@ const Info = (props: any) => {
                         <OwnerIcon/>
                         <Owner>{props.owner?.name}</Owner>
                     </OwnerContainer>
-                    <BackupButton>
+                    <BackupButton
+                        onClick={submitBackup}
+                    >
                         Backup
                     </BackupButton>
                 </Row>
