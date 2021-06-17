@@ -16,7 +16,7 @@ it('should create a backup', async () => {
         playlistName: '1',
         playlistDescription: '1',
         contentHash: '1',
-        trackIds: ['1'],
+        tracks: ['1'],
         followers: 1,
         createdById: user.id
     });
@@ -37,7 +37,7 @@ it('should get the most recent backup', async () => {
         playlistName: '1',
         playlistDescription: '1',
         contentHash: '1',
-        trackIds: ['1'],
+        tracks: ['1'],
         followers: 1,
         createdById: user.id
     });
@@ -49,7 +49,7 @@ it('should get the most recent backup', async () => {
         playlistName: '1',
         playlistDescription: '1',
         contentHash: '1',
-        trackIds: ['1'],
+        tracks: ['1'],
         followers: 1,
         createdById: user.id
     });
