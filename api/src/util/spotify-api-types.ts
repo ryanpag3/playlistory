@@ -128,11 +128,11 @@ export interface Item {
     added_by:        Owner;
     is_local:        boolean;
     primary_color:   null;
-    track:           Track;
+    track:           SpotifyTrack;
     video_thumbnail: VideoThumbnail;
 }
 
-export interface Track {
+export interface SpotifyTrack {
     album:             Album;
     artists:           Owner[];
     available_markets: string[];

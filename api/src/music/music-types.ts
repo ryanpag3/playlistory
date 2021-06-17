@@ -17,3 +17,17 @@ export interface Playlist {
     };
     followers?: number;
 }
+
+export interface Track {
+    platform: string;
+    id: string;
+    name: string;
+    artists: {
+        id: string;
+        name: string;
+        uri: string;
+        url: string;
+    }[];
+    uri: string;
+    url: string;
+}

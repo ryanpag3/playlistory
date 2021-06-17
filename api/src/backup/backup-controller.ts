@@ -26,8 +26,8 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
             followers: playlist.followers as any,
             tracks: playlist.tracks.items.map(i => {
                 return {
-                    id: i.track.id,
-                    uri: i.track.uri
+                    id: i.id,
+                    uri: i.uri
                 }
             }),
             // @ts-ignore

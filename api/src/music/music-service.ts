@@ -2,8 +2,8 @@ import { Platform, User } from '@prisma/client';
 import Platforms from 'shared/src/Platforms';
 import logger from '../util/logger';
 import SpotifyApi from '../util/spotify-api';
-import { GetMyPlaylistsResult, SpotifyPlaylist } from '../util/spotify-api-types';
-import { Playlist } from './music-types';
+import { GetMyPlaylistsResult, SpotifyPlaylist, SpotifyTrack } from '../util/spotify-api-types';
+import { Playlist, Track } from './music-types';
 
 export const getMyPlaylists = async (user: User, offset: number = 0, limit: number = 50, platform: string): Promise<Playlist[]> => {
     let result;
@@ -74,10 +74,29 @@ const normalizeSpotifyPlaylist = (spotifyPlaylist: SpotifyPlaylist): Playlist =>
         },
         snapshotId: spotifyPlaylist.snapshot_id,
         tracks: {
-            items: spotifyPlaylist.tracks.items as any,
+            // @ts-ignore
+            items: spotifyPlaylist.tracks.items.map(i => normalizeSpotifyTrack(i.track)),
             total: spotifyPlaylist.tracks.total
         },
         followers: spotifyPlaylist.followers.total
+    }
+}
+
+const normalizeSpotifyTrack = (sTrack: SpotifyTrack): Track => {
+    return {
+        platform: Platforms.SPOTIFY,
+        id: sTrack.id,
+        name: sTrack.name,
+        artists: sTrack.artists.map(a => {
+            return {
+                id: a.id as any,
+                name: a.display_name as any || a.name as any,
+                uri: a.uri as any,
+                url: a.external_urls.spotify as any,
+            }
+        }),
+        uri: sTrack.uri,
+        url: sTrack.external_urls.spotify
     }
 }
 
