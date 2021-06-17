@@ -15,40 +15,25 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
         // @ts-ignore
         const playlist = await MusicService.getPlaylist(request.user, platform, playlistId);
 
-        const cachedPlaylist = await prisma.playlist.create({
-            data :{
-                playlistId: playlist.id,
-                name: playlist.name,
-                description: playlist.description,
-                imageUrl: playlist.imageUrl,
-                contentHash: playlist.snapshotId,
-                followers: playlist.followers,
-                tracks: playlist.tracks.items.map(i => {
-                    return {
-                        id: i.track.id,
-                        uri: i.track.uri
-                    }
-                }),
-                // @ts-ignore
-                platform: Platforms.SPOTIFY,
-                // @ts-ignore
-                createdById: request.user.id
-            },
-            include: {
-                createdBy: true
-            }
-        });
-
-        let currentBackup = await prisma.backup.create({
-            data: {
-                name: backupName,
-                // @ts-ignore
-                createdById: request.user.id,
-                playlistId: cachedPlaylist.id,
-            },
-            include: {
-                playlist: true
-            }
+        // @ts-ignore
+        let currentBackup = await BackupService.createBackup(request.user, {
+            name: backupName,
+            playlistId: playlist.id,
+            playlistName: playlist.name,
+            playlistDescription: playlist.description,
+            imageUrl: playlist.imageUrl as any,
+            contentHash: playlist.snapshotId,
+            followers: playlist.followers as any,
+            tracks: playlist.tracks.items.map(i => {
+                return {
+                    id: i.track.id,
+                    uri: i.track.uri
+                }
+            }),
+            // @ts-ignore
+            platform: Platforms.SPOTIFY,
+            // @ts-ignore
+            createdById: request.user.id
         });
 
         if (mostRecentBackup?.playlist.contentHash === currentBackup.playlist.contentHash) {
@@ -56,28 +41,9 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
             return reply.send(JSON.stringify(currentBackup));
         }
 
-        // @ts-ignore
-        const diffAdded = currentBackup.playlist.tracks.filter(x => !mostRecentBackup?.playlist.tracks.includes(x));
+        const withManifest = await BackupService.generateManifest(mostRecentBackup, currentBackup);
 
-        // @ts-ignore
-        const diffRemoved = mostRecentBackup?.playlist.tracks.filter(x => !currentBackup.playlist.tracks.includes(x));
-
-        currentBackup = await prisma.backup.update({
-            where: {
-                id: currentBackup.id
-            },
-            data: {
-                manifest: {
-                    added: diffAdded,
-                    removed: diffRemoved
-                }
-            },
-            include: {
-                playlist: true
-            }
-        });
-
-        reply.send(JSON.stringify(currentBackup));
+        reply.send(JSON.stringify(withManifest));
     } catch (e) {
         logger.error(e);
         reply.code(500).send();
