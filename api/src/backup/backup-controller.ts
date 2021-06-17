@@ -6,14 +6,19 @@ import * as BackupService from './backup-service';
 import * as MusicService from '../music/music-service';
 import prisma from '../util/prisma';
 import Platforms from '../../../shared/src/Platforms';
+import { delay } from 'bluebird';
 
 export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
         // @ts-ignore
         const { playlistId, backupName, platform } = request.body;
+        
         const mostRecentBackup = await BackupService.getMostRecentBackup(playlistId);
         // @ts-ignore
         const playlist = await MusicService.getPlaylist(request.user, platform, playlistId);
+
+        if (!playlist)
+            throw new Error(`Playlist not found.`);
 
         // @ts-ignore
         let currentBackup = await BackupService.createBackup(request.user, {
@@ -46,6 +51,8 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
         reply.send(JSON.stringify(withManifest));
     } catch (e) {
         logger.error(e);
+        console.log(e);
+        await delay(2000);
         reply.code(500).send();
     }
 }

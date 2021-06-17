@@ -55,6 +55,8 @@ export const getPlaylist = async (user: User, platform: Platform, id: string) =>
             const spotifyApi = new SpotifyApi(user.spotifyRefreshToken);
             playlist = normalizeSpotifyPlaylist(await spotifyApi.getPlaylistAndTracks(id))
             break;
+        default:
+            throw new Error(`Valid platform not found.`);
     }
     return playlist;
 }
