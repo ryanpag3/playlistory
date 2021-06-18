@@ -22,7 +22,7 @@ export interface Track {
     platform: string;
     id: string;
     name: string;
-    artists: {
+    artists?: {
         id: string;
         name: string;
         uri: string;

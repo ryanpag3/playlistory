@@ -1,12 +1,8 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { Playlist } from '@prisma/client';
 import logger from '../util/logger';
-import SpotifyApi from '../util/spotify-api';
 import * as BackupService from './backup-service';
 import * as MusicService from '../music/music-service';
-import prisma from '../util/prisma';
 import Platforms from '../../../shared/src/Platforms';
-import { delay } from 'bluebird';
 
 export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
@@ -51,8 +47,16 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
         reply.send(JSON.stringify(withManifest));
     } catch (e) {
         logger.error(e);
-        console.log(e);
-        await delay(2000);
+        reply.code(500).send();
+    }
+}
+
+export const getBackups = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        return BackupService.getBackups(request.user, request.params.playlistId);
+    } catch (e) {
+        logger.error(e);
         reply.code(500).send();
     }
 }

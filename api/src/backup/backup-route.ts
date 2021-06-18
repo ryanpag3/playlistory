@@ -33,31 +33,31 @@ const routes = [
         ]),
         handler: BackupController.backup
     },
-    // {
-    //     method: 'GET',
-    //     url: '/backup',
-    //     schema: {
-    //         description: 'Get a list of backups for a particular id.',
-    //         querystring: {
-    //             id: {
-    //                 type: 'string',
-    //                 description: 'ID of the entity the backup was created for.'
-    //             }
-    //         },
-    //         response: {
-    //             200: {
-    //                 type: 'object',
-    //                 description: 'An array of backups.'
-    //             }
-    //         }
-    //     },
-    //     // @ts-ignore
-    //     preHandler: server.auth([
-    //         // @ts-ignore
-    //         server.verifyJWT
-    //     ]),
-    //     handler: BackupController.getBackups
-    // },
+    {
+        method: 'GET',
+        url: '/backup',
+        schema: {
+            description: 'Get a list of backups for a particular id.',
+            querystring: {
+                id: {
+                    type: 'string',
+                    description: 'ID of the entity the backup was created for.'
+                }
+            },
+            response: {
+                200: {
+                    type: 'object',
+                    description: 'An array of backups.'
+                }
+            }
+        },
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ]),
+        handler: BackupController.getBackups
+    },
     // {
     //     method: 'POST',
     //     url: '/backup/revert/added',

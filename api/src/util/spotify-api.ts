@@ -154,5 +154,19 @@ export default class SpotifyApi {
         )
         return data.items;
     }
+
+    async getTracks(ids: string[]) {
+        await this.refreshAccessToken();
+        const { data } = await axios(`https://api.spotify.com/v1/tracks`, {
+            method: 'GET',
+            headers: {
+                ...this.getAuthHeader()
+            },
+            params: {
+                ids: ids.join(',')
+            }
+        });
+        return data.tracks;
+    }
 }
 
