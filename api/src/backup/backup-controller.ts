@@ -54,7 +54,8 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
 export const getBackups = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
         // @ts-ignore
-        return BackupService.getBackups(request.user, request.params.playlistId);
+        const backups = await BackupService.getBackups(request.user, request.params.id);
+        reply.send(JSON.stringify(backups));
     } catch (e) {
         logger.error(e);
         reply.code(500).send();

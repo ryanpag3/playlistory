@@ -1,9 +1,9 @@
 import { Backup, Platform, Playlist, User } from '@prisma/client';
 import { chunk } from '../util/array';
-import { getNormSpotifyPlaylist } from '../util/normalizer';
+import logger from '../util/logger';
+import { getNormSpotifyTrack } from '../util/normalizer';
 import prisma from '../util/prisma';
 import SpotifyApi from '../util/spotify-api';
-import { backup } from './backup-controller';
 
 export const createBackup = async (user: User, opts: {
     platform: string;
@@ -96,8 +96,10 @@ export const getMostRecentBackup = async (playlistId: string) => {
 export const getBackups = async (user: User, playlistId: string) => {
     const backups = await prisma.backup.findMany({
         where: {
-            playlistId,
-            createdBy: user
+            playlist: {
+                id: playlistId
+            },
+            createdById: user.id
         },
         orderBy: {
             createdAt: 'desc'
@@ -127,25 +129,29 @@ const resolveManifest = async (user: User, platform: string|Platform, manifest: 
 }
 
 const resolveManifestSpotify = async (user: User, manifest: any) => {
+    logger.debug(`resolving spotify manifest`);
     // lets query as one to save API calls
-    let trackIds = [...manifest.added, ...manifest.removed];
+    let trackIds = [...(manifest.added || []), ...(manifest.removed || [])];
 
     if (trackIds.length === 0)
         return manifest;
-    
+
     const spotifyApi = new SpotifyApi(user.spotifyRefreshToken);
     const chunks = chunk(trackIds, 50);
     let tracks: any[] = [];
     for (const chunk of chunks) {
-        tracks = [...tracks, ...await spotifyApi.getTracks(chunk)];
+        const newTracks = await await spotifyApi.getTracks(chunk.map(c => c.id));
+        tracks = [...tracks, ...newTracks];
     }
 
-    for (let i = 0; i < manifest.added.length; i++) {
-        manifest.added[i] = getNormSpotifyPlaylist(tracks.filter((t: any) => t.id === manifest.added[i])[0]);
+    logger.debug(`${tracks.length} tracks to resolve.`);
+
+    for (let i = 0; i < (manifest.added?.length || 0); i++) {
+        manifest.added[i] = getNormSpotifyTrack(tracks.filter((t: any) => t.id === manifest.added[i].id)[0]);
     }
 
-    for (let i = 0; i < manifest.removed.length; i++) {
-        manifest.removed[i] = getNormSpotifyPlaylist(tracks.filter((t: any) => t.id === manifest.removed[i])[0]);
+    for (let i = 0; i < (manifest.removed?.length || 0); i++) {
+        manifest.removed[i] = getNormSpotifyTrack(tracks.filter((t: any) => t.id === manifest.removed[i].id)[0]);
     }
 
     return manifest;

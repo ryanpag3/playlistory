@@ -6,6 +6,7 @@ import InnerContainer from '../../components/InnerContainer';
 import NavBar from '../../components/NavBar';
 import Screen from '../../components/Screen';
 import colors from '../../constants/colors';
+import BackupList from './BackupList';
 import Info from './Info';
 
 const Playlist = (props: any) => {
@@ -18,6 +19,7 @@ const Playlist = (props: any) => {
             <StyledInnerContainer>
                 <Info { ...state }/>
                 <StyledDivider/>
+                <BackupList/>
             </StyledInnerContainer>
         </StyledScreen>
     )
