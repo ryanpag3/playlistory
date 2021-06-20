@@ -11,6 +11,7 @@
     "@types/node": "^12.0.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "@types/styled-components": "^5.1.10",
     "axios": "^0.21.1",
     "axios-hooks": "^2.6.3",
     "moment": "^2.29.1",
@@ -28,7 +29,7 @@
   },
   "scripts": {
     "start": "PORT=8080 BROWSER=none react-scripts start",
-    "build": "react-scripts build",
+    "build": "npx react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

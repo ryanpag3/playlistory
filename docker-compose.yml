@@ -4,3 +4,11 @@ services:
     build:
       context: ./api
     image: ryanpage/playlistory-api
+    ports:
+      - 3000:3000
+  web:
+    build:
+      context: ./web
+    image: ryanpage/playlistory-web
+    ports:
+      - 80:80

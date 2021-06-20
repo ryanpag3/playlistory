@@ -1,6 +1,7 @@
 {
   "private": true,
-  "devDependencies": {
+  "devDependencies": {},
+  "dependencies": {
     "@types/styled-components": "^5.1.10"
   }
 }
