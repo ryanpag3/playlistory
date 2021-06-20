@@ -16,6 +16,10 @@ const BackupList = (props: any) => {
         }
     });
 
+    useEffect(() => {
+        refetch();
+    }, [props.refresh]);
+
     return (
         <Container>
             <HeaderContainer>
@@ -42,7 +46,7 @@ const BackupList = (props: any) => {
                 hasMore={false}
                 loader={<div></div>}
             >
-                {data && data.map((d: any) => <BackupListRow {...d }/>)}
+                {(!data || !data.length) ? <NoBackupsCont>No backups created yet :(</NoBackupsCont> : data.map((d: any) => <BackupListRow {...d }/>)}
             </InfiniteScroll>
         </Container>
     )
@@ -91,6 +95,14 @@ const NameContainer = styled(HeaderSectionCont)`
 
 const TracksContainer = styled(HeaderSectionCont)`
     margin-right: 3em;
+`;
+
+const NoBackupsCont = styled.div`
+    width: 100%;
+    display: flex;
+    padding-top: 3em;
+    align-items: center;
+    justify-content: center;
 `;
 
 export default BackupList

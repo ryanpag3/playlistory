@@ -1,5 +1,5 @@
-import { Divider } from '@material-ui/core';
-import React from 'react'
+import { Divider, setRef } from '@material-ui/core';
+import React, { useRef, useState } from 'react'
 import { useHistory, useLocation, useParams } from 'react-router';
 import styled from 'styled-components';
 import InnerContainer from '../../components/InnerContainer';
@@ -11,15 +11,19 @@ import Info from './Info';
 
 const Playlist = (props: any) => {
     const { state } = useLocation();
-    const params = useParams();
+    const [refresh, setRefresh] = useState(0);
+
+    function triggerRefetch() {
+        setRefresh(refresh+1);
+    }
 
     return (
         <StyledScreen>
             <NavBar/>
             <StyledInnerContainer>
-                <Info { ...state }/>
+                <Info { ...state } triggerRefetch={triggerRefetch}/>
                 <StyledDivider/>
-                <BackupList { ...state }/>
+                <BackupList { ...state } refresh={refresh}/>
             </StyledInnerContainer>
         </StyledScreen>
     )

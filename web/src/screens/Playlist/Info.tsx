@@ -7,13 +7,13 @@ import axios from 'axios';
 
 const Info = (props: any) => {
     const [modalOpened, setModalOpened] = useState(false);
-    console.log(props)
 
     async function submitBackup() {
         await axios.post('/backup', {
             playlistId: props.id,
             platform: props.platform
         });
+        props.triggerRefetch();
         setModalOpened(false);
     }
 
