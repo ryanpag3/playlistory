@@ -10,7 +10,7 @@ fs
 .forEach((directory) => {
     const fullpath = path.join(__dirname, directory.name);
     return fs.readdirSync(fullpath)
-        .filter((file: string) => file.endsWith('route.ts'))
+        .filter((file: string) => (file.endsWith('route.ts') || file.endsWith('route.js')))
         .forEach((file: string) => {
             logger.debug(`including routes from ${file}`);
             routes = [...routes, ...require(path.join(fullpath, file)).default ]

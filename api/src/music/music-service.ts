@@ -1,6 +1,5 @@
 import { Platform, User } from '@prisma/client';
-import Platforms from 'shared/src/Platforms';
-import logger from '../util/logger';
+import Platforms from '../util/Platforms';
 import prisma from '../util/prisma';
 import SpotifyApi from '../util/spotify-api';
 import { GetMyPlaylistsResult, SpotifyPlaylist, SpotifyTrack } from '../util/spotify-api-types';

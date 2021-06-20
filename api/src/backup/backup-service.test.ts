@@ -1,5 +1,5 @@
 import { delay } from 'bluebird';
-import Platforms from '../../../shared/src/Platforms';
+import Platforms from '../util/Platforms';
 import { create } from '../user/user-service'
 import logger from '../util/logger';
 import { getRandomString } from '../util/test-helper';

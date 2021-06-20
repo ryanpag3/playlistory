@@ -1,0 +1,8 @@
+version: "3"
+services:
+  api:
+    build:
+      context: ./api
+    image: ryanpage/playlistory-api
+    env_file: ./api/.env.private
+    # entrypoint: tail -F /dev/null
