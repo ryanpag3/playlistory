@@ -1,14 +1,14 @@
 import axios from 'axios';
 import moment from 'moment';
 import logger from './logger';
-import { GetMyPlaylistsResult, Me } from './spotify-api-types';
+import { GetMyPlaylistsResult, Item, Me, SpotifyPlaylist } from './spotify-api-types';
 
 export default class SpotifyApi {
-    private refreshToken: string;
+    private refreshToken: string|null;
     private accessToken?: string;
     private expiresOn?: moment.Moment;
 
-    constructor(refreshToken: string, accessToken?: string) {
+    constructor(refreshToken: string|null, accessToken?: string) {
         this.refreshToken = refreshToken;
         this.accessToken = accessToken;
     }
@@ -97,7 +97,6 @@ export default class SpotifyApi {
     }
 
     async getMyPlaylists(offset: number = 0, limit: number = 50): Promise<GetMyPlaylistsResult> {
-        logger.info(`offset ${offset} limit ${limit}`);
         await this.refreshAccessToken();
         const { data } = await axios(
             `https://api.spotify.com/v1/me/playlists`,
@@ -113,6 +112,61 @@ export default class SpotifyApi {
             }
         );
         return data;
+    }
+
+    async getPlaylistAndTracks(id: string) {
+        await this.refreshAccessToken();
+        const { data }: {
+            data: SpotifyPlaylist;
+        } = await axios(
+            `https://api.spotify.com/v1/playlists/${id}`,
+            {
+                headers: {
+                    ...this.getAuthHeader()
+                }
+            }
+        );
+    
+        let offset = 0;
+        const limit = 100;
+        let tracks: any = [];
+        while (offset < data.tracks.total) {
+            tracks = [...tracks, ...await this.getPlaylistTracks(id, offset, limit)];
+            offset += limit;
+        }
+        data.tracks.items = tracks;
+        return data;
+    }
+
+    async getPlaylistTracks(id: string, offset: number = 0, limit: number = 100): Promise<Item[]> {
+        await this.refreshAccessToken();
+        const { data } = await axios(
+            `https://api.spotify.com/v1/playlists/${id}/tracks`,
+            {
+                headers: {
+                    ...this.getAuthHeader()
+                },
+                params: {
+                    offset,
+                    limit
+                }
+            }
+        )
+        return data.items;
+    }
+
+    async getTracks(ids: string[]) {
+        await this.refreshAccessToken();
+        const { data } = await axios(`https://api.spotify.com/v1/tracks`, {
+            method: 'GET',
+            headers: {
+                ...this.getAuthHeader()
+            },
+            params: {
+                ids: ids.join(',')
+            }
+        });
+        return data.tracks;
     }
 }
 

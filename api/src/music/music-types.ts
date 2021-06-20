@@ -1,4 +1,5 @@
 export interface Playlist {
+    platform: string;
     id: string;
     name: string;
     description: string;
@@ -13,5 +14,20 @@ export interface Playlist {
     tracks: {
         items: [any],
         total: number
-    }
+    };
+    followers?: number;
+}
+
+export interface Track {
+    platform: string;
+    id: string;
+    name: string;
+    artists?: {
+        id: string;
+        name: string;
+        uri: string;
+        url: string;
+    }[];
+    uri: string;
+    url: string;
 }

@@ -1,4 +1,4 @@
-import { server } from '..';
+import { server } from '../index';
 import * as SpotifyController from './spotify-controller';
 
 const routes = [

@@ -1,4 +1,4 @@
-import { server } from '..';
+import { server } from '../index';
 import * as AuthController from './auth-controller';
 
 const routes = [

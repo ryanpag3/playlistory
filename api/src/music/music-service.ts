@@ -1,9 +1,10 @@
-import { User } from '@prisma/client';
+import { Platform, User } from '@prisma/client';
 import Platforms from 'shared/src/Platforms';
 import logger from '../util/logger';
+import prisma from '../util/prisma';
 import SpotifyApi from '../util/spotify-api';
-import { GetMyPlaylistsResult } from '../util/spotify-api-types';
-import { Playlist } from './music-types';
+import { GetMyPlaylistsResult, SpotifyPlaylist, SpotifyTrack } from '../util/spotify-api-types';
+import { Playlist, Track } from './music-types';
 
 export const getMyPlaylists = async (user: User, offset: number = 0, limit: number = 50, platform: string): Promise<Playlist[]> => {
     let result;
@@ -15,8 +16,34 @@ export const getMyPlaylists = async (user: User, offset: number = 0, limit: numb
         default:
             throw new Error(`Valid platform not found.`);
     }
-    logger.info(JSON.stringify(result, null, 4));
-    return result
+
+    result = result.map(async (playlist: Playlist) => {
+        const [ backup ] = await prisma.backup.findMany({
+            where: {
+                playlist: {
+                    playlistId: playlist.id
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            },
+            include: {
+                playlist: true
+            },
+            take: 1
+        });
+        if (backup) {
+            // @ts-ignore
+            playlist.lastBackedUp = backup.createdAt;
+        }
+
+        return playlist;
+    });
+
+    result = await Promise.all(result);
+    
+    // @ts-ignore
+    return result;
 }
 
 const getMySpotifyPlaylists = async (user: User, offset: number = 0, limit: number = 50) => {
@@ -28,6 +55,7 @@ const getMySpotifyPlaylists = async (user: User, offset: number = 0, limit: numb
 const getNormalSpotifyMyPlaylistResult = (result: GetMyPlaylistsResult): Playlist[] => {
     return result.items.map(item => {
         return {
+            platform: Platforms.SPOTIFY,
             id: item.id,
             name: item.name,
             description: item.description,
@@ -46,3 +74,58 @@ const getNormalSpotifyMyPlaylistResult = (result: GetMyPlaylistsResult): Playlis
         }
     });
 }
+
+export const getPlaylist = async (user: User, platform: Platform, id: string) => {
+    let playlist;
+    switch (platform) {
+        case Platform.SPOTIFY:
+            const spotifyApi = new SpotifyApi(user.spotifyRefreshToken);
+            playlist = normalizeSpotifyPlaylist(await spotifyApi.getPlaylistAndTracks(id))
+            break;
+        default:
+            throw new Error(`Valid platform not found.`);
+    }
+    return playlist;
+}
+
+const normalizeSpotifyPlaylist = (spotifyPlaylist: SpotifyPlaylist): Playlist => {
+    return {
+        platform: Platforms.SPOTIFY,
+        id: spotifyPlaylist.id,
+        name: spotifyPlaylist.name,
+        description: spotifyPlaylist.description,
+        url: spotifyPlaylist.external_urls.spotify,
+        uri: spotifyPlaylist.uri,
+        imageUrl: spotifyPlaylist.images[0]?.url,
+        owner: {
+            id: spotifyPlaylist.owner.id,
+            name: spotifyPlaylist.owner.display_name as any
+        },
+        snapshotId: spotifyPlaylist.snapshot_id,
+        tracks: {
+            // @ts-ignore
+            items: spotifyPlaylist.tracks.items.map(i => normalizeSpotifyTrack(i.track)),
+            total: spotifyPlaylist.tracks.total
+        },
+        followers: spotifyPlaylist.followers.total
+    }
+}
+
+const normalizeSpotifyTrack = (sTrack: SpotifyTrack): Track => {
+    return {
+        platform: Platforms.SPOTIFY,
+        id: sTrack.id,
+        name: sTrack.name,
+        artists: sTrack.artists.map(a => {
+            return {
+                id: a.id as any,
+                name: a.display_name as any || a.name as any,
+                uri: a.uri as any,
+                url: a.external_urls.spotify as any,
+            }
+        }),
+        uri: sTrack.uri,
+        url: sTrack.external_urls.spotify
+    }
+}
+

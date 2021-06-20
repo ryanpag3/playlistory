@@ -1,6 +1,7 @@
 
 import { Button, Divider } from '@material-ui/core';
 import React, { Fragment } from 'react'
+import moment from 'moment';
 import styled from 'styled-components';
 import { FaEllipsisH } from 'react-icons/fa';
 import colors from '../../constants/colors';
@@ -28,7 +29,7 @@ const PlaylistRow = (props: any) => {
                     <TrackCount>{props.tracks.total}</TrackCount>
                 </TrackCountContainer>
                 <LastBackupContainer>
-                    <LastBackup>A few hours ago</LastBackup>
+                    <LastBackup>{props.lastBackedUp ? moment(props.lastBackedUp).fromNow() : 'Never'}</LastBackup>
                 </LastBackupContainer>
                 <MenuContainer>
                     <MenuButton disableRipple >
@@ -72,6 +73,7 @@ const Image = styled.img`
     width: 2.5em;
     height: 2.5em;
     border-radius: 1.5em;
+    object-fit: cover;
 `;
 
 const NameContainer = styled.div`
