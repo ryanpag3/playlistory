@@ -1,6 +1,7 @@
 import { Platform, User } from '@prisma/client';
 import Platforms from 'shared/src/Platforms';
 import logger from '../util/logger';
+import prisma from '../util/prisma';
 import SpotifyApi from '../util/spotify-api';
 import { GetMyPlaylistsResult, SpotifyPlaylist, SpotifyTrack } from '../util/spotify-api-types';
 import { Playlist, Track } from './music-types';
@@ -15,8 +16,34 @@ export const getMyPlaylists = async (user: User, offset: number = 0, limit: numb
         default:
             throw new Error(`Valid platform not found.`);
     }
-    logger.info(JSON.stringify(result, null, 4));
-    return result
+
+    result = result.map(async (playlist: Playlist) => {
+        const [ backup ] = await prisma.backup.findMany({
+            where: {
+                playlist: {
+                    playlistId: playlist.id
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            },
+            include: {
+                playlist: true
+            },
+            take: 1
+        });
+        if (backup) {
+            // @ts-ignore
+            playlist.lastBackedUp = backup.createdAt;
+        }
+
+        return playlist;
+    });
+
+    result = await Promise.all(result);
+    
+    // @ts-ignore
+    return result;
 }
 
 const getMySpotifyPlaylists = async (user: User, offset: number = 0, limit: number = 50) => {

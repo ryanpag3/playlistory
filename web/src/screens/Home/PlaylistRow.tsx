@@ -1,12 +1,14 @@
 
 import { Button, Divider } from '@material-ui/core';
 import React, { Fragment } from 'react'
+import moment from 'moment';
 import styled from 'styled-components';
 import { FaEllipsisH } from 'react-icons/fa';
 import colors from '../../constants/colors';
 import { useHistory } from 'react-router-dom';
 
 const PlaylistRow = (props: any) => {
+    console.log(props);
     const history = useHistory();
     
     function goToPlaylistScreen() {
@@ -28,7 +30,7 @@ const PlaylistRow = (props: any) => {
                     <TrackCount>{props.tracks.total}</TrackCount>
                 </TrackCountContainer>
                 <LastBackupContainer>
-                    <LastBackup>A few hours ago</LastBackup>
+                    <LastBackup>{props.lastBackedUp ? moment(props.lastBackedUp).fromNow() : 'Never'}</LastBackup>
                 </LastBackupContainer>
                 <MenuContainer>
                     <MenuButton disableRipple >
