@@ -8,7 +8,6 @@ import colors from '../../constants/colors';
 import { useHistory } from 'react-router-dom';
 
 const PlaylistRow = (props: any) => {
-    console.log(props);
     const history = useHistory();
     
     function goToPlaylistScreen() {
