@@ -1,0 +1,43 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - develop
+      - feature/*
+      - defect/*
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: test_playlistory_db
+          POSTGRES_PASSWORD: adminadmin
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v2
+      - name: setup nodejs
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+      - name: run tests
+        env:
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_TEST_REFRESH_TOKEN: ${{ secrets.SPOTIFY_TEST_REFRESH_TOKEN }}
+        run: |
+          yarn install
+          yarn test
+        working-directory: ./api
+
+
+      

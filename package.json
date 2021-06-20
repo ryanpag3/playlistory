@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "workspaces": [
+    "api",
+    "shared",
+    "web"
+  ],
+  "devDependencies": {
+    "@types/styled-components": "^5.1.10"
+  }
+}
