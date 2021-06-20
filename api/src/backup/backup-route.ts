@@ -13,6 +13,9 @@ const routes = [
                     playlistId: {
                         type: 'string'
                     },
+                    platform: {
+                        type: 'string',
+                    },
                     backupName: {
                         type: 'string',
                         require: false

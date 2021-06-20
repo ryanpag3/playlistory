@@ -63,8 +63,8 @@ export const generateManifest = async (mostRecentBackup: (Backup & { playlist: P
         },
         data: {
             manifest: {
-                added: diffAdded,
-                removed: diffRemoved
+                added: diffAdded || [],
+                removed: diffRemoved || []
             }
         },
         include: {
@@ -94,10 +94,14 @@ export const getMostRecentBackup = async (playlistId: string) => {
 };
 
 export const getBackups = async (user: User, playlistId: string) => {
+    logger.debug(`getting backups for playlist ${playlistId}`);
+    if (!playlistId)
+        throw new Error(`playlist ID is required.`);
+    
     const backups = await prisma.backup.findMany({
         where: {
             playlist: {
-                id: playlistId
+                playlistId
             },
             createdById: user.id
         },

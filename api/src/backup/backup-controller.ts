@@ -3,11 +3,16 @@ import logger from '../util/logger';
 import * as BackupService from './backup-service';
 import * as MusicService from '../music/music-service';
 import Platforms from '../../../shared/src/Platforms';
+import prisma from '../util/prisma';
 
 export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
         // @ts-ignore
-        const { playlistId, backupName, platform } = request.body;
+        let { playlistId, backupName, platform } = request.body;
+
+        if (!backupName) {
+            backupName = `Playlistory Backup | ${new Date().toLocaleDateString()}`;
+        }
         
         const mostRecentBackup = await BackupService.getMostRecentBackup(playlistId);
         // @ts-ignore
@@ -39,6 +44,21 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
 
         if (mostRecentBackup?.playlist.contentHash === currentBackup.playlist.contentHash) {
             logger.debug(`skipping diff generation as the contents of the playlist [${playlist.id}] hasn't changed.`);
+            currentBackup = await prisma.backup.update({
+                where: {
+                    id: currentBackup.id
+                },
+                data: {
+                    manifest: {
+                        added: [],
+                        removed: []
+                    }
+                },
+                include: {
+                    playlist: true,
+                    createdBy: true
+                }
+            });
             return reply.send(JSON.stringify(currentBackup));
         }
 
@@ -54,7 +74,7 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
 export const getBackups = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
         // @ts-ignore
-        const backups = await BackupService.getBackups(request.user, request.params.id);
+        const backups = await BackupService.getBackups(request.user, request.query.playlistId);
         reply.send(JSON.stringify(backups));
     } catch (e) {
         logger.error(e);

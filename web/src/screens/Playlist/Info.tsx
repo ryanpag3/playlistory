@@ -1,25 +1,33 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components';
 import { IoMdPerson } from 'react-icons/io';
-import { Button } from '@material-ui/core';
+import { Button, Dialog, DialogContent, DialogTitle, TextField } from '@material-ui/core';
 import colors from '../../constants/colors';
 import axios from 'axios';
 
 const Info = (props: any) => {
+    const [modalOpened, setModalOpened] = useState(false);
     console.log(props)
 
     async function submitBackup() {
-        const res = await axios.post('/backup', {
+        await axios.post('/backup', {
             playlistId: props.id,
-            backupName: 'hello there',
             platform: props.platform
         });
-        console.log(res);
+        setModalOpened(false);
+    }
+
+    async function openBackupModal() {
+        setModalOpened(true);
+
+    }
+
+    function onClosedModal() {
+        setModalOpened(false);
     }
 
     return (
         <Container>
-
             <ImageContainer>
                 <Image src={props.imageUrl}/>
             </ImageContainer>
@@ -41,12 +49,30 @@ const Info = (props: any) => {
                         <Owner>{props.owner?.name}</Owner>
                     </OwnerContainer>
                     <BackupButton
-                        onClick={submitBackup}
+                        onClick={openBackupModal}
                     >
                         Backup
                     </BackupButton>
                 </Row>
             </TextContainer>
+            <StyledDialog
+                open={modalOpened}
+                onClose={onClosedModal}
+            >
+                <DialogContainer>
+                    <DialogTitle>Create Backup</DialogTitle>
+                    <DialogContent>
+                        <BackupNameTextField
+                            placeholder="Optional backup name"
+                        />
+                        <SubmitButtonCont>
+                            <SubmitButton
+                                onClick={submitBackup}
+                            >Submit</SubmitButton>
+                        </SubmitButtonCont>
+                    </DialogContent>
+                </DialogContainer>
+            </StyledDialog>
         </Container>
     )
 }
@@ -83,6 +109,7 @@ const TextContainer = styled.div`
     display: flex;
     flex-direction: column;
     padding: .5em;
+    width: 100%;
 `;
 
 const TitleContainer = styled.div`
@@ -125,6 +152,39 @@ const Owner = styled.text`
 
 const BackupButton = styled(Button)`
     background-color: ${colors.PRIMARY_ACCENT};
+    padding-left: 1em;
+    padding-right: 1em;
+    font-size: 18px;
+    font-weight: bold;
+
+    &:hover {
+        background-color: ${colors.SECONDARY_ACCENT};
+    }
+`;
+
+const StyledDialog = styled(Dialog)`
+`;
+
+const DialogContainer = styled.div`
+    width: 20em;
+    align-items: center;
+    background-color: ${colors.LIGHT};
+`;
+
+const BackupNameTextField = styled(TextField)`
+    width: 100%;
+`;
+
+const SubmitButtonCont = styled.div`
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+`;
+
+const SubmitButton = styled(Button)`
+    background-color: ${colors.PRIMARY_ACCENT};
+    margin: 1em;
     padding-left: 1em;
     padding-right: 1em;
     font-size: 18px;

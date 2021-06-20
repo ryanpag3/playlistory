@@ -19,7 +19,7 @@ const Playlist = (props: any) => {
             <StyledInnerContainer>
                 <Info { ...state }/>
                 <StyledDivider/>
-                <BackupList/>
+                <BackupList { ...state }/>
             </StyledInnerContainer>
         </StyledScreen>
     )
