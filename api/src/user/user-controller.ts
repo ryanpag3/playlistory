@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import logger from '../util/logger';
 import * as UserService from './user-service';
 import * as AuthService from '../auth/auth-service';
-import CookieNames from 'shared/src/CookieNames';
+import CookieNames from '../util/CookieNames';
 
 /**
  * Sign up a new user.

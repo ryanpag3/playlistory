@@ -1,5 +1,5 @@
 import { server } from '..';
-import CookieNames from '../../../shared/src/CookieNames';
+import CookieNames from '../util/CookieNames';
 import { createTestUser } from '../util/test-helper';
 
 it('should create a backup for a valid user', async () => {
