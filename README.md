@@ -6,6 +6,6 @@ Playlistory allows you to create backups of your music playlists, revert changes
 
 [![CICD Build](https://github.com/ryanpag3/playlistory/actions/workflows/workflow.yml/badge.svg?branch=develop)](https://github.com/ryanpag3/playlistory/actions/workflows/workflow.yml)
 
-##   Master Build Status
+## Master Build Status
 
 [![CICD Build](https://github.com/ryanpag3/playlistory/actions/workflows/workflow.yml/badge.svg?branch=master)](https://github.com/ryanpag3/playlistory/actions/workflows/workflow.yml)
