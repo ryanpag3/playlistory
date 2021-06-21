@@ -30,7 +30,11 @@ export const revertAddedToBackup = async (request: FastifyRequest, reply: Fastif
 
 export const revertRemovedFromBackup = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-
+        // @ts-ignore
+        const { backupId } = request.query;
+        // @ts-ignore
+        const result = await MusicService.revertRemovedFromBackup(request.user, backupId);
+        reply.code(200).send(JSON.stringify(result));
     } catch (e) {
         logger.error(e);
         reply.code(500).send();   

@@ -21,7 +21,14 @@ const BackupListRow = (props: any) => {
     }
 
     async function undoRemoved() {
-
+        const res = await axios({
+            method: 'PUT',
+            url: '/playlist/revert/removed',
+            params: {
+                backupId: props.id
+            }
+        });
+        console.log(res);
     }
 
     async function restoreToThisPoint() {

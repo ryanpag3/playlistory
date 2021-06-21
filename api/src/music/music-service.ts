@@ -170,3 +170,42 @@ const removeSongsFromSpotifyPlaylist = async (user: User, playlistId: string, to
     logger.info(res);
     return res;
 }
+
+export const revertRemovedFromBackup = async (user: User, backupId: string) => {
+    const backup = await prisma.backup.findUnique({
+        where: {
+            id: backupId
+        },
+        include: {
+            playlist: true
+        }
+    });
+
+    if (!backup)
+        throw new Error(`Cannot find backup to revert added songs with id ${backupId}`);
+
+    // @ts-ignore
+    return addSongs(user, backup.playlist.platform, backup.playlist.playlistId, backup.manifest?.removed as any);
+}
+
+const addSongs = async (user: User, platform: Platform, playlistId: string, toAdd: {
+    uri: string;
+    id: string;
+}[] = []) => {
+    switch (platform) {
+        case Platform.SPOTIFY:
+            return addSongsToSpotifyPlaylist(user, playlistId, toAdd);
+        default:
+            throw new Error(`Invalid platform provided`);
+    }
+}
+
+const addSongsToSpotifyPlaylist = async (user: User, playlistId: string, toAdd: {
+    uri: string;
+    id: string;
+}[]) => {
+    const spotifyApi = new SpotifyApi(user.spotifyRefreshToken);
+    const res = await spotifyApi.addTracksToPlaylist(playlistId, toAdd.map(r => r.uri));
+    logger.info(res);
+    return res;
+}

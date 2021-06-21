@@ -169,8 +169,9 @@ export default class SpotifyApi {
         return data.tracks;
     }
 
-    async addTracksToPlaylist(playlistId: string, trackUris: string[]) {
+    async addTracksToPlaylist(playlistId: string, trackUris: any[]) {
         await this.refreshAccessToken();
+        console.log(trackUris);
         const { data } = await axios(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
             method: 'POST',
             headers: {
@@ -178,7 +179,7 @@ export default class SpotifyApi {
                 'Content-Type': 'application/json'
             },
             data: {
-                uris: trackUris.join(',')
+                uris: trackUris
             }
         });
         return data;
@@ -186,8 +187,6 @@ export default class SpotifyApi {
 
     async removeTracksFromPlaylist(playlistId: string, trackUris: any[]) {
         await this.refreshAccessToken();
-
-        logger.info(trackUris);
 
         const { data } = await axios(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
             method: 'DELETE',
