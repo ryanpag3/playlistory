@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import CookieNames from 'shared/src/CookieNames';
+import CookieNames from '../util/CookieNames';
 import logger from '../util/logger';
 import prisma from '../util/prisma';
 import { createJWT, parseEmailFromJWT, validatePassword } from './auth-service';

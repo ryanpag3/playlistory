@@ -1,5 +1,5 @@
 import { server } from '..';
-import CookieNames from '../../../shared/src/CookieNames';
+import CookieNames from '../util/CookieNames';
 import { createTestUser } from '../util/test-helper';
 
 it('should get the playlists the user has tied to their account', async () => {

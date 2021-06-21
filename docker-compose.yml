@@ -1,0 +1,24 @@
+version: "3"
+services:
+  api:
+    build:
+      context: ./api
+    image: ryanpage/playlistory-api
+    ports:
+      - 3000:3000
+    # uncomment to configure deployment
+    # env:
+    #   LOG_LEVEL: info
+    #   DATABASE_URL: postgresql://username:password@localhost:5432/playlistory_db?schema=public
+    #   JWT_SECRET: my super duper secret
+    #   COOKIE_SECRET: my super duper secret
+    #   SPOTIFY_REDIRECT_URI: http://localhost:8080/spotify
+  web:
+    build:
+      context: ./web
+    image: ryanpage/playlistory-web
+    ports:
+      - 80:80
+    # uncomment to configure deployment
+    # env:
+    #   REACT_APP_SPOTIFY_REDIRECT_URI: http://localhost:8080/spotify
