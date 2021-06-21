@@ -1,11 +1,25 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useState } from 'react'
 import styled from 'styled-components';
 import moment from 'moment';
-import { Button, Divider } from '@material-ui/core';
+import { Button, Divider, Menu, MenuItem, Tooltip } from '@material-ui/core';
 import { FaEllipsisH } from 'react-icons/fa';
 import colors from '../../constants/colors';
 
 const BackupListRow = (props: any) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    async function undoAdded() {
+
+    }
+
+    async function undoRemoved() {
+
+    }
+
+    async function restoreToThisPoint() {
+
+    }
+
     return (
         <Fragment>
             <Container>
@@ -20,9 +34,32 @@ const BackupListRow = (props: any) => {
                     <AddedSongsText>{props.manifest.added.length !== 0 ? `+${props.manifest.added.length}` : 0}</AddedSongsText> |&nbsp;
                     <RemovedSongsText>{props.manifest.removed.length !== 0 ? `-${props.manifest.removed.length}` : 0}</RemovedSongsText>
                 </SongsCont>
-                <MenuContainer>
+                <MenuContainer
+                    // @ts-ignore
+                    onClick={(event: any) => setAnchorEl(event.currentTarget)}
+                >
                     <MenuIcon/>
                 </MenuContainer>
+                <StyledMenu
+                    id="row-menu"
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClick={() => setAnchorEl(null)}
+                >
+                    <Tooltip title="Remove the songs added in this backup." enterDelay={1500}>
+                        <StyledMenuItem
+                            onClick={undoAdded}
+                        >Undo Added</StyledMenuItem>
+                    </Tooltip>
+                    <Tooltip title="Add the songs removed in this backup." enterDelay={1500}>
+                        <StyledMenuItem
+                            onClick={undoRemoved}
+                        >Undo Removed</StyledMenuItem>
+                    </Tooltip>
+                    <StyledMenuItem
+                        onClick={restoreToThisPoint}
+                    >Restore To This Point</StyledMenuItem>
+                </StyledMenu>
             </Container>
             <StyledDivider/>
         </Fragment>
@@ -86,6 +123,17 @@ const MenuContainer = styled.div`
 `;
 
 const MenuIcon = styled(FaEllipsisH)`
+
+`;
+
+const StyledMenu = styled(Menu)`
+
+    & .MuiPaper-root {
+        background-color: ${colors.LIGHT};
+    }
+`;
+
+const StyledMenuItem = styled(MenuItem)`
 
 `;
 
