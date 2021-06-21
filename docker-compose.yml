@@ -3,7 +3,7 @@ services:
   api:
     build:
       context: ./api
-    image: ryanpage/playlistory-api
+    image: ryanpage/playlistory-api:latest
     ports:
       - 3000:3000
     # uncomment to configure deployment

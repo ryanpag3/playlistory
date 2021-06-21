@@ -63,4 +63,8 @@ jobs:
           docker push ryanpage/playlistory-web:$branchName-${{ github.run_number }}
       - name: push to latest
         run: docker-compose push
+        if: |
+          contains('
+            refs/heads/master
+          ', github.ref)   
       
