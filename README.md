@@ -8,4 +8,4 @@ Playlistory allows you to create backups of your music playlists, revert changes
 
 ##   Master Build Status
 
-[![[![CICD Build](https://github.com/ryanpag3/playlistory/actions/workflows/build-develop.yml/badge.svg?branch=master)](https://github.com/ryanpag3/playlistory/actions/workflows/build-develop.yml)
+[![CICD Build](https://github.com/ryanpag3/playlistory/actions/workflows/build-develop.yml/badge.svg?branch=master)](https://github.com/ryanpag3/playlistory/actions/workflows/build-develop.yml)
