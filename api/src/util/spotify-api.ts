@@ -168,5 +168,38 @@ export default class SpotifyApi {
         });
         return data.tracks;
     }
+
+    async addTracksToPlaylist(playlistId: string, trackUris: string[]) {
+        await this.refreshAccessToken();
+        const { data } = await axios(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+            method: 'POST',
+            headers: {
+                ...this.getAuthHeader(),
+                'Content-Type': 'application/json'
+            },
+            data: {
+                uris: trackUris.join(',')
+            }
+        });
+        return data;
+    }
+
+    async removeTracksFromPlaylist(playlistId: string, trackUris: any[]) {
+        await this.refreshAccessToken();
+
+        logger.info(trackUris);
+
+        const { data } = await axios(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+            method: 'DELETE',
+            headers: {
+                ...this.getAuthHeader(),
+                'Content-Type': 'application/json'
+            },
+            data: {
+                tracks: trackUris
+            }
+        });
+        return data;
+    }
 }
 

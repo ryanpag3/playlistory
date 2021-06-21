@@ -14,3 +14,25 @@ export const getMyPlaylists = async (request: FastifyRequest, reply: FastifyRepl
         reply.code(500).send();
     }
 }
+
+export const revertAddedToBackup = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        const { backupId } = request.query;
+        // @ts-ignore
+        const result = await MusicService.revertAddedToBackup(request.user, backupId);
+        reply.code(200).send(JSON.stringify(result));
+    } catch (e) {
+        logger.error(e);
+        reply.code(500).send();   
+    }
+}
+
+export const revertRemovedFromBackup = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+
+    } catch (e) {
+        logger.error(e);
+        reply.code(500).send();   
+    }
+}

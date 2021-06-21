@@ -1,4 +1,5 @@
 import { Platform, User } from '@prisma/client';
+import logger from '../util/logger';
 import Platforms from '../util/Platforms';
 import prisma from '../util/prisma';
 import SpotifyApi from '../util/spotify-api';
@@ -128,3 +129,44 @@ const normalizeSpotifyTrack = (sTrack: SpotifyTrack): Track => {
     }
 }
 
+export const revertAddedToBackup = async (user: User, backupId: string) => {
+    const backup = await prisma.backup.findUnique({
+        where: {
+            id: backupId
+        },
+        include: {
+            playlist: true
+        }
+    });
+
+    if (!backup)
+        throw new Error(`Cannot find backup to revert added songs with id ${backupId}`);
+
+    // @ts-ignore
+    return removeSongs(user, backup.playlist.platform, backup.playlist.playlistId, backup.manifest?.added as any);
+}
+
+const removeSongs = async (user: User, platform: Platform, playlistId: string, toRemove: {
+    uri: string;
+    id: string;
+}[] = []) => {
+    switch (platform) {
+        case Platform.SPOTIFY:
+            return removeSongsFromSpotifyPlaylist(user, playlistId, toRemove);
+        default:
+            throw new Error(`Invalid platform provided`);
+    }
+}
+
+
+const removeSongsFromSpotifyPlaylist = async (user: User, playlistId: string, toRemove: {
+    uri: string;
+    id: string;
+}[]) => {
+    const spotifyApi = new SpotifyApi(user.spotifyRefreshToken);
+    const res = await spotifyApi.removeTracksFromPlaylist(playlistId, toRemove.map(r => {
+        return { uri: r.uri }
+    }));
+    logger.info(res);
+    return res;
+}

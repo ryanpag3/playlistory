@@ -4,12 +4,20 @@ import moment from 'moment';
 import { Button, Divider, Menu, MenuItem, Tooltip } from '@material-ui/core';
 import { FaEllipsisH } from 'react-icons/fa';
 import colors from '../../constants/colors';
+import axios from 'axios';
 
 const BackupListRow = (props: any) => {
     const [anchorEl, setAnchorEl] = useState(null);
 
     async function undoAdded() {
-
+        const res = await axios({
+            method: 'PUT',
+            url: '/playlist/revert/added',
+            params: {
+                backupId: props.id
+            }
+        });
+        console.log(res);
     }
 
     async function undoRemoved() {

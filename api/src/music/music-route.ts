@@ -39,6 +39,16 @@ const routes = [
             // @ts-ignore
             server.validateJWT
         ]),
+    },
+    {
+        url: '/playlist/revert/added',
+        method: 'PUT',
+        handler: MusicController.revertAddedToBackup,
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ]),
     }
 ];
 
