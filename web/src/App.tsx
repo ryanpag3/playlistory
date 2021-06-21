@@ -5,8 +5,7 @@ import {
   Route
 } from 'react-router-dom';
 import cookies from './util/cookies';
-import CookieNames from 'shared/src/CookieNames'
-;
+import CookieNames from './util/CookieNames';
 import SignUpLogin from './screens/SignUpLogin';
 import AccountLink from './screens/AccountLink';
 import SpotifyRedirect from './screens/SpotifyRedirect';

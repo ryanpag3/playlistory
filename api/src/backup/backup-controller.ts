@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import logger from '../util/logger';
 import * as BackupService from './backup-service';
 import * as MusicService from '../music/music-service';
-import Platforms from '../../../shared/src/Platforms';
+import Platforms from '../util/Platforms';
 import prisma from '../util/prisma';
 
 export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
