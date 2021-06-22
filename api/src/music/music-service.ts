@@ -1,4 +1,5 @@
 import { Platform, User } from '@prisma/client';
+import moment from 'moment';
 import { chunk } from '../util/array';
 import logger from '../util/logger';
 import { getNormSpotifyPlaylist } from '../util/normalizer';
@@ -17,7 +18,7 @@ export const getAllMyPlaylists = async (user: User, platform: Platform) => {
         if (p.length === 0)
             break;
         playlists = [...playlists, ...p];
-        offset = offset+limit;
+        offset = offset + limit;
     }
     return playlists;
 }
@@ -34,7 +35,7 @@ export const getMyPlaylists = async (user: User, offset: number = 0, limit: numb
     }
 
     result = result.map(async (playlist: Playlist) => {
-        const [ backup ] = await prisma.backup.findMany({
+        const [backup] = await prisma.backup.findMany({
             where: {
                 playlist: {
                     playlistId: playlist.id
@@ -57,9 +58,66 @@ export const getMyPlaylists = async (user: User, offset: number = 0, limit: numb
     });
 
     result = await Promise.all(result);
-    
+
+    if (offset === 0) { // only append deleted on first query
+        const deletedPlaylistBackups = await prisma.backup.findMany({
+            where: {
+                createdById: user.id,
+                playlist: {
+                    playlistId: {
+                        notIn: result.map(r => r.id)
+                    }
+                }
+            },
+            include: {
+                playlist: true
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        const deletedPlaylists = deletedPlaylistBackups.map(b => {
+            //@ts-ignore
+            b.playlist.lastBackedUp = b.createdAt;
+            return b.playlist;
+        });
+
+        const uniqueList = removeDuplicates(deletedPlaylists, 'playlistId');
+
+        result = [...result, ...uniqueList];
+    }
+
+    result = result.sort((a, b) => {
+        
+        const aM = moment(a.lastBackedUp || '1970');
+        const bM = moment(b.lastBackedUp || '1970');
+
+        if (aM.isAfter(bM))
+            return -1;
+        
+        if (aM.isBefore(bM))
+            return 1;
+        
+        return 0;
+    })
+
     // @ts-ignore
     return result;
+}
+
+function removeDuplicates(originalArray: any[], prop: string) {
+    var newArray = [];
+    var lookupObject: any = {};
+
+    for (var i in originalArray) {
+        lookupObject[originalArray[i][prop]] = originalArray[i];
+    }
+
+    for (i in lookupObject) {
+        newArray.push(lookupObject[i]);
+    }
+    return newArray;
 }
 
 const getMySpotifyPlaylists = async (user: User, offset: number = 0, limit: number = 50) => {
@@ -234,18 +292,20 @@ export const restoreToBackup = async (user: User, backupId: string) => {
             playlist: true
         }
     });
-    
+
     if (!backup)
         throw new Error(`Backup not found.`);
-    
+
+    logger.info(`restoring ${backup.playlist.playlistId} from backup ${backupId}`);
+
     let playlist = await getPlaylist(user, backup.playlist.platform, backup.playlist.playlistId);
     const myPlaylists = await getAllMyPlaylists(user, backup.playlist.platform);
-    if (!playlist || myPlaylists.filter(p => p.id === playlist.id).length < 1){
-        logger.info('creating playlist');
+    if (!playlist || myPlaylists.filter(p => p.id === playlist.id).length < 1) {
+        logger.debug('creating playlist');
         // @ts-ignore
         playlist = await createPlaylist(user, backup.playlist.platform, backup.playlist.name, backup.playlist.description);
     } else {
-        logger.info('removing existing songs');
+        logger.debug('removing existing songs');
         // first, delete all existing tracks
         const removeChunks = chunk(playlist.tracks.items as any, 100);
         for (const chunk of removeChunks) {
@@ -257,7 +317,7 @@ export const restoreToBackup = async (user: User, backupId: string) => {
         }
     }
 
-    logger.info('adding songs from backup');
+    logger.debug('adding songs from backup');
     // add songs from backup
     const addChunks = chunk(backup.playlist.tracks as any, 100);
     for (const chunk of addChunks) {

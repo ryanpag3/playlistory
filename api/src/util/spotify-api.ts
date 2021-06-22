@@ -80,7 +80,7 @@ export default class SpotifyApi {
         expiresOn.add(data.expires_in, 'seconds');
         this.accessToken = data.access_token;
         this.expiresOn = expiresOn;
-        logger.info('refreshed access token');
+        logger.trace('refreshed access token');
     }
 
     async getMe(): Promise<Me> {
