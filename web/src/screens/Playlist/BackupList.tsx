@@ -25,12 +25,12 @@ const BackupList = (props: any) => {
             <HeaderContainer>
                 <DateCreatedCont>
                     <HeaderText>
-                        Created On
+                        Created
                     </HeaderText>
                 </DateCreatedCont>
                 <NameContainer>
                     <HeaderText>
-                        Backup Name
+                        Name
                     </HeaderText>
                 </NameContainer>
                 <TracksContainer>

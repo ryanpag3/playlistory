@@ -39,6 +39,36 @@ const routes = [
             // @ts-ignore
             server.validateJWT
         ]),
+    },
+    {
+        url: '/playlist/revert/added',
+        method: 'PUT',
+        handler: MusicController.revertAddedToBackup,
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ]),
+    },
+    {
+        url: '/playlist/revert/removed',
+        method: 'PUT',
+        handler: MusicController.revertRemovedFromBackup,
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ]),
+    },
+    {
+        url: '/playlist/restore',
+        method: 'PUT',
+        handler: MusicController.restoreToBackup,
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ])
     }
 ];
 

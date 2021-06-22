@@ -12,7 +12,7 @@ export const getNormSpotifyPlaylist = (spotifyPlaylist: SpotifyPlaylist): Playli
         description: spotifyPlaylist.description,
         url: spotifyPlaylist.external_urls.spotify,
         uri: spotifyPlaylist.uri,
-        imageUrl: spotifyPlaylist.images[0].url,
+        imageUrl: spotifyPlaylist.images.length > 0 ? spotifyPlaylist.images[0].url : '',
         owner: {
             id: spotifyPlaylist.owner.id,
             name: spotifyPlaylist.owner.display_name as any,
