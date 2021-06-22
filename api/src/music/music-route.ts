@@ -43,6 +43,18 @@ const routes = [
     {
         url: '/playlist/revert/added',
         method: 'PUT',
+        schema: {
+            querystring: {
+                type: 'object',
+                required: ['backupId'],
+                properties: {
+                    backupId: {
+                        type: 'string',
+                        description: 'The backup that is being acted upon.'
+                    }
+                }
+            },
+        },
         handler: MusicController.revertAddedToBackup,
         // @ts-ignore
         preHandler: server.auth([
@@ -53,6 +65,18 @@ const routes = [
     {
         url: '/playlist/revert/removed',
         method: 'PUT',
+        schema: {
+            querystring: {
+                type: 'object',
+                required: ['backupId'],
+                properties: {
+                    backupId: {
+                        type: 'string',
+                        description: 'The backup that is being acted upon.'
+                    }
+                }
+            },
+        },
         handler: MusicController.revertRemovedFromBackup,
         // @ts-ignore
         preHandler: server.auth([
@@ -63,6 +87,18 @@ const routes = [
     {
         url: '/playlist/restore',
         method: 'PUT',
+        schema: {
+            querystring: {
+                type: 'object',
+                required: ['backupId'],
+                properties: {
+                    backupId: {
+                        type: 'string',
+                        description: 'The backup that is being acted upon.'
+                    }
+                }
+            },
+        },
         handler: MusicController.restoreToBackup,
         // @ts-ignore
         preHandler: server.auth([
