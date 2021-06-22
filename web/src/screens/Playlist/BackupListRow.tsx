@@ -42,6 +42,18 @@ const BackupListRow = (props: any) => {
         console.log(res);
     }
 
+    async function deleteBackup() {
+        const res = await axios({
+            method: 'DELETE',
+            url: '/backup',
+            params: {
+                id: props.id
+            }
+        });
+        console.log(res);
+        props.onDeleted(props.index);
+    }
+
     return (
         <Fragment>
             <Container>
@@ -81,6 +93,9 @@ const BackupListRow = (props: any) => {
                     <StyledMenuItem
                         onClick={restoreToThisPoint}
                     >Restore To This Point</StyledMenuItem>
+                    <StyledMenuItem
+                        onClick={deleteBackup}
+                    >Delete Backup</StyledMenuItem>
                 </StyledMenu>
             </Container>
             <StyledDivider/>

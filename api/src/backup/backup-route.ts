@@ -61,31 +61,31 @@ const routes = [
         ]),
         handler: BackupController.getBackups
     },
-    // {
-    //     method: 'POST',
-    //     url: '/backup/revert/added',
-    //     schema: {
-    //         description: 'Revert songs that were added during this revision.',
-    //         querystring: {
-    //             id: {
-    //                 type: 'string',
-    //                 description: 'The ID of the backup that we are reverting additions for.'
-    //             }
-    //         },
-    //         response: {
-    //             200: {
-    //                 type: 'object',
-    //                 description: 'The updated backup that contains the changes in the revert.'
-    //             }
-    //         }
-    //     },
-    //     // @ts-ignore
-    //     preHandler: server.auth([
-    //         // @ts-ignore
-    //         server.verifyJWT
-    //     ]),
-    //     handler: BackupController.getBackups
-    // }
+    {
+        method: 'DELETE',
+        url: '/backup',
+        schema: {
+            description: 'Delete a backup.',
+            querystring: {
+                id: {
+                    type: 'string',
+                    description: 'ID of backup to be deleted.'
+                }
+            },
+            response: {
+                200: {
+                    type: 'boolean',
+                    description: 'Backup was deleted'
+                }
+            }
+        },
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ]),
+        handler: BackupController.deleteBackup
+    }
 ];
 
 export default routes;
