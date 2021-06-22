@@ -1,5 +1,6 @@
 import { Platform, User } from '@prisma/client';
 import moment from 'moment';
+import { createBackup } from '../backup/backup-service';
 import { chunk } from '../util/array';
 import logger from '../util/logger';
 import { getNormSpotifyPlaylist } from '../util/normalizer';
@@ -9,12 +10,12 @@ import SpotifyApi from '../util/spotify-api';
 import { GetMyPlaylistsResult, SpotifyPlaylist, SpotifyTrack } from '../util/spotify-api-types';
 import { Playlist, Track } from './music-types';
 
-export const getAllMyPlaylists = async (user: User, platform: Platform) => {
+export const getAllMyPlaylists = async (user: User, platform: Platform, includeDeleted: boolean = true) => {
     let offset = 0;
     const limit = 50;
     let playlists: any[] = [];
     while (true) {
-        const p = await getMyPlaylists(user, offset, limit, platform);
+        const p = await getMyPlaylists(user, offset, limit, platform, includeDeleted);
         if (p.length === 0)
             break;
         playlists = [...playlists, ...p];
@@ -23,7 +24,7 @@ export const getAllMyPlaylists = async (user: User, platform: Platform) => {
     return playlists;
 }
 
-export const getMyPlaylists = async (user: User, offset: number = 0, limit: number = 50, platform: string): Promise<Playlist[]> => {
+export const getMyPlaylists = async (user: User, offset: number = 0, limit: number = 50, platform: string, includeDeleted: boolean = true): Promise<Playlist[]> => {
     let result;
     switch (platform) {
         case Platforms.SPOTIFY:
@@ -59,7 +60,7 @@ export const getMyPlaylists = async (user: User, offset: number = 0, limit: numb
 
     result = await Promise.all(result);
 
-    if (offset === 0) { // only append deleted on first query
+    if (offset === 0 && includeDeleted === true) { // only append deleted on first query
         const deletedPlaylistBackups = await prisma.backup.findMany({
             where: {
                 createdById: user.id,
@@ -80,16 +81,17 @@ export const getMyPlaylists = async (user: User, offset: number = 0, limit: numb
         const deletedPlaylists = deletedPlaylistBackups.map(b => {
             //@ts-ignore
             b.playlist.lastBackedUp = b.createdAt;
+            b.playlist.id = b.playlist.playlistId;
             return b.playlist;
         });
 
-        const uniqueList = removeDuplicates(deletedPlaylists, 'playlistId');
+        const uniqueList = removeDuplicates(deletedPlaylists, 'id');
 
         result = [...result, ...uniqueList];
     }
 
     result = result.sort((a, b) => {
-        
+
         const aM = moment(a.lastBackedUp || '1970');
         const bM = moment(b.lastBackedUp || '1970');
 
@@ -241,7 +243,6 @@ const removeSongsFromSpotifyPlaylist = async (user: User, playlistId: string, to
     const res = await spotifyApi.removeTracksFromPlaylist(playlistId, toRemove.map(r => {
         return { uri: r.uri }
     }));
-    logger.info(res);
     return res;
 }
 
@@ -299,7 +300,7 @@ export const restoreToBackup = async (user: User, backupId: string) => {
     logger.info(`restoring ${backup.playlist.playlistId} from backup ${backupId}`);
 
     let playlist = await getPlaylist(user, backup.playlist.platform, backup.playlist.playlistId);
-    const myPlaylists = await getAllMyPlaylists(user, backup.playlist.platform);
+    const myPlaylists = await getAllMyPlaylists(user, backup.playlist.platform, false);
     if (!playlist || myPlaylists.filter(p => p.id === playlist.id).length < 1) {
         logger.debug('creating playlist');
         // @ts-ignore
@@ -309,11 +310,9 @@ export const restoreToBackup = async (user: User, backupId: string) => {
         // first, delete all existing tracks
         const removeChunks = chunk(playlist.tracks.items as any, 100);
         for (const chunk of removeChunks) {
-            const res = await removeSongs(user, backup.playlist.platform, backup.playlist.playlistId, chunk.map(c => {
-                logger.info(c);
+            await removeSongs(user, backup.playlist.platform, backup.playlist.playlistId, chunk.map(c => {
                 return c;
             }));
-            logger.info(res);
         }
     }
 
@@ -324,6 +323,22 @@ export const restoreToBackup = async (user: User, backupId: string) => {
         await addSongs(user, backup.playlist.platform, playlist.id, chunk);
     }
 
+    return prisma.playlist.update({
+        where: {
+            id: backup.playlist.id
+        },
+        data: {
+            platform: backup.playlist.platform,
+            playlistId: playlist.id,
+            name: playlist.name,
+            description: playlist.description,
+            imageUrl: playlist.imageUrl,
+            contentHash: playlist.snapshotId,
+            followers: playlist.followers,
+            tracks: playlist.tracks,
+            createdById: user.id
+        }
+    });
 }
 
 const createPlaylist = async (user: User, platform: Platform, title: string, description: string) => {
