@@ -302,12 +302,14 @@ export const restoreToBackup = async (user: User, backupId: string) => {
     let playlist = await getPlaylist(user, backup.playlist.platform, backup.playlist.playlistId);
     const myPlaylists = await getAllMyPlaylists(user, backup.playlist.platform, false);
     if (!playlist || myPlaylists.filter(p => p.id === playlist.id).length < 1) {
-        logger.debug('creating playlist');
+        // re-link playlist to platform
+        logger.debug('creating playlist to relink to platform');
         // @ts-ignore
         playlist = await createPlaylist(user, backup.playlist.platform, backup.playlist.name, backup.playlist.description);
-        await prisma.playlist.update({
+        // update all references to old playlist to use new one
+        await prisma.playlist.updateMany({
             where: {
-                id: backup.playlist.id
+                playlistId: backup.playlist.playlistId
             },
             data: {
                 platform: backup.playlist.platform,
@@ -315,15 +317,10 @@ export const restoreToBackup = async (user: User, backupId: string) => {
                 name: playlist.name,
                 description: playlist.description,
                 imageUrl: playlist.imageUrl,
-                contentHash: playlist.snapshotId,
-                followers: playlist.followers,
-                tracks: playlist.tracks,
-                createdById: user.id
             }
         });
     } else {
         logger.debug('removing existing songs');
-        // first, delete all existing tracks
         const removeChunks = chunk(playlist.tracks.items as any, 100);
         for (const chunk of removeChunks) {
             await removeSongs(user, backup.playlist.platform, backup.playlist.playlistId, chunk.map(c => {
@@ -333,7 +330,6 @@ export const restoreToBackup = async (user: User, backupId: string) => {
     }
 
     logger.debug('adding songs from backup');
-    // add songs from backup
     const addChunks = chunk(backup.playlist.tracks as any, 100);
     for (const chunk of addChunks) {
         await addSongs(user, backup.playlist.platform, playlist.id, chunk);
