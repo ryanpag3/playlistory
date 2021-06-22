@@ -305,6 +305,22 @@ export const restoreToBackup = async (user: User, backupId: string) => {
         logger.debug('creating playlist');
         // @ts-ignore
         playlist = await createPlaylist(user, backup.playlist.platform, backup.playlist.name, backup.playlist.description);
+        await prisma.playlist.update({
+            where: {
+                id: backup.playlist.id
+            },
+            data: {
+                platform: backup.playlist.platform,
+                playlistId: playlist.id,
+                name: playlist.name,
+                description: playlist.description,
+                imageUrl: playlist.imageUrl,
+                contentHash: playlist.snapshotId,
+                followers: playlist.followers,
+                tracks: playlist.tracks,
+                createdById: user.id
+            }
+        });
     } else {
         logger.debug('removing existing songs');
         // first, delete all existing tracks
@@ -322,23 +338,6 @@ export const restoreToBackup = async (user: User, backupId: string) => {
     for (const chunk of addChunks) {
         await addSongs(user, backup.playlist.platform, playlist.id, chunk);
     }
-
-    return prisma.playlist.update({
-        where: {
-            id: backup.playlist.id
-        },
-        data: {
-            platform: backup.playlist.platform,
-            playlistId: playlist.id,
-            name: playlist.name,
-            description: playlist.description,
-            imageUrl: playlist.imageUrl,
-            contentHash: playlist.snapshotId,
-            followers: playlist.followers,
-            tracks: playlist.tracks,
-            createdById: user.id
-        }
-    });
 }
 
 const createPlaylist = async (user: User, platform: Platform, title: string, description: string) => {
