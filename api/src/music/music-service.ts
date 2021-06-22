@@ -1,4 +1,4 @@
-import { Platform, User } from '@prisma/client';
+import { Backup, Platform, User } from '@prisma/client';
 import moment from 'moment';
 import { createBackup } from '../backup/backup-service';
 import { chunk } from '../util/array';
@@ -301,39 +301,15 @@ export const restoreToBackup = async (user: User, backupId: string) => {
 
     let playlist = await getPlaylist(user, backup.playlist.platform, backup.playlist.playlistId);
     const myPlaylists = await getAllMyPlaylists(user, backup.playlist.platform, false);
-    if (!playlist || myPlaylists.filter(p => p.id === playlist.id).length < 1) {
-        // re-link playlist to platform
-        logger.debug('creating playlist to relink to platform');
-        // @ts-ignore
-        playlist = await createPlaylist(user, backup.playlist.platform, backup.playlist.name, backup.playlist.description);
-        // update all references to old playlist to use new one
-        await prisma.playlist.updateMany({
-            where: {
-                playlistId: backup.playlist.playlistId
-            },
-            data: {
-                platform: backup.playlist.platform,
-                playlistId: playlist.id,
-                name: playlist.name,
-                description: playlist.description,
-                imageUrl: playlist.imageUrl,
-            }
-        });
-    } else {
-        logger.debug('removing existing songs');
-        const removeChunks = chunk(playlist.tracks.items as any, 100);
-        for (const chunk of removeChunks) {
-            await removeSongs(user, backup.playlist.platform, backup.playlist.playlistId, chunk.map(c => {
-                return c;
-            }));
-        }
-    }
+    const isFollowingPlaylist = myPlaylists.filter(p => p.id === playlist.id).length >= 1;
 
-    logger.debug('adding songs from backup');
-    const addChunks = chunk(backup.playlist.tracks as any, 100);
-    for (const chunk of addChunks) {
-        await addSongs(user, backup.playlist.platform, playlist.id, chunk);
+    if (!playlist || !isFollowingPlaylist) {
+        playlist = await resolvePlaylistLink(backup);
+    } else {
+        await removeAddedFromBackup(user, backup, playlist);
     }
+    
+    await addRemovedFromBackup(user, backup, playlist);
 }
 
 const createPlaylist = async (user: User, platform: Platform, title: string, description: string) => {
@@ -349,4 +325,48 @@ const createPlaylist = async (user: User, platform: Platform, title: string, des
 const createPlaylistSpotify = async (user: User, platform: Platform, title: string, description: string) => {
     const spotifyApi = new SpotifyApi(user.spotifyRefreshToken);
     return spotifyApi.createPlaylist(title, description);
+}
+
+const resolvePlaylistLink = async (backup: Backup) => {
+    // re-link playlist to platform
+    logger.debug('creating playlist to relink to platform');
+    // @ts-ignore
+    const playlist = await createPlaylist(user, backup.playlist.platform, backup.playlist.name, backup.playlist.description);
+    // update all references to old playlist to use new one
+    await prisma.playlist.updateMany({
+        where: {
+            // @ts-ignore
+            playlistId: backup.playlist.playlistId
+        },
+        data: {
+            // @ts-ignore
+            platform: backup.playlist.platform,
+            playlistId: playlist.id,
+            name: playlist.name,
+            description: playlist.description,
+            imageUrl: playlist.imageUrl,
+        }
+    });
+    return playlist;
+}
+
+const removeAddedFromBackup = async (user: User, backup: Backup, playlist: Playlist) => {
+    logger.debug('removing existing songs');
+    const removeChunks = chunk(playlist.tracks.items as any, 100);
+    for (const chunk of removeChunks) {
+        // @ts-ignore
+        await removeSongs(user, backup.playlist.platform, backup.playlist.playlistId, chunk.map(c => {
+            return c;
+        }));
+    }
+}
+
+const addRemovedFromBackup = async (user: User, backup: Backup, playlist: Playlist) => {
+    logger.debug('adding songs from backup');
+    // @ts-ignore
+    const addChunks = chunk(backup.playlist.tracks as any, 100);
+    for (const chunk of addChunks) {
+        // @ts-ignore
+        await addSongs(user, backup.playlist.platform, playlist.id, chunk);
+    }
 }
