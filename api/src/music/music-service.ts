@@ -1,10 +1,26 @@
 import { Platform, User } from '@prisma/client';
+import { chunk } from '../util/array';
 import logger from '../util/logger';
+import { getNormSpotifyPlaylist } from '../util/normalizer';
 import Platforms from '../util/Platforms';
 import prisma from '../util/prisma';
 import SpotifyApi from '../util/spotify-api';
 import { GetMyPlaylistsResult, SpotifyPlaylist, SpotifyTrack } from '../util/spotify-api-types';
 import { Playlist, Track } from './music-types';
+
+export const getAllMyPlaylists = async (user: User, platform: Platform) => {
+    let offset = 0;
+    const limit = 50;
+    let playlists: any[] = [];
+    while (true) {
+        const p = await getMyPlaylists(user, offset, limit, platform);
+        if (p.length === 0)
+            break;
+        playlists = [...playlists, ...p];
+        offset = offset+limit;
+    }
+    return playlists;
+}
 
 export const getMyPlaylists = async (user: User, offset: number = 0, limit: number = 50, platform: string): Promise<Playlist[]> => {
     let result;
@@ -206,6 +222,61 @@ const addSongsToSpotifyPlaylist = async (user: User, playlistId: string, toAdd: 
 }[]) => {
     const spotifyApi = new SpotifyApi(user.spotifyRefreshToken);
     const res = await spotifyApi.addTracksToPlaylist(playlistId, toAdd.map(r => r.uri));
-    logger.info(res);
     return res;
+}
+
+export const restoreToBackup = async (user: User, backupId: string) => {
+    const backup = await prisma.backup.findUnique({
+        where: {
+            id: backupId
+        },
+        include: {
+            playlist: true
+        }
+    });
+    
+    if (!backup)
+        throw new Error(`Backup not found.`);
+    
+    let playlist = await getPlaylist(user, backup.playlist.platform, backup.playlist.playlistId);
+    const myPlaylists = await getAllMyPlaylists(user, backup.playlist.platform);
+    if (!playlist || myPlaylists.filter(p => p.id === playlist.id).length < 1){
+        logger.info('creating playlist');
+        // @ts-ignore
+        playlist = await createPlaylist(user, backup.playlist.platform, backup.playlist.name, backup.playlist.description);
+    } else {
+        logger.info('removing existing songs');
+        // first, delete all existing tracks
+        const removeChunks = chunk(playlist.tracks.items as any, 100);
+        for (const chunk of removeChunks) {
+            const res = await removeSongs(user, backup.playlist.platform, backup.playlist.playlistId, chunk.map(c => {
+                logger.info(c);
+                return c;
+            }));
+            logger.info(res);
+        }
+    }
+
+    logger.info('adding songs from backup');
+    // add songs from backup
+    const addChunks = chunk(backup.playlist.tracks as any, 100);
+    for (const chunk of addChunks) {
+        await addSongs(user, backup.playlist.platform, playlist.id, chunk);
+    }
+
+}
+
+const createPlaylist = async (user: User, platform: Platform, title: string, description: string) => {
+    switch (platform) {
+        case Platform.SPOTIFY:
+            const playlist = await createPlaylistSpotify(user, platform, title, description);
+            return getNormSpotifyPlaylist(playlist);
+        default:
+            throw new Error(`Invalid platform provided`);
+    }
+}
+
+const createPlaylistSpotify = async (user: User, platform: Platform, title: string, description: string) => {
+    const spotifyApi = new SpotifyApi(user.spotifyRefreshToken);
+    return spotifyApi.createPlaylist(title, description);
 }

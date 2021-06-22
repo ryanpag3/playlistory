@@ -21,7 +21,7 @@ export const createBackup = async (user: User, opts: {
         data: {
             platform: Platform.SPOTIFY,
             playlistId: opts.playlistId,
-            name: opts.name,
+            name: opts.playlistName,
             description: opts.playlistDescription,
             imageUrl: opts.imageUrl,
             contentHash: opts.contentHash,

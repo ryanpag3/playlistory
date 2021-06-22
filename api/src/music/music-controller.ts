@@ -40,3 +40,18 @@ export const revertRemovedFromBackup = async (request: FastifyRequest, reply: Fa
         reply.code(500).send();   
     }
 }
+
+export const restoreToBackup = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        const { backupId } = request.query;
+        if (!backupId)
+            throw new Error(`Backup ID is required.`);
+        // @ts-ignore
+        const result = await MusicService.restoreToBackup(request.user, backupId);
+        reply.code(200).send();
+    } catch (e) {
+        logger.error(e);
+        reply.code(500).send();   
+    }
+}

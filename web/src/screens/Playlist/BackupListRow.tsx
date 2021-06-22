@@ -32,7 +32,14 @@ const BackupListRow = (props: any) => {
     }
 
     async function restoreToThisPoint() {
-
+        const res = await axios({
+            method: 'PUT',
+            url: '/playlist/restore',
+            params: {
+                backupId: props.id
+            }
+        });
+        console.log(res);
     }
 
     return (

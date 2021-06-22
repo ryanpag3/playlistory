@@ -59,6 +59,16 @@ const routes = [
             // @ts-ignore
             server.validateJWT
         ]),
+    },
+    {
+        url: '/playlist/restore',
+        method: 'PUT',
+        handler: MusicController.restoreToBackup,
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ])
     }
 ];
 

@@ -7,6 +7,7 @@ export default class SpotifyApi {
     private refreshToken: string|null;
     private accessToken?: string;
     private expiresOn?: moment.Moment;
+    private me?: Me;
 
     constructor(refreshToken: string|null, accessToken?: string) {
         this.refreshToken = refreshToken;
@@ -79,10 +80,12 @@ export default class SpotifyApi {
         expiresOn.add(data.expires_in, 'seconds');
         this.accessToken = data.access_token;
         this.expiresOn = expiresOn;
+        logger.info('refreshed access token');
     }
 
     async getMe(): Promise<Me> {
         await this.refreshAccessToken();
+
         const { data } = await axios(
             `https://api.spotify.com/v1/me`,
             {
@@ -98,7 +101,12 @@ export default class SpotifyApi {
 
     async getMyPlaylists(offset: number = 0, limit: number = 50): Promise<GetMyPlaylistsResult> {
         await this.refreshAccessToken();
-        const { data } = await axios(
+        logger.info('getting playlists');
+        if (!this.me) {
+            this.me = await this.getMe();
+        }
+
+        let { data } = await axios(
             `https://api.spotify.com/v1/me/playlists`,
             {
                 method: 'GET',
@@ -111,11 +119,18 @@ export default class SpotifyApi {
                 }
             }
         );
+
+        // @ts-ignore
+        data.items = data.items.filter(d => {
+            return d.owner.id === this.me?.id;
+        })
+
         return data;
     }
 
     async getPlaylistAndTracks(id: string) {
         await this.refreshAccessToken();
+
         const { data }: {
             data: SpotifyPlaylist;
         } = await axios(
@@ -126,7 +141,7 @@ export default class SpotifyApi {
                 }
             }
         );
-    
+
         let offset = 0;
         const limit = 100;
         let tracks: any = [];
@@ -171,7 +186,6 @@ export default class SpotifyApi {
 
     async addTracksToPlaylist(playlistId: string, trackUris: any[]) {
         await this.refreshAccessToken();
-        console.log(trackUris);
         const { data } = await axios(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
             method: 'POST',
             headers: {
@@ -185,9 +199,10 @@ export default class SpotifyApi {
         return data;
     }
 
-    async removeTracksFromPlaylist(playlistId: string, trackUris: any[]) {
+    async removeTracksFromPlaylist(playlistId: string, trackUris: {
+        uri: string;
+    }[]) {
         await this.refreshAccessToken();
-
         const { data } = await axios(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
             method: 'DELETE',
             headers: {
@@ -196,6 +211,24 @@ export default class SpotifyApi {
             },
             data: {
                 tracks: trackUris
+            }
+        });
+        return data;
+    }
+
+    async createPlaylist(title: string, description: string) {
+        await this.refreshAccessToken();
+        const me = await this.getMe();
+        const { data } = await axios(`https://api.spotify.com/v1/users/${me.id}/playlists`, 
+        {
+            method: 'POST',
+            headers: {
+                ...this.getAuthHeader(),
+                'Content-Type': 'application/json'
+            },
+            data: {
+                name: title,
+                description
             }
         });
         return data;
