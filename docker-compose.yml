@@ -13,6 +13,8 @@ services:
     #   JWT_SECRET: my super duper secret
     #   COOKIE_SECRET: my super duper secret
     #   SPOTIFY_REDIRECT_URI: http://localhost:8080/spotify
+    #   SPOTIFY_CLIENT_ID: abc123
+    #   SPOTIFY_CLIENT_SECRET: abc123
   web:
     build:
       context: ./web
