@@ -1,12 +1,13 @@
 import { Divider } from '@material-ui/core';
 import useAxios from 'axios-hooks';
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component';
 import styled from 'styled-components';
 import colors from '../../constants/colors';
 import BackupListRow from './BackupListRow';
 
 const BackupList = (props: any) => {
+    const [backups, setBackups] = useState([] as any);
 
     const [{ data, loading, error}, refetch] = useAxios({
         method: 'GET',
@@ -19,6 +20,18 @@ const BackupList = (props: any) => {
     useEffect(() => {
         refetch();
     }, [props.refresh]);
+
+    useEffect(() => {
+        if (!data)
+            return;
+        setBackups([ ...data ]);
+    }, [ data ]);
+
+    async function handleOnDeleted(index: number) {
+        console.log(index);
+        backups.splice(index, 1);
+        setBackups([ ...backups ]);
+    }
 
     return (
         <Container>
@@ -46,7 +59,8 @@ const BackupList = (props: any) => {
                 hasMore={false}
                 loader={<div></div>}
             >
-                {(!data || !data.length) ? <NoBackupsCont>No backups created yet :(</NoBackupsCont> : data.map((d: any) => <BackupListRow {...d }/>)}
+                {(!backups || !backups.length) ? <NoBackupsCont>No backups created yet :(</NoBackupsCont> 
+                    : backups.map((d: any, index: number) => <BackupListRow {...d } key={index} index={index} onDeleted={(index: number) => handleOnDeleted(index)}/>)}
             </InfiniteScroll>
         </Container>
     )

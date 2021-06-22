@@ -160,3 +160,27 @@ const resolveManifestSpotify = async (user: User, manifest: any) => {
 
     return manifest;
 }
+
+export const deleteBackup = async (id: string) => {
+    logger.info(`deleting backup ${id}`);
+    const backup = await prisma.backup.findUnique({
+        where: {
+            id
+        }
+    });
+    
+    const res = await prisma.$transaction([
+        prisma.backup.delete({
+            where: {
+                id: backup?.id
+            }
+        }),
+        prisma.playlist.delete({
+            where: {
+                id: backup?.playlistId
+            }
+        })
+    ]);
+
+    return res;
+}
