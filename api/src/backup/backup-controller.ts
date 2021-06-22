@@ -81,3 +81,14 @@ export const getBackups = async (request: FastifyRequest, reply: FastifyReply) =
         reply.code(500).send();
     }
 }
+
+export const deleteBackup = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        const res = await BackupService.deleteBackup(request.query.id);
+        reply.send(JSON.stringify(res));
+    } catch (e) {
+        logger.error(e);
+        reply.code(500).send();
+    }
+}
