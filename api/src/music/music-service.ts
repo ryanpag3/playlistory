@@ -218,8 +218,17 @@ export const revertAddedToBackup = async (user: User, backupId: string) => {
     if (!backup)
         throw new Error(`Cannot find backup to revert added songs with id ${backupId}`);
 
+    let playlist = await getPlaylist(user, backup.playlist.platform, backup.playlist.playlistId);
+    const myPlaylists = await getAllMyPlaylists(user, backup.playlist.platform, false);
+    const isFollowingPlaylist = myPlaylists.filter(p => p.id === playlist.id).length >= 1;
+    if (!playlist || !isFollowingPlaylist) {
+        playlist = await resolvePlaylistLink(user, backup);
+        // @ts-ignore
+        await addSongs(user, backup.playlist.platform, backup.playlist.tracks);
+    }
+
     // @ts-ignore
-    return removeSongs(user, backup.playlist.platform, backup.playlist.playlistId, backup.manifest?.added as any);
+    return removeSongs(user, backup.playlist.platform, playlist.id, backup.manifest?.added as any);
 }
 
 const removeSongs = async (user: User, platform: Platform, playlistId: string, toRemove: {
@@ -258,6 +267,16 @@ export const revertRemovedFromBackup = async (user: User, backupId: string) => {
 
     if (!backup)
         throw new Error(`Cannot find backup to revert added songs with id ${backupId}`);
+
+    let playlist = await getPlaylist(user, backup.playlist.platform, backup.playlist.playlistId);
+    const myPlaylists = await getAllMyPlaylists(user, backup.playlist.platform, false);
+    const isFollowingPlaylist = myPlaylists.filter(p => p.id === playlist.id).length >= 1;
+    if (!playlist || !isFollowingPlaylist) {
+        playlist = await resolvePlaylistLink(user, backup);
+        logger.info(backup.playlist);
+        // @ts-ignore
+        await addSongs(user, backup.playlist.platform, playlist.id, backup.playlist.tracks);
+    }
 
     // @ts-ignore
     return addSongs(user, backup.playlist.platform, backup.playlist.playlistId, backup.manifest?.removed as any);
@@ -304,11 +323,11 @@ export const restoreToBackup = async (user: User, backupId: string) => {
     const isFollowingPlaylist = myPlaylists.filter(p => p.id === playlist.id).length >= 1;
 
     if (!playlist || !isFollowingPlaylist) {
-        playlist = await resolvePlaylistLink(backup);
+        playlist = await resolvePlaylistLink(user, backup);
     } else {
         await removeAddedFromBackup(user, backup, playlist);
     }
-    
+
     await addRemovedFromBackup(user, backup, playlist);
 }
 
@@ -327,7 +346,7 @@ const createPlaylistSpotify = async (user: User, platform: Platform, title: stri
     return spotifyApi.createPlaylist(title, description);
 }
 
-const resolvePlaylistLink = async (backup: Backup) => {
+const resolvePlaylistLink = async (user: User, backup: Backup) => {
     // re-link playlist to platform
     logger.debug('creating playlist to relink to platform');
     // @ts-ignore
