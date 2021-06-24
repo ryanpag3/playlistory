@@ -59,7 +59,7 @@ const NavBar = () => {
                                 onClick={() => navToRoute('/accounts')}
                             >
                                 <StyledListItemText>
-                                    Accounts
+                                    Music Connections
                                 </StyledListItemText>
                             </ListItem>
                             <ListItem button

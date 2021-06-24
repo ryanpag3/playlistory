@@ -21,7 +21,7 @@ function App() {
           <Route path="/spotify" children={<SpotifyRedirect/>}/>
           <Route path="/sign-up" children={<SignUpLogin formType="sign-up"/>}/>
           <Route path="/login" children={<SignUpLogin formType="login"/>}/>
-          <Route path="/accounts" children={<AccountLink/>}/>
+          <Route path="/connections" children={<AccountLink/>}/>
           <Route path="/" render={() => {
             if (cookies.get(CookieNames.TOKEN_EXISTS)) {
               return <Home/>
