@@ -13,7 +13,7 @@ setupServer(server)
     }));
 
 process.on('SIGTERM', async () => {
-    logger.info('shutting down Playlistory API server');
+    logger.debug('shutting down Playlistory API server');
     await server.close();
     process.exit();
 });
