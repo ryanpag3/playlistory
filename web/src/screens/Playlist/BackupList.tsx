@@ -28,7 +28,6 @@ const BackupList = (props: any) => {
     }, [ data ]);
 
     async function handleOnDeleted(index: number) {
-        console.log(index);
         backups.splice(index, 1);
         setBackups([ ...backups ]);
     }
