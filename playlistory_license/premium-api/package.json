@@ -1,0 +1,25 @@
+{
+  "name": "premium-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "UNLICENSED",
+  "scripts": {
+    "watch": "tsnd src/index.ts",
+    "test": "jest --forceExit --runInBand --coverage",
+    "migrate": "npx prisma migrate dev"
+  },
+  "dependencies": {
+    "@prisma/client": "^2.25.0",
+    "dotenv": "^10.0.0",
+    "fastify": "^3.18.0",
+    "fastify-auth": "^1.1.0",
+    "fastify-cookie": "^5.3.1",
+    "fastify-cors": "^6.0.1",
+    "fastify-swagger": "^4.8.0",
+    "jsonwebtoken": "^8.5.1",
+    "log4js": "^6.3.0",
+    "ts-node": "^10.0.0",
+    "ts-node-dev": "^1.1.6",
+    "typescript": "^4.3.4"
+  }
+}
