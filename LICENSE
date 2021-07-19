@@ -1,6 +1,6 @@
 Source code in this repository is covered by one of two licenses: (i) GPL-3.0 (ii) unlicensed. The
 default license throughout the repository is GPL-3.0 unless the header
-specifies another license. Unlicensed code is found in the playlistory_license/ directory.
+specifies another license. Unlicensed code is defined by source code headers.
 
 GPL v3.0:
 https://github.com/ryanpag3/playlistory/blob/master/LICENSE_GPL3
