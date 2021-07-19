@@ -2,7 +2,6 @@
  * Copyright (C) Ryan Page - All Rights Reserved
  * For more information, refer to LICENSE file.
  */
-import { features } from 'process';
 import React from 'react'
 import styled from 'styled-components';
 import colors from '../../constants/colors';
