@@ -72,6 +72,21 @@ const NavBar = () => {
                         </StyledList>
                     </StyledDrawer>
                 </Fragment>
+                <EmptySpace/>
+                {
+                    history.location.pathname !== '/upgrade' && 
+                    <UpgradeAccountLinkContainer
+                        onClick={() => {
+                            const path = '/upgrade';
+                            if (history.location.pathname === path) {
+                                return;
+                            }
+                            history.push(path);
+                        }}
+                    >
+                        <UpgradeAccountLink>Upgrade Account</UpgradeAccountLink>
+                    </UpgradeAccountLinkContainer>
+                }
             </StyledToolbar>
         </AppBar>
     )
@@ -106,6 +121,19 @@ const StyledListItemText = styled(ListItemText)`
     padding-right: 10px;
     color: ${colors.LIGHT};
     font-size: 16px;
+`;
+
+const EmptySpace = styled.div`
+    flex-grow: 1;
+`;
+
+const UpgradeAccountLinkContainer = styled.div`
+
+`;
+
+const UpgradeAccountLink = styled.h2`
+    font-size: .8em;
+    cursor: pointer;
 `;
 
 export default NavBar

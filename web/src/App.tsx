@@ -11,6 +11,7 @@ import AccountLink from './screens/AccountLink';
 import SpotifyRedirect from './screens/SpotifyRedirect';
 import Home from './screens/Home';
 import Playlist from './screens/Playlist';
+import UpgradeAccount from './screens/UpgradeAccount';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/sign-up" children={<SignUpLogin formType="sign-up"/>}/>
           <Route path="/login" children={<SignUpLogin formType="login"/>}/>
           <Route path="/connections" children={<AccountLink/>}/>
+          <Route path="/upgrade" children={<UpgradeAccount/>}/>
           <Route path="/" render={() => {
             if (cookies.get(CookieNames.TOKEN_EXISTS)) {
               return <Home/>
