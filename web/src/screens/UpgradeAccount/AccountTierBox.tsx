@@ -84,7 +84,7 @@ const SubmitButtonContainer = styled.div`
     width: 100%;
     display: flex;
     justify-content: center;
-    padding-bottom: 1em;
+    padding-bottom: 1.5em;
 `;
 
 export default AccountTierBox;

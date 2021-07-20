@@ -25,3 +25,31 @@ export const createUser = async (request: FastifyRequest, reply: FastifyReply) =
         reply.code(500).send();
     }
 }
+
+export const subscribeUser = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        const { user } = request;
+        if (!user)
+            throw new Error(`Cannot subscribe user without valid authenticated user.`);
+        await UserService.subscribeUser(user);
+        reply.code(200).send();
+    } catch (e) {
+        logger.error(`Error while subscribing user.`, e);
+        reply.code(500).send();
+    }
+}
+
+export const unsubscribeUser = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        const { user } = request;
+        if (!user)
+            throw new Error(`Cannot unsubscribe user without valid authenticated user.`);
+        await UserService.unsubscribeUser(user);
+        reply.code(200).send();
+    } catch (e) {
+        logger.error(`Error while unsubscribing user.`, e);
+        reply.code(500).send();
+    }
+}
