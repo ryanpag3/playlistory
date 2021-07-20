@@ -25,6 +25,11 @@ model User {
   JsonWebTokenBlacklist JsonWebTokenBlacklist[]
   backups               Backup[]
   playlists             Playlist[]
+  stripeUserId          String?
+  stripeSubscriptionId  String?
+  // TODO: remove before launch
+  // This will be the temporary subscribed flag until the stripe integration is complete
+  isSubscribed          Boolean                 @default(false)
 }
 
 model JsonWebTokenBlacklist {
