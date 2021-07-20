@@ -37,7 +37,10 @@ const AccountTierBox = (props: {
             {
                 props.SubmitButton &&
                 <SubmitButtonContainer>
-                    <props.SubmitButton>{props.buttonText}</props.SubmitButton>
+                    <props.SubmitButton
+                        // @ts-ignore
+                        onClick={() => props.onSubmit()}
+                    >{props.buttonText}</props.SubmitButton>
                 </SubmitButtonContainer>
             }
         </Container>

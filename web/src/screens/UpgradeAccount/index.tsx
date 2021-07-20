@@ -2,7 +2,8 @@
  * Copyright (C) Ryan Page - All Rights Reserved
  * For more information, refer to LICENSE file.
  */
-import React from 'react'
+import axios from 'axios';
+import React, { useState } from 'react'
 import styled from 'styled-components';
 import Button from '../../components/Button';
 import NavBar from '../../components/NavBar';
@@ -11,6 +12,23 @@ import colors from '../../constants/colors';
 import AccountTierBox from './AccountTierBox';
 
 const UpgradeAccount = () => {
+    // TODO: query this ahead of time to allow for new sessions w/ upgraded users
+    const [isUpgraded, setIsUpgraded] = useState(false);
+
+    async function subscribeUser() {
+        await axios('/user/subscribe', {
+            method: 'POST'
+        })
+        setIsUpgraded(true);
+    }
+
+    async function unsubscribeUser() {
+        await axios('/user/unsubscribe', {
+            method: 'POST'
+        })
+        setIsUpgraded(false);
+    }
+
     return (
         <Container>
             <NavBar />
@@ -32,8 +50,8 @@ const UpgradeAccount = () => {
                         "Receive notifications when backup completes."
                     ]}
                     SubmitButton={UpgradeButton}
-                    buttonText="Upgrade"
-                    onSubmit={() => console.log('hurr')}
+                    buttonText={!isUpgraded ? 'Subscribe' : 'Unsubscribe' }
+                    onSubmit={!isUpgraded ? subscribeUser : unsubscribeUser}
                 />
             </AccountTiersContainer>
         </Container>

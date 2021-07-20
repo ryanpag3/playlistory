@@ -25,6 +25,7 @@ export const create = async (body: {
  * integration is complete.
  */
 export const subscribeUser = async (user: User) => {
+    logger.debug(`subscribing user`);
     return await prisma.user.update({
         where: {
             id: user.id
@@ -41,6 +42,7 @@ export const subscribeUser = async (user: User) => {
  * integration is complete.
  */
 export const unsubscribeUser = async (user: User) => {
+    logger.debug(`unsubscribing user`);
     return await prisma.user.update({
         where: {
             id: user.id
