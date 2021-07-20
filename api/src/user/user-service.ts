@@ -48,7 +48,7 @@ export const unsubscribeUser = async (user: User) => {
             id: user.id
         },
         data: {
-            isSubscribed: true
+            isSubscribed: false
         }
     });
 }

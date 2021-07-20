@@ -13,7 +13,13 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
         if (!backupName) {
             backupName = `Playlistory Backup | ${new Date().toLocaleDateString()}`;
         }
-        
+
+        // @ts-ignore
+        const isBackupPermitted = await BackupService.isBackupPermitted(request.user, playlistId);
+        if (!isBackupPermitted) {
+            return reply.code(403).send(`You are not permitted to create a backup. Please consider upgrading to premium to remove this limit.`);
+        }
+
         const mostRecentBackup = await BackupService.getMostRecentBackup(playlistId);
         // @ts-ignore
         const playlist = await MusicService.getPlaylist(request.user, platform, playlistId);

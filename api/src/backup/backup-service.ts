@@ -184,3 +184,22 @@ export const deleteBackup = async (id: string) => {
 
     return res;
 }
+
+export const isBackupPermitted = async (user: User, playlistId: string) => {
+    if (user.isSubscribed) {
+        logger.debug(`user is premium tier, backup is permitted.`);
+        return true;
+    }
+
+    const backupAmt = await prisma.backup.count({
+        where: {
+            playlist: {
+                playlistId 
+            }
+        }
+    });
+
+    logger.info(backupAmt);
+
+    return backupAmt < 3;
+}

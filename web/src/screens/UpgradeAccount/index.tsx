@@ -36,8 +36,9 @@ const UpgradeAccount = () => {
                 <AccountTierBox
                     accountTitle="Free"
                     features={[
-                        "Backup up to three playlists",
-                        "Run one backup per week manually"
+                        "Backup up to three playlists.",
+                        "Save up to three backups per playlist.",
+                        "Run one backup per week manually."
                     ]}
                 />
                 <AccountTierBox
@@ -46,6 +47,7 @@ const UpgradeAccount = () => {
                     features={[
                         "Backup unlimited playlists.",
                         "Run backups as often as you'd like.",
+                        "Save as many backups as you'd like.",
                         "Schedule backups to run automatically.",
                         "Receive notifications when backup completes."
                     ]}

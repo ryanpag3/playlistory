@@ -52,7 +52,7 @@ const Container = styled.div`
     flex-direction: column;
     background: ${colors.LIGHT};
     border: 1px solid black;
-    width: 22em;
+    width: 25em;
 `;
 
 const AccountTitleContainer = styled.div`
