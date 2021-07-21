@@ -8,7 +8,7 @@ import prisma from '../util/prisma';
 export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
         // @ts-ignore
-        let { playlistId, backupName, platform, cronSchedule } = request.body;
+        let { playlistId, backupName, platform, interval } = request.body;
 
         if (!backupName) {
             backupName = `Playlistory Backup | ${new Date().toLocaleDateString()}`;
@@ -27,8 +27,26 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
         if (!playlist)
             throw new Error(`Playlist not found.`);
         
-        if (cronSchedule) {
-            BackupService.validateCronSchedule(cronSchedule);
+        let cronSchedule;
+        if (interval) {
+            cronSchedule = BackupService.getCronSchedule(interval);
+            const existingScheduledBackup = await prisma.backup.findMany({
+                where: {
+                    playlist: {
+                        playlistId
+                    },
+                    scheduled: true
+                },
+                include: {
+                    playlist: true
+                }
+            });
+            if (existingScheduledBackup) {
+                logger.debug(`deleting existing scheduled backups for playlist.`);
+                for (const bu of existingScheduledBackup) {
+                    await BackupService.deleteBackup(bu.id);
+                }
+            }
         }
 
         // @ts-ignore
@@ -54,7 +72,7 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
             cronSchedule
         });
 
-        if (mostRecentBackup?.playlist.contentHash === currentBackup.playlist.contentHash) {
+        if (mostRecentBackup?.playlist.contentHash === currentBackup.playlist.contentHash || cronSchedule !== undefined) {
             logger.debug(`skipping diff generation as the contents of the playlist [${playlist.id}] hasn't changed.`);
             currentBackup = await prisma.backup.update({
                 where: {

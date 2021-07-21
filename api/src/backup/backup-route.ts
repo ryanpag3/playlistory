@@ -20,7 +20,7 @@ const routes = [
                         type: 'string',
                         require: false
                     },
-                    cronSchedule: {
+                    interval: {
                         type: 'string',
                         require: false
                     }

@@ -107,7 +107,9 @@ export const getBackups = async (user: User, playlistId: string) => {
             playlist: {
                 playlistId
             },
-            createdById: user.id
+            createdById: user.id,
+            // we want backups that have been executed, not scheduled
+            scheduled: false
         },
         orderBy: {
             createdAt: 'desc'
@@ -166,7 +168,7 @@ const resolveManifestSpotify = async (user: User, manifest: any) => {
 }
 
 export const deleteBackup = async (id: string) => {
-    logger.info(`deleting backup ${id}`);
+    logger.debug(`deleting backup ${id}`);
     const backup = await prisma.backup.findUnique({
         where: {
             id
@@ -217,24 +219,24 @@ export const isBackupPermitted = async (user: User, playlistId: string) => {
  * 
  * Times are hardcoded and cannot be changed, jobs are buffered using a queue so no point allowing scheduled times.
  */
-export const validateCronSchedule = (cronSchedule: string) => {
+export const getCronSchedule = (interval: string) => {
     const ONCE_PER_HOUR  = '0 * * * *';
     const ONCE_PER_DAY   = '0 0 * * *';
     const ONCE_PER_WEEK  = '0 0 0 * *';
     const ONCE_PER_MONTH = '0 0 0 0 *';
     const ONCE_PER_YEAR  = '0 0 0 0 0';
 
-    switch (cronSchedule) {
-        case ONCE_PER_HOUR:
-            break;
-        case ONCE_PER_DAY:
-            break;
-        case ONCE_PER_WEEK:
-            break;
-        case ONCE_PER_MONTH:
-            break;
-        case ONCE_PER_YEAR:
-            break;
+    switch (interval) {
+        case 'hour':
+            return ONCE_PER_HOUR;
+        case 'day':
+            return ONCE_PER_DAY;
+        case 'week':
+            return ONCE_PER_WEEK;
+        case 'month':
+            return ONCE_PER_MONTH;
+        case 'year':
+            return ONCE_PER_YEAR;
         default:
             throw new Error(`Invalid cron expression provided.`);
     }

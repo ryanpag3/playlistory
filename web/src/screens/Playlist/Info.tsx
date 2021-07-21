@@ -1,17 +1,25 @@
 import React, { useState } from 'react'
 import styled from 'styled-components';
 import { IoMdPerson } from 'react-icons/io';
-import { Button, Dialog, DialogContent, DialogTitle, TextField } from '@material-ui/core';
+import { Button, Checkbox, Dialog, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, Tooltip } from '@material-ui/core';
 import colors from '../../constants/colors';
 import axios from 'axios';
 
 const Info = (props: any) => {
     const [modalOpened, setModalOpened] = useState(false);
+    const [interval, setInterval] = useState('hour');
+    const [scheduledChecked, setScheduledChecked] = useState(false);
+
+    async function handleIntervalChange(changed: any) {
+        setInterval(changed.target.value);
+    }
 
     async function submitBackup() {
+        console.log(interval);
         await axios.post('/backup', {
             playlistId: props.id,
-            platform: props.platform
+            platform: props.platform,
+            interval: scheduledChecked === true ? interval : undefined
         });
         props.triggerRefetch();
         setModalOpened(false);
@@ -44,10 +52,41 @@ const Info = (props: any) => {
                     <Description>{props.description || 'No description.'}</Description>
                 </DescriptionContainer>
                 <Row>
-                    <OwnerContainer>
-                        <OwnerIcon/>
-                        <Owner>{props.owner?.name}</Owner>
-                    </OwnerContainer>
+                    <BottomInfoCont>
+                        <OwnerContainer>
+                            <OwnerIcon/>
+                            <Owner>{props.owner?.name}</Owner>
+                        </OwnerContainer>
+                        <ScheduledContainer>
+                            <FormControlLabel
+                                control={
+                                    <ScheduledCheckbox
+                                        onChange={(e) => setScheduledChecked(e.target.checked)}
+                                    />
+                                }
+                                label="Scheduled"
+                            />
+                            {
+                            scheduledChecked && 
+                            <FormControl>
+                                <Tooltip title="Backups always start at the top of the interval. For example, every week would be on Sunday at 12am PST. Every day would be 12am PST, etc.">
+                                    <InputLabel id="interval-label">Interval</InputLabel>
+                                </Tooltip>
+                                <Select
+                                    labelId="interval-label"
+                                    value={interval}
+                                    onChange={handleIntervalChange}
+                                >
+                                    <MenuItem value="hour">Once per hour</MenuItem>
+                                    <MenuItem value="day">Once per day</MenuItem>
+                                    <MenuItem value="week">Once per week</MenuItem>
+                                    <MenuItem value="month">Once per month</MenuItem>
+                                    <MenuItem value="year">Once per year</MenuItem>
+                                </Select>
+                            </FormControl>
+                            }
+                        </ScheduledContainer>
+                    </BottomInfoCont>
                     <BackupButton
                         onClick={openBackupModal}
                     >
@@ -134,6 +173,14 @@ const Row = styled.div`
     width: 100%;
 `;
 
+const Column = styled.div`
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+`;
+
+const BottomInfoCont = styled(Column)``;
+
 const OwnerContainer = styled.div`
     display: flex;
     flex-direction: row;
@@ -150,12 +197,29 @@ const Owner = styled.text`
 
 `;
 
+const ScheduledContainer = styled.div`
+
+`;
+
+const ScheduledCheckContainer = styled.div`
+
+`;
+
+const ScheduledCheckbox = styled(Checkbox)`
+
+`;
+
+const ScheduledFormLabel = styled(FormControlLabel)`
+
+`;
+
 const BackupButton = styled(Button)`
     background-color: ${colors.PRIMARY_ACCENT};
     padding-left: 1em;
     padding-right: 1em;
     font-size: 18px;
     font-weight: bold;
+    max-height: 2.5em;
 
     &:hover {
         background-color: ${colors.SECONDARY_ACCENT};
