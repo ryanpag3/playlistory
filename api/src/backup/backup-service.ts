@@ -206,10 +206,6 @@ export const isBackupPermitted = async (user: User, playlistId: string) => {
     return backupAmt < 3;
 }
 
-export const createScheduledBackup = async (user: User, playlistId: string, cronSchedule: string) => {
-    
-}
-
 /**
  * This is very rudimentary but our choices for scheduling are also rudimentary.
  * We support:
