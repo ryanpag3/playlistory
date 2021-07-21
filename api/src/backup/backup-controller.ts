@@ -8,7 +8,7 @@ import prisma from '../util/prisma';
 export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
         // @ts-ignore
-        let { playlistId, backupName, platform } = request.body;
+        let { playlistId, backupName, platform, cronSchedule } = request.body;
 
         if (!backupName) {
             backupName = `Playlistory Backup | ${new Date().toLocaleDateString()}`;
@@ -26,6 +26,10 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
 
         if (!playlist)
             throw new Error(`Playlist not found.`);
+        
+        if (cronSchedule) {
+            BackupService.validateCronSchedule(cronSchedule);
+        }
 
         // @ts-ignore
         let currentBackup = await BackupService.createBackup(request.user, {
@@ -45,7 +49,9 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
             // @ts-ignore
             platform: Platforms.SPOTIFY,
             // @ts-ignore
-            createdById: request.user.id
+            createdById: request.user.id,
+            scheduled: cronSchedule ? true : false,
+            cronSchedule
         });
 
         if (mostRecentBackup?.playlist.contentHash === currentBackup.playlist.contentHash) {

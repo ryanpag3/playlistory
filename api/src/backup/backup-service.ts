@@ -4,7 +4,6 @@ import logger from '../util/logger';
 import { getNormSpotifyTrack } from '../util/normalizer';
 import prisma from '../util/prisma';
 import SpotifyApi from '../util/spotify-api';
-import ProcessBackupsFreeQueue from '../message-queues/process-backups-free';
 
 export const createBackup = async (user: User, opts: {
     platform: string;
@@ -17,6 +16,8 @@ export const createBackup = async (user: User, opts: {
     followers: number;
     imageUrl: string;
     createdById: string;
+    scheduled: boolean;
+    cronSchedule?: string;
 }) => {
     const playlist = await prisma.playlist.create({
         data: {
@@ -39,7 +40,9 @@ export const createBackup = async (user: User, opts: {
         data: {
             createdById: user.id,
             name: opts.name,
-            playlistId: playlist.id
+            playlistId: playlist.id,
+            scheduled: opts.scheduled,
+            cronSchedule: opts.cronSchedule || null
         },
         include: {
             playlist: true,
@@ -205,4 +208,38 @@ export const isBackupPermitted = async (user: User, playlistId: string) => {
 
 export const createScheduledBackup = async (user: User, playlistId: string, cronSchedule: string) => {
     
+}
+
+/**
+ * This is very rudimentary but our choices for scheduling are also rudimentary.
+ * We support:
+ * Once per hour
+ * Once per day
+ * Once per week
+ * Once per month
+ * Once per year
+ * 
+ * Times are hardcoded and cannot be changed, jobs are buffered using a queue so no point allowing scheduled times.
+ */
+export const validateCronSchedule = (cronSchedule: string) => {
+    const ONCE_PER_HOUR  = '0 * * * *';
+    const ONCE_PER_DAY   = '0 0 * * *';
+    const ONCE_PER_WEEK  = '0 0 0 * *';
+    const ONCE_PER_MONTH = '0 0 0 0 *';
+    const ONCE_PER_YEAR  = '0 0 0 0 0';
+
+    switch (cronSchedule) {
+        case ONCE_PER_HOUR:
+            break;
+        case ONCE_PER_DAY:
+            break;
+        case ONCE_PER_WEEK:
+            break;
+        case ONCE_PER_MONTH:
+            break;
+        case ONCE_PER_YEAR:
+            break;
+        default:
+            throw new Error(`Invalid cron expression provided.`);
+    }
 }
