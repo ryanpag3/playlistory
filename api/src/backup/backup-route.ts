@@ -19,13 +19,17 @@ const routes = [
                     backupName: {
                         type: 'string',
                         require: false
+                    },
+                    cronSchedule: {
+                        type: 'string',
+                        require: false
                     }
                 }
             },
             response: {
                 200: {
                     type: 'string',
-                    description: 'Backup started.'
+                    description: 'Backup has been created and optionally started depending on if scheduled.'
                 }
             }
         },
