@@ -4,6 +4,7 @@ import logger from '../util/logger';
 import { getNormSpotifyTrack } from '../util/normalizer';
 import prisma from '../util/prisma';
 import SpotifyApi from '../util/spotify-api';
+import ProcessBackupsFreeQueue from '../message-queues/process-backups-free';
 
 export const createBackup = async (user: User, opts: {
     platform: string;
@@ -199,7 +200,9 @@ export const isBackupPermitted = async (user: User, playlistId: string) => {
         }
     });
 
-    logger.info(backupAmt);
-
     return backupAmt < 3;
+}
+
+export const createScheduledBackup = async (user: User, playlistId: string, cronSchedule: string) => {
+    
 }

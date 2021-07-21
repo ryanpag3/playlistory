@@ -3,6 +3,7 @@ import { FastifyCookieOptions } from 'fastify-cookie';
 import SwaggerConfig from './util/openapi';
 import * as AuthController from './auth/auth-controller';
 import logger from './util/logger';
+import * as MessageQueue from './message-queues';
 
 export async function setupServer(server: FastifyInstance) {
     /* SWAGGER */
@@ -27,6 +28,11 @@ export async function setupServer(server: FastifyInstance) {
     logger.debug(`setting up auth`);
     await server.register(require('fastify-auth'));
     server.decorate('validateJWT', AuthController.verifyJWT);
+
+    /* MESSAGE QUEUES */
+    MessageQueue.setup();
+
+    /* ROUTES */
 
     // this must be called locally to ensure the server instance is properly decorated
     const routes = require('./route').default;

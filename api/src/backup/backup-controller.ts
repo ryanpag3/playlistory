@@ -98,3 +98,16 @@ export const deleteBackup = async (request: FastifyRequest, reply: FastifyReply)
         reply.code(500).send();
     }
 }
+
+export const createScheduledBackup = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        const { cronSchedule, playlistId } = request.query;
+        // @ts-ignore
+        const res = await BackupService.createScheduledBackup(request.user);
+        reply.send(JSON.stringify(res));
+    } catch (e) {
+        logger.error(`Error occured while creating scheduled backup.`, e);
+        reply.code(500).send();
+    }
+}
