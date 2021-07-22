@@ -1,6 +1,6 @@
 import { Backup, Platform, User } from '@prisma/client';
 import moment from 'moment';
-import { createBackup } from '../backup/backup-service';
+import { createBackup, getIntervalFromCronSchedule } from '../backup/backup-service';
 import { chunk } from '../util/array';
 import logger from '../util/logger';
 import { getNormSpotifyPlaylist } from '../util/normalizer';
@@ -36,11 +36,12 @@ export const getMyPlaylists = async (user: User, offset: number = 0, limit: numb
     }
 
     result = result.map(async (playlist: Playlist) => {
-        const [backup] = await prisma.backup.findMany({
+        const [scheduledBackup] = await prisma.backup.findMany({
             where: {
                 playlist: {
                     playlistId: playlist.id
-                }
+                },
+                scheduled: true
             },
             orderBy: {
                 createdAt: 'desc'
@@ -50,6 +51,35 @@ export const getMyPlaylists = async (user: User, offset: number = 0, limit: numb
             },
             take: 1
         });
+
+        if (scheduledBackup) {
+            logger.debug('including scheduled  backup');
+            // @ts-ignore
+            scheduledBackup.interval = getIntervalFromCronSchedule(scheduledBackup.cronSchedule);
+            
+            logger.info(scheduledBackup);
+            // @ts-ignore
+            playlist.scheduledBackup = scheduledBackup;
+        } else {
+            logger.info('scheduled backup not found.');
+        }
+
+        const [backup] = await prisma.backup.findMany({
+            where: {
+                playlist: {
+                    playlistId: playlist.id
+                },
+                scheduled: false
+            },
+            orderBy: {
+                createdAt: 'desc'
+            },
+            include: {
+                playlist: true
+            },
+            take: 1
+        });
+
         if (backup) {
             // @ts-ignore
             playlist.lastBackedUp = backup.createdAt;

@@ -6,9 +6,12 @@ import colors from '../../constants/colors';
 import axios from 'axios';
 
 const Info = (props: any) => {
+
+    console.log(props);
+
     const [modalOpened, setModalOpened] = useState(false);
-    const [interval, setInterval] = useState('hour');
-    const [scheduledChecked, setScheduledChecked] = useState(false);
+    const [interval, setInterval] = useState(props.scheduledBackup ? props.scheduledBackup.interval : 'day');
+    const [scheduledChecked, setScheduledChecked] = useState(props.scheduledBackup !== undefined ? true : false);
 
     useEffect(() => {
         if (scheduledChecked === false) {
@@ -76,6 +79,7 @@ const Info = (props: any) => {
                             <FormControlLabel
                                 control={
                                     <ScheduledCheckbox
+                                        checked={scheduledChecked}
                                         onChange={(e) => setScheduledChecked(e.target.checked)}
                                     />
                                 }

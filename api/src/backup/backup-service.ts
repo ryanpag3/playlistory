@@ -227,6 +227,12 @@ export const isBackupPermitted = async (user: User, playlistId: string) => {
     return backupAmt < 3;
 }
 
+const ONCE_PER_HOUR  = '0 * * * *';
+const ONCE_PER_DAY   = '0 0 * * *';
+const ONCE_PER_WEEK  = '0 0 0 * *';
+const ONCE_PER_MONTH = '0 0 0 0 *';
+const ONCE_PER_YEAR  = '0 0 0 0 0';
+
 /**
  * This is very rudimentary but our choices for scheduling are also rudimentary.
  * We support:
@@ -239,11 +245,6 @@ export const isBackupPermitted = async (user: User, playlistId: string) => {
  * Times are hardcoded and cannot be changed, jobs are buffered using a queue so no point allowing scheduled times.
  */
 export const getCronSchedule = (interval: string) => {
-    const ONCE_PER_HOUR  = '0 * * * *';
-    const ONCE_PER_DAY   = '0 0 * * *';
-    const ONCE_PER_WEEK  = '0 0 0 * *';
-    const ONCE_PER_MONTH = '0 0 0 0 *';
-    const ONCE_PER_YEAR  = '0 0 0 0 0';
 
     switch (interval) {
         case 'hour':
@@ -258,5 +259,20 @@ export const getCronSchedule = (interval: string) => {
             return ONCE_PER_YEAR;
         default:
             throw new Error(`Invalid cron expression provided.`);
+    }
+}
+
+export const getIntervalFromCronSchedule = (schedule: string) => {
+    switch(schedule) {
+        case ONCE_PER_HOUR:
+            return 'hour';
+        case ONCE_PER_DAY:
+            return 'day';
+        case ONCE_PER_WEEK:
+            return 'week';
+        case ONCE_PER_MONTH:
+            return 'month';
+        case ONCE_PER_YEAR:
+            return 'year';
     }
 }
