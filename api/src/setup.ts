@@ -4,6 +4,7 @@ import SwaggerConfig from './util/openapi';
 import * as AuthController from './auth/auth-controller';
 import logger from './util/logger';
 import * as MessageQueue from './message-queues';
+import * as Scheduler from './util/scheduler';
 
 export async function setupServer(server: FastifyInstance) {
     /* SWAGGER */
@@ -31,6 +32,8 @@ export async function setupServer(server: FastifyInstance) {
 
     /* MESSAGE QUEUES */
     MessageQueue.setup();
+    
+    await Scheduler.scheduleJobs();
 
     /* ROUTES */
 
