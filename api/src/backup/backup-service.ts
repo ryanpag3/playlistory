@@ -191,6 +191,25 @@ export const deleteBackup = async (id: string) => {
     return res;
 }
 
+export const deleteScheduledBackupsByPlaylistId = async (playlistId: string) => {
+    logger.debug(`deleting scheduled backups by playlist id ${playlistId}`);
+    const backups = await prisma.backup.findMany({
+        where: {
+            playlist: {
+                playlistId
+            },
+            scheduled: true
+        }
+    });
+    
+    const promises = [];
+    for (const backup of backups) {
+        promises.push(deleteBackup(backup.id));
+    }
+
+    return Promise.all(promises);
+}
+
 export const isBackupPermitted = async (user: User, playlistId: string) => {
     if (user.isSubscribed) {
         logger.debug(`user is premium tier, backup is permitted.`);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components';
 import { IoMdPerson } from 'react-icons/io';
 import { Button, Checkbox, Dialog, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, Tooltip } from '@material-ui/core';
@@ -10,12 +10,27 @@ const Info = (props: any) => {
     const [interval, setInterval] = useState('hour');
     const [scheduledChecked, setScheduledChecked] = useState(false);
 
+    useEffect(() => {
+        if (scheduledChecked === false) {
+            cleanupScheduledBackups();
+        } else {
+            submitBackup();
+        }
+    }, [ scheduledChecked, interval ]);
+
     async function handleIntervalChange(changed: any) {
         setInterval(changed.target.value);
     }
 
+    async function cleanupScheduledBackups() {
+        await axios.delete('/backup/scheduled', {
+            params: {
+                playlistId: props.id
+            }
+        })
+    }
+
     async function submitBackup() {
-        console.log(interval);
         await axios.post('/backup', {
             playlistId: props.id,
             platform: props.platform,

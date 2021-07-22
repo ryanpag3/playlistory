@@ -115,7 +115,20 @@ export const getBackups = async (request: FastifyRequest, reply: FastifyReply) =
 export const deleteBackup = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
         // @ts-ignore
-        const res = await BackupService.deleteBackup(request.query.id);
+        const { id } = request.query;
+        const res = await BackupService.deleteBackup(id);
+        reply.send(JSON.stringify(res));
+    } catch (e) {
+        logger.error(e);
+        reply.code(500).send();
+    }
+}
+
+export const deleteScheduledBackup = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        const { playlistId } = request.query;
+        const res = await BackupService.deleteScheduledBackupsByPlaylistId(playlistId);
         reply.send(JSON.stringify(res));
     } catch (e) {
         logger.error(e);
