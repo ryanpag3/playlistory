@@ -1,10 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import logger from '../util/logger';
 import * as BackupService from './backup-service';
-import * as MusicService from '../music/music-service';
-import Platforms from '../util/Platforms';
-import prisma from '../util/prisma';
-import { scheduleJobs } from '../util/scheduler';
 
 export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
@@ -16,7 +12,7 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
         }
 
         // @ts-ignore
-        const isBackupPermitted = await BackupService.isBackupPermitted(request.user, playlistId);
+        const isBackupPermitted = await BackupService.isBackupPermitted(request.user, playlistId, interval);
         if (!isBackupPermitted) {
             return reply.code(403).send(`You are not permitted to create a backup. Please consider upgrading to premium to remove this limit.`);
         }

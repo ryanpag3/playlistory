@@ -295,21 +295,29 @@ export const deleteScheduledBackupsByPlaylistId = async (playlistId: string) => 
     return Promise.all(promises);
 }
 
-export const isBackupPermitted = async (user: User, playlistId: string) => {
+export const isBackupPermitted = async (user: User, playlistId: string, interval?: string) => {
     if (user.isSubscribed) {
         logger.debug(`user is premium tier, backup is permitted.`);
         return true;
     }
 
+    const uniquePlaylists = await prisma.playlist.findMany({
+        where: {
+            createdById: user.id
+        },
+        distinct: [ 'playlistId' ]
+    });
+
     const backupAmt = await prisma.backup.count({
         where: {
+            createdById: user.id,
             playlist: {
-                playlistId 
+                playlistId
             }
         }
     });
 
-    return backupAmt < 3;
+    return interval === undefined || backupAmt < 3 || uniquePlaylists.length < 3;
 }
 
 const ONCE_PER_HOUR  = '0 * * * *';

@@ -48,8 +48,7 @@ const UpgradeAccount = () => {
                         "Backup unlimited playlists.",
                         "Run backups as often as you'd like.",
                         "Save as many backups as you'd like.",
-                        "Schedule backups to run automatically.",
-                        "Receive notifications when backup completes."
+                        "Schedule backups to run automatically."
                     ]}
                     SubmitButton={UpgradeButton}
                     buttonText={!isUpgraded ? 'Subscribe' : 'Unsubscribe' }
