@@ -16,7 +16,7 @@ const Info = (props: any) => {
     useEffect(() => {
         if (scheduledChecked === false) {
             cleanupScheduledBackups();
-        } else {
+        } else if (interval) {
             submitBackup();
         }
     }, [ scheduledChecked, interval ]);

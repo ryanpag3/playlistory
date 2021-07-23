@@ -3,7 +3,92 @@ import { chunk } from '../util/array';
 import logger from '../util/logger';
 import { getNormSpotifyTrack } from '../util/normalizer';
 import prisma from '../util/prisma';
+import { scheduleJobs } from '../util/scheduler';
 import SpotifyApi from '../util/spotify-api';
+import * as MusicService from '../music/music-service';
+import Platforms from '../util/Platforms';
+
+export const runBackup = async (user: User, playlistId: string, backupName: string, platform: string, interval?: string) => {
+    const mostRecentBackup = await getMostRecentBackup(playlistId);
+        // @ts-ignore
+        const playlist = await MusicService.getPlaylist(user, platform, playlistId);
+
+        if (!playlist)
+            throw new Error(`Playlist not found.`);
+        
+        let cronSchedule;
+        if (interval) {
+            cronSchedule = getCronSchedule(interval);
+            const existingScheduledBackup = await prisma.backup.findMany({
+                where: {
+                    playlist: {
+                        playlistId
+                    },
+                    scheduled: true
+                },
+                include: {
+                    playlist: true
+                }
+            });
+            if (existingScheduledBackup) {
+                logger.debug(`deleting existing scheduled backups for playlist.`);
+                for (const bu of existingScheduledBackup) {
+                    await deleteBackup(bu.id);
+                }
+            }
+        }
+
+        // @ts-ignore
+        let currentBackup = await createBackup(user, {
+            name: backupName,
+            playlistId: playlist.id,
+            playlistName: playlist.name,
+            playlistDescription: playlist.description,
+            imageUrl: playlist.imageUrl as any,
+            contentHash: playlist.snapshotId,
+            followers: playlist.followers as any,
+            // @ts-ignore
+            tracks: playlist.tracks.items.map(i => {
+                return {
+                    id: i.id,
+                    uri: i.uri
+                }
+            }),
+            // @ts-ignore
+            platform: Platforms.SPOTIFY,
+            // @ts-ignore
+            createdById: user.id,
+            scheduled: cronSchedule ? true : false,
+            cronSchedule
+        });
+
+        if (interval) {
+            scheduleJobs();
+        }
+
+        if (mostRecentBackup?.playlist.contentHash === currentBackup.playlist.contentHash || cronSchedule !== undefined) {
+            logger.debug(`skipping diff generation as the contents of the playlist [${playlist.id}] hasn't changed.`);
+            currentBackup = await prisma.backup.update({
+                where: {
+                    id: currentBackup.id
+                },
+                data: {
+                    manifest: {
+                        added: [],
+                        removed: []
+                    }
+                },
+                include: {
+                    playlist: true,
+                    createdBy: true
+                }
+            });
+            
+            return currentBackup;
+        }
+
+        return generateManifest(mostRecentBackup, currentBackup);
+}
 
 export const createBackup = async (user: User, opts: {
     platform: string;
@@ -229,9 +314,9 @@ export const isBackupPermitted = async (user: User, playlistId: string) => {
 
 const ONCE_PER_HOUR  = '0 * * * *';
 const ONCE_PER_DAY   = '0 0 * * *';
-const ONCE_PER_WEEK  = '0 0 0 * *';
-const ONCE_PER_MONTH = '0 0 0 0 *';
-const ONCE_PER_YEAR  = '0 0 0 0 0';
+const ONCE_PER_WEEK  = '0 0 * * 0';
+const ONCE_PER_MONTH = '0 0 1 * *';
+const ONCE_PER_YEAR  = '0 0 1 1 *';
 
 /**
  * This is very rudimentary but our choices for scheduling are also rudimentary.

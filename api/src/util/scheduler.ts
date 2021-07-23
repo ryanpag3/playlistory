@@ -15,6 +15,8 @@ const redlock = new Redlock(
 export const jobs = {};
 
 export const scheduleJobs = async () => {
+    stopAllJobs();
+
     const scheduledBackups = await prisma.backup.findMany({
         where: {
             scheduled: true
@@ -25,7 +27,7 @@ export const scheduleJobs = async () => {
     });
 
     for (const scheduledBackup of scheduledBackups) {
-        logger.debug(`creating new cron job with id ${scheduledBackup.id}`);
+        logger.debug(`creating new cron job with id ${scheduledBackup.id} and cron pattern ${scheduledBackup.cronSchedule}`);
         // @ts-ignore
         jobs[scheduledBackup.id] = new CronJob(scheduledBackup.cronSchedule, async () => {
             try {
@@ -47,6 +49,12 @@ export const scheduleJobs = async () => {
 
 }
 
-export const refreshScheduledJobs = async () => {
+const stopAllJobs = () => {
+    const keys = Object.keys(jobs);
 
+    for (const key of keys) {
+        // @ts-ignore
+        const job = jobs[key];
+        job.stop();
+    }
 }
