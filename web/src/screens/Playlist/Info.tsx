@@ -6,20 +6,25 @@ import colors from '../../constants/colors';
 import axios from 'axios';
 
 const Info = (props: any) => {
-
-    console.log(props);
-
+    const [isInit, setIsInit] = useState(false);
     const [modalOpened, setModalOpened] = useState(false);
     const [interval, setInterval] = useState(props.scheduledBackup ? props.scheduledBackup.interval : 'day');
     const [scheduledChecked, setScheduledChecked] = useState(props.scheduledBackup !== undefined ? true : false);
 
     useEffect(() => {
+        if (!isInit)
+            return;
+        
         if (scheduledChecked === false) {
             cleanupScheduledBackups();
         } else if (interval) {
             submitBackup();
         }
     }, [ scheduledChecked, interval ]);
+
+    useEffect(() => {
+        setIsInit(true);
+    }, [ isInit === false ])
 
     async function handleIntervalChange(changed: any) {
         setInterval(changed.target.value);
@@ -34,6 +39,7 @@ const Info = (props: any) => {
     }
 
     async function submitBackup() {
+        console.log('submitting backup');
         await axios.post('/backup', {
             playlistId: props.id,
             platform: props.platform,

@@ -1,4 +1,3 @@
-import Queue from 'bull';
 import logger from '../../util/logger';
 import prisma from '../../util/prisma';
 import { getBullQueue } from '../util';
