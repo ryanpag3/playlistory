@@ -53,7 +53,8 @@ export const deleteScheduledBackup = async (request: FastifyRequest, reply: Fast
     try {
         // @ts-ignore
         const { playlistId } = request.query;
-        const res = await BackupService.deleteScheduledBackupsByPlaylistId(playlistId);
+        // @ts-ignore
+        const res = await BackupService.deleteScheduledBackupsByPlaylistId(request.user?.id, playlistId);
         reply.send(JSON.stringify(res));
     } catch (e) {
         logger.error(e);

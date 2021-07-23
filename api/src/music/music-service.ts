@@ -38,6 +38,7 @@ export const getMyPlaylists = async (user: User, offset: number = 0, limit: numb
     result = result.map(async (playlist: Playlist) => {
         const [scheduledBackup] = await prisma.backup.findMany({
             where: {
+                createdById: user.id,
                 playlist: {
                     playlistId: playlist.id
                 },
@@ -66,6 +67,7 @@ export const getMyPlaylists = async (user: User, offset: number = 0, limit: numb
 
         const [backup] = await prisma.backup.findMany({
             where: {
+                createdById: user.id,
                 playlist: {
                     playlistId: playlist.id
                 },
@@ -384,6 +386,7 @@ const resolvePlaylistLink = async (user: User, backup: Backup) => {
     // update all references to old playlist to use new one
     await prisma.playlist.updateMany({
         where: {
+            createdById: user.id,
             // @ts-ignore
             playlistId: backup.playlist.playlistId
         },

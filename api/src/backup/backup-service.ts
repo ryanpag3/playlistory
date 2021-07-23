@@ -9,7 +9,7 @@ import * as MusicService from '../music/music-service';
 import Platforms from '../util/Platforms';
 
 export const runBackup = async (user: User, playlistId: string, backupName: string, platform: string, interval?: string) => {
-    const mostRecentBackup = await getMostRecentBackup(playlistId);
+    const mostRecentBackup = await getMostRecentBackup(user.id, playlistId);
         // @ts-ignore
         const playlist = await MusicService.getPlaylist(user, platform, playlistId);
 
@@ -21,6 +21,7 @@ export const runBackup = async (user: User, playlistId: string, backupName: stri
             cronSchedule = getCronSchedule(interval);
             const existingScheduledBackup = await prisma.backup.findMany({
                 where: {
+                    createdById: user.id,
                     playlist: {
                         playlistId
                     },
@@ -164,9 +165,10 @@ export const generateManifest = async (mostRecentBackup: (Backup & { playlist: P
     return backup;
 }
 
-export const getMostRecentBackup = async (playlistId: string) => {
+export const getMostRecentBackup = async (createdById: string, playlistId: string) => {
     return prisma.backup.findFirst({
         where: {
+            createdById,
             playlist: {
                 playlistId
             }
@@ -276,10 +278,11 @@ export const deleteBackup = async (id: string) => {
     return res;
 }
 
-export const deleteScheduledBackupsByPlaylistId = async (playlistId: string) => {
+export const deleteScheduledBackupsByPlaylistId = async (createdById: string, playlistId: string) => {
     logger.debug(`deleting scheduled backups by playlist id ${playlistId}`);
     const backups = await prisma.backup.findMany({
         where: {
+            createdById,
             playlist: {
                 playlistId
             },
