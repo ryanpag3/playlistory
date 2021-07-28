@@ -73,6 +73,25 @@ const routes = [
             server.validateJWT
         ]),
         handler: UserController.unsubscribeUser
+    },
+    {
+        method: 'GET',
+        url: '/user/me',
+        schema: {
+            description: 'Get metadata about the currently authenticated user.',
+            response: {
+                200: {
+                    type: 'object',
+                    description: 'The user metadata object.'
+                }
+            }
+        },
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ]),
+        handler: UserController.getMe
     }
 ];
 

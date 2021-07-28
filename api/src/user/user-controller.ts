@@ -53,3 +53,14 @@ export const unsubscribeUser = async (request: FastifyRequest, reply: FastifyRep
         reply.code(500).send();
     }
 }
+
+export const getMe = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        const metadata = UserService.getMe(request.user);
+        reply.code(200).send(JSON.stringify(metadata));
+    } catch (e) {
+        logger.error(`Error while getting current user metadata.`, e);
+        reply.code(500).send();
+    }
+}

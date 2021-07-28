@@ -61,3 +61,14 @@ export const unsubscribeUser = async (user: User) => {
 export const isUserSubscribed = async (user: User) => {
     return user.isSubscribed === true;
 }
+
+/**
+ * Nothing super fancy here, just whitelist any properties you want available.
+ * 
+ * User object comes from JWT auth flow.
+ */
+export const getMe = (user: User) => {
+    return {
+        isSubscribed: user.isSubscribed
+    }
+}
