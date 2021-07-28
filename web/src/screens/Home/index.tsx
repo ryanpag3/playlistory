@@ -1,5 +1,5 @@
 import useAxios from 'axios-hooks';
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import NavBar from '../../components/NavBar';
 import Screen from '../../components/Screen'

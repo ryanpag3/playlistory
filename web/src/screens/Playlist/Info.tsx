@@ -4,27 +4,40 @@ import { IoMdPerson } from 'react-icons/io';
 import { Button, Checkbox, Dialog, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, Tooltip } from '@material-ui/core';
 import colors from '../../constants/colors';
 import axios from 'axios';
+import useAxios from 'axios-hooks';
 
 const Info = (props: any) => {
     const [isInit, setIsInit] = useState(false);
     const [modalOpened, setModalOpened] = useState(false);
     const [interval, setInterval] = useState(props.scheduledBackup ? props.scheduledBackup.interval : 'day');
     const [scheduledChecked, setScheduledChecked] = useState(props.scheduledBackup !== undefined ? true : false);
+    const [me, setMe] = useState();
+
+    const [getMeObj, refetch] = useAxios({
+        method: 'GET',
+        url: '/user/me'
+    });
+
+    useEffect(() => {
+        if (!getMeObj || !getMeObj.data)
+            return;
+        setMe(getMeObj.data);
+    }, [getMeObj.data])
 
     useEffect(() => {
         if (!isInit)
             return;
-        
+
         if (scheduledChecked === false) {
             cleanupScheduledBackups();
         } else if (interval) {
             submitBackup();
         }
-    }, [ scheduledChecked, interval ]);
+    }, [scheduledChecked, interval]);
 
     useEffect(() => {
         setIsInit(true);
-    }, [ isInit === false ])
+    }, [isInit === false])
 
     async function handleIntervalChange(changed: any) {
         setInterval(changed.target.value);
@@ -58,10 +71,48 @@ const Info = (props: any) => {
         setModalOpened(false);
     }
 
+    function ScheduledMenu() {
+        // @ts-ignore
+        if (getMeObj.loading || (me && me.isSubscribed === false))
+            return null;
+        return (
+            <ScheduledContainer>
+                <FormControlLabel
+                    control={
+                        <ScheduledCheckbox
+                            checked={scheduledChecked}
+                            onChange={(e) => setScheduledChecked(e.target.checked)}
+                        />
+                    }
+                    label="Scheduled"
+                />
+                {
+                    scheduledChecked &&
+                    <FormControl>
+                        <Tooltip title="Backups always start at the top of the interval. For example, every week would be on Sunday at 12am PST. Every day would be 12am PST, etc.">
+                            <InputLabel id="interval-label">Interval</InputLabel>
+                        </Tooltip>
+                        <Select
+                            labelId="interval-label"
+                            value={interval}
+                            onChange={handleIntervalChange}
+                        >
+                            <MenuItem value="hour">Once per hour</MenuItem>
+                            <MenuItem value="day">Once per day</MenuItem>
+                            <MenuItem value="week">Once per week</MenuItem>
+                            <MenuItem value="month">Once per month</MenuItem>
+                            <MenuItem value="year">Once per year</MenuItem>
+                        </Select>
+                    </FormControl>
+                }
+            </ScheduledContainer>
+        )
+    }
+
     return (
         <Container>
             <ImageContainer>
-                <Image src={props.imageUrl}/>
+                <Image src={props.imageUrl} />
             </ImageContainer>
             <TextContainer>
                 <PlatformContainer>
@@ -78,39 +129,10 @@ const Info = (props: any) => {
                 <Row>
                     <BottomInfoCont>
                         <OwnerContainer>
-                            <OwnerIcon/>
+                            <OwnerIcon />
                             <Owner>{props.owner?.name}</Owner>
                         </OwnerContainer>
-                        <ScheduledContainer>
-                            <FormControlLabel
-                                control={
-                                    <ScheduledCheckbox
-                                        checked={scheduledChecked}
-                                        onChange={(e) => setScheduledChecked(e.target.checked)}
-                                    />
-                                }
-                                label="Scheduled"
-                            />
-                            {
-                            scheduledChecked && 
-                            <FormControl>
-                                <Tooltip title="Backups always start at the top of the interval. For example, every week would be on Sunday at 12am PST. Every day would be 12am PST, etc.">
-                                    <InputLabel id="interval-label">Interval</InputLabel>
-                                </Tooltip>
-                                <Select
-                                    labelId="interval-label"
-                                    value={interval}
-                                    onChange={handleIntervalChange}
-                                >
-                                    <MenuItem value="hour">Once per hour</MenuItem>
-                                    <MenuItem value="day">Once per day</MenuItem>
-                                    <MenuItem value="week">Once per week</MenuItem>
-                                    <MenuItem value="month">Once per month</MenuItem>
-                                    <MenuItem value="year">Once per year</MenuItem>
-                                </Select>
-                            </FormControl>
-                            }
-                        </ScheduledContainer>
+                        <ScheduledMenu/>
                     </BottomInfoCont>
                     <BackupButton
                         onClick={openBackupModal}
