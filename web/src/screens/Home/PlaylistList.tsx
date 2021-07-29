@@ -24,20 +24,22 @@ const PlaylistList = (props: any) => {
 
     useEffect(() => {
         if (data === undefined || 
-                data.length === undefined)
+                data.length === undefined && loading)
             return;
 
-        if (data.length === 0) {
+        setLoadedData([...loadedData, ...data] as any);
+
+        if (data.length === 0 || data.length < limit) {
             console.log('setting hasMore to false');
             setHasMore(false);
             return;
         }
 
-        setLoadedData([...loadedData, ...data] as any);
-    }, [data]);
+    }, [ data ]);
 
     useEffect(() => {
         console.log(`loaded data is now ${loadedData.length}`);
+
     }, [ loadedData ]);
 
     async function navToPlaylistPage(playlist: any) {
@@ -46,6 +48,7 @@ const PlaylistList = (props: any) => {
     }
 
     async function fetchMoreData() {
+        console.log('fetching more data');
         const newOffset = offset + limit;
         setOffset(newOffset);
     }
@@ -54,7 +57,7 @@ const PlaylistList = (props: any) => {
         <Container>
             <InfiniteScroll
                 dataLength={loadedData.length}
-                next={fetchMoreData}
+                next={() => fetchMoreData()}
                 hasMore={hasMore}
                 loader={<h4>loading...</h4>}
             >
@@ -80,6 +83,7 @@ const PlaylistList = (props: any) => {
 const Container = styled.div`
     display: flex;
     background-color: ${colors.MEDIUM};
+    flex-grow: 1;
 `;
 
 const ChildContainer = styled.div`
