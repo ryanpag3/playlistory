@@ -320,7 +320,7 @@ export const isBackupPermitted = async (user: User, playlistId: string, interval
         }
     });
 
-    return interval === undefined || backupAmt < 3 || uniquePlaylists.length < 3;
+    return (backupAmt < 3 || uniquePlaylists.length < 3) && interval === undefined;
 }
 
 const ONCE_PER_HOUR  = '0 * * * *';

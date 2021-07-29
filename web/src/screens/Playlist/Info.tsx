@@ -5,10 +5,12 @@ import { Button, Checkbox, Dialog, DialogContent, DialogTitle, FormControl, Form
 import colors from '../../constants/colors';
 import axios from 'axios';
 import useAxios from 'axios-hooks';
+import UpgradeNeededDialog from './UpgradeNeededDialog';
 
 const Info = (props: any) => {
     const [isInit, setIsInit] = useState(false);
     const [modalOpened, setModalOpened] = useState(false);
+    const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
     const [interval, setInterval] = useState(props.scheduledBackup ? props.scheduledBackup.interval : 'day');
     const [scheduledChecked, setScheduledChecked] = useState(props.scheduledBackup !== undefined ? true : false);
     const [me, setMe] = useState();
@@ -52,14 +54,20 @@ const Info = (props: any) => {
     }
 
     async function submitBackup() {
-        console.log('submitting backup');
-        await axios.post('/backup', {
-            playlistId: props.id,
-            platform: props.platform,
-            interval: scheduledChecked === true ? interval : undefined
-        });
-        props.triggerRefetch();
-        setModalOpened(false);
+        try {
+            await axios.post('/backup', {
+                playlistId: props.id,
+                platform: props.platform,
+                interval: scheduledChecked === true ? interval : undefined
+            });
+            props.triggerRefetch();
+            setModalOpened(false);
+        } catch (e) {
+            if (e.toString().includes('403')) {
+                setModalOpened(false);
+                setTimeout(() => setShowUpgradeDialog(true), 25);
+            }
+        }
     }
 
     async function openBackupModal() {
@@ -132,7 +140,7 @@ const Info = (props: any) => {
                             <OwnerIcon />
                             <Owner>{props.owner?.name}</Owner>
                         </OwnerContainer>
-                        <ScheduledMenu/>
+                        <ScheduledMenu />
                     </BottomInfoCont>
                     <BackupButton
                         onClick={openBackupModal}
@@ -159,6 +167,9 @@ const Info = (props: any) => {
                     </DialogContent>
                 </DialogContainer>
             </StyledDialog>
+            <UpgradeNeededDialog 
+                showDialog={showUpgradeDialog} 
+                setShowDialog={(showDialog: boolean) => setShowUpgradeDialog(showDialog)}/>
         </Container>
     )
 }
