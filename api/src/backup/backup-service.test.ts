@@ -58,7 +58,7 @@ it('should get the most recent backup', async () => {
         createdById: user.id,
         scheduled: false
     });
-    const recent = await getMostRecentBackup('1234');
+    const recent = await getMostRecentBackup(user.id, '1234');
     expect(recent?.id).toBe(backup.id);
 });
 
