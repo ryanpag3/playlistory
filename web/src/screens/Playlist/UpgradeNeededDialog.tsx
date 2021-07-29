@@ -9,7 +9,6 @@ const UpgradeNeededDialog = (props: any) => {
     const [showDialog, setShowDialog] = useState(props.showDialog || false);
 
     useEffect(() => {
-        console.log(props);
         setShowDialog(props.showDialog);
     }, [ props.showDialog !== showDialog])
 
