@@ -89,6 +89,7 @@ const HeaderContainer = styled.div`
     width: 100%;
     background-color: ${colors.MEDIUM_DARK};
     padding-top: .1em;
+    cursor: default;
 `;
 
 const HeaderText = styled.text`

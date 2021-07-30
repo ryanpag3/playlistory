@@ -209,6 +209,7 @@ const Container = styled.div`
     flex-direction: row;
     padding: 1em;
     padding-bottom: .5em;
+    cursor: default;
 `;
 
 const ImageContainer = styled.div`

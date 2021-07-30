@@ -17,7 +17,6 @@ const BackupListRow = (props: any) => {
                 backupId: props.id
             }
         });
-        console.log(res);
     }
 
     async function undoRemoved() {
@@ -28,7 +27,6 @@ const BackupListRow = (props: any) => {
                 backupId: props.id
             }
         });
-        console.log(res);
     }
 
     async function restoreToThisPoint() {
@@ -39,7 +37,6 @@ const BackupListRow = (props: any) => {
                 backupId: props.id
             }
         });
-        console.log(res);
     }
 
     async function deleteBackup() {
@@ -50,7 +47,6 @@ const BackupListRow = (props: any) => {
                 id: props.id
             }
         });
-        console.log(res);
         props.onDeleted(props.index);
     }
 
@@ -109,6 +105,7 @@ const Container = styled.div`
     align-items: center;
     min-height: 2.5em;
     width: 100%;
+    cursor: default;
 
     &:hover {
         background-color: ${colors.SECONDARY_ACCENT};

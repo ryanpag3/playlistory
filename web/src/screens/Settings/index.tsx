@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState } from 'react'
 import styled from 'styled-components';
 import Button from '../../components/Button';
@@ -9,6 +10,25 @@ import UpdateEmailSetting from './UpdateEmailSetting';
 
 const Settings = () => {
     const [email, setEmail] = useState();
+
+    async function submit() {
+        try {
+            await submitEmail();
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    async function submitEmail() {
+        await axios({
+            method: 'PUT',
+            url: '/user/email',
+            data: {
+                email
+            }
+        });
+    }
+    
     return (
         <Container>
             <NavBar/>
@@ -17,7 +37,9 @@ const Settings = () => {
                     setEmail={(email: any) => setEmail(email)}
                 />
                 <SaveButtonCont>
-                    <SaveButton>Save</SaveButton>
+                    <SaveButton
+                        onClick={submit}
+                    >Save</SaveButton>
                 </SaveButtonCont>
             </SettingsContainer>
         </Container>
