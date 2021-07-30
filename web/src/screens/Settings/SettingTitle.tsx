@@ -16,6 +16,8 @@ const Container = styled.div`
 `;
 
 const SettingTitleText = styled.h2`
+    font-size: 1.25em;
+    margin-bottom: .5em;
     color: ${colors.LIGHT};
 `;
 

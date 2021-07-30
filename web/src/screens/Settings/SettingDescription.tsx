@@ -16,6 +16,7 @@ const Container = styled.div`
 
 const SettingDescriptionText = styled.span`
     color: ${colors.LIGHT};
+    font-size: .75em;
 `;
 
 export default SettingDescription
