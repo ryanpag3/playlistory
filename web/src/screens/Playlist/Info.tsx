@@ -50,7 +50,8 @@ const Info = (props: any) => {
         if (scheduledChecked === false) {
             cleanupScheduledBackups();
         } else if (interval) {
-            submitBackup();
+            const runNow = false;
+            submitBackup(runNow);
         }
     }, [scheduledChecked, interval]);
 
@@ -70,12 +71,12 @@ const Info = (props: any) => {
         })
     }
 
-    async function submitBackup() {
+    async function submitBackup(runNow: boolean = true) {
         try {
             await axios.post('/backup', {
                 playlistId: props.id,
                 platform: props.platform,
-                interval: scheduledChecked === true ? interval : undefined
+                interval: (scheduledChecked === true && runNow === false) ? interval : undefined
             });
             props.triggerRefetch();
             setModalOpened(false);
@@ -190,7 +191,7 @@ const Info = (props: any) => {
                         />
                         <SubmitButtonCont>
                             <SubmitButton
-                                onClick={submitBackup}
+                                onClick={() => submitBackup()}
                             >Submit</SubmitButton>
                         </SubmitButtonCont>
                     </DialogContent>

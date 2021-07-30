@@ -140,10 +140,14 @@ export const createBackup = async (user: User, opts: {
 export const generateManifest = async (mostRecentBackup: (Backup & { playlist: Playlist; }) | null, 
                                             currentBackup: (Backup & { playlist: Playlist; }) | null) => {
     // @ts-ignore
-    const diffAdded = currentBackup.playlist.tracks.filter(x => !mostRecentBackup?.playlist.tracks.includes(x));
+    const diffAdded = currentBackup.playlist.tracks.filter(x => !mostRecentBackup?.playlist.tracks.some((t) => {
+        return x.id === t.id;
+    }));
 
     // @ts-ignore
-    const diffRemoved = mostRecentBackup?.playlist.tracks.filter(x => !currentBackup.playlist.tracks.includes(x));
+    const diffRemoved = mostRecentBackup?.playlist.tracks.filter(x => !currentBackup.playlist.tracks.some((t) => {
+        return x.id === t.id;
+    }));
 
     // @ts-ignore
     const backup = await prisma.backup.update({
