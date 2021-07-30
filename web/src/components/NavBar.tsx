@@ -99,6 +99,13 @@ const NavBar = () => {
                                 </StyledListItemText>
                             </ListItem>
                             <ListItem button
+                                onClick={() => navToRoute('/settings')}
+                            >
+                                <StyledListItemText>
+                                    Settings
+                                </StyledListItemText>
+                            </ListItem>
+                            <ListItem button
                                 onClick={() => logout()}
                             >
                                 <StyledListItemText>
