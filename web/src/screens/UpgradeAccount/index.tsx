@@ -3,7 +3,8 @@
  * For more information, refer to LICENSE file.
  */
 import axios from 'axios';
-import React, { useState } from 'react'
+import useAxios from 'axios-hooks';
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components';
 import Button from '../../components/Button';
 import NavBar from '../../components/NavBar';
@@ -14,6 +15,17 @@ import AccountTierBox from './AccountTierBox';
 const UpgradeAccount = () => {
     // TODO: query this ahead of time to allow for new sessions w/ upgraded users
     const [isUpgraded, setIsUpgraded] = useState(false);
+
+    const [getMeObj, refetch] = useAxios({
+        method: 'GET',
+        url: '/user/me'
+    });
+
+    useEffect(() => {
+        if (!getMeObj.data)
+            return;
+        setIsUpgraded(getMeObj.data.isSubscribed);
+    }, [ getMeObj.loading ])
 
     async function subscribeUser() {
         await axios('/user/subscribe', {
@@ -40,6 +52,7 @@ const UpgradeAccount = () => {
                         "Save up to three backups per playlist.",
                         "Run one backup per week manually."
                     ]}
+                    loading={false}
                 />
                 <AccountTierBox
                     accountTitle="Premium"
@@ -53,6 +66,7 @@ const UpgradeAccount = () => {
                     SubmitButton={UpgradeButton}
                     buttonText={!isUpgraded ? 'Subscribe' : 'Unsubscribe' }
                     onSubmit={!isUpgraded ? subscribeUser : unsubscribeUser}
+                    loading={getMeObj.loading}
                 />
             </AccountTiersContainer>
         </Container>
@@ -72,6 +86,7 @@ const AccountTiersContainer = styled.div`
 const UpgradeButton = styled(Button)`
     padding-left: 1.5em;
     padding-right: 1.5em;
+    min-width: 12em;
     background-color: ${colors.PRIMARY_ACCENT};
     color: ${colors.LIGHT};
 

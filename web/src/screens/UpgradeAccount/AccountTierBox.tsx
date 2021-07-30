@@ -2,6 +2,7 @@
  * Copyright (C) Ryan Page - All Rights Reserved
  * For more information, refer to LICENSE file.
  */
+import { CircularProgress } from '@material-ui/core';
 import React from 'react'
 import styled from 'styled-components';
 import colors from '../../constants/colors';
@@ -13,6 +14,7 @@ const AccountTierBox = (props: {
     SubmitButton?: any;
     buttonText?: string;
     onSubmit?: () => void;
+    loading: boolean;
 }) => {
     return (
         <Container>
@@ -40,7 +42,7 @@ const AccountTierBox = (props: {
                     <props.SubmitButton
                         // @ts-ignore
                         onClick={() => props.onSubmit()}
-                    >{props.buttonText}</props.SubmitButton>
+                    >{props.loading ? <StyledProgress size={28}/> : props.buttonText}</props.SubmitButton>
                 </SubmitButtonContainer>
             }
         </Container>
@@ -88,6 +90,10 @@ const SubmitButtonContainer = styled.div`
     display: flex;
     justify-content: center;
     padding-bottom: 1.5em;
+`;
+
+const StyledProgress = styled(CircularProgress)`
+    color: ${colors.LIGHT};
 `;
 
 export default AccountTierBox;
