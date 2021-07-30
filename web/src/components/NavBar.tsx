@@ -92,17 +92,25 @@ const NavBar = () => {
                                 </StyledListItemText>
                             </ListItem>
                             <ListItem button
+                                onClick={() => navToRoute('/settings')}
+                            >
+                                <StyledListItemText>
+                                    Account Settings
+                                </StyledListItemText>
+                            </ListItem>
+                            <ListItem button
                                 onClick={() => navToRoute('/connections')}
                             >
                                 <StyledListItemText>
                                     Music Connections
                                 </StyledListItemText>
                             </ListItem>
+
                             <ListItem button
-                                onClick={() => navToRoute('/settings')}
+                                onClick={() => navToRoute('/upgrade')}
                             >
                                 <StyledListItemText>
-                                    Settings
+                                    Manage Subscription
                                 </StyledListItemText>
                             </ListItem>
                             <ListItem button
