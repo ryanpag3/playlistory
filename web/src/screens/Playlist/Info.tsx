@@ -1,11 +1,26 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components';
 import { IoMdPerson } from 'react-icons/io';
-import { Button, Checkbox, Dialog, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, Tooltip } from '@material-ui/core';
+import { Button, Checkbox, Dialog, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, makeStyles, MenuItem, Select, TextField, Tooltip } from '@material-ui/core';
 import colors from '../../constants/colors';
 import axios from 'axios';
 import useAxios from 'axios-hooks';
 import UpgradeNeededDialog from './UpgradeNeededDialog';
+
+const useStyles = makeStyles((theme: any) => ({
+    select: {
+        color: `${colors.DARK} !important`,
+        '&:before': {
+            borderColor: colors.DARK
+        },
+        '&:after': {
+            borderColor: colors.DARK
+        }
+    },
+    label: {
+        color: `${colors.DARK} !important`
+    }
+}));
 
 const Info = (props: any) => {
     const [isInit, setIsInit] = useState(false);
@@ -14,6 +29,8 @@ const Info = (props: any) => {
     const [interval, setInterval] = useState(props.scheduledBackup ? props.scheduledBackup.interval : 'day');
     const [scheduledChecked, setScheduledChecked] = useState(props.scheduledBackup !== undefined ? true : false);
     const [me, setMe] = useState();
+
+    const classes = useStyles();
 
     const [getMeObj, refetch] = useAxios({
         method: 'GET',
@@ -79,38 +96,45 @@ const Info = (props: any) => {
         setModalOpened(false);
     }
 
+
+
     function ScheduledMenu() {
         // @ts-ignore
         if (getMeObj.loading || (me && me.isSubscribed === false))
             return null;
         return (
             <ScheduledContainer>
-                <FormControlLabel
+                <ScheduledFormLabel
                     control={
                         <ScheduledCheckbox
                             checked={scheduledChecked}
                             onChange={(e) => setScheduledChecked(e.target.checked)}
+                            style={{
+                                color: colors.PRIMARY_ACCENT
+                            }}
                         />
                     }
                     label="Scheduled"
                 />
                 {
                     scheduledChecked &&
-                    <FormControl>
+                    <FormControl
+                    >
                         <Tooltip title="Backups always start at the top of the interval. For example, every week would be on Sunday at 12am PST. Every day would be 12am PST, etc.">
-                            <InputLabel id="interval-label">Interval</InputLabel>
+                            <InputLabel id="interval-label" className={classes.label}>Interval</InputLabel>
                         </Tooltip>
-                        <Select
+                        <StyledSelect
                             labelId="interval-label"
                             value={interval}
                             onChange={handleIntervalChange}
+                            className={classes.select}
                         >
                             <MenuItem value="hour">Once per hour</MenuItem>
                             <MenuItem value="day">Once per day</MenuItem>
                             <MenuItem value="week">Once per week</MenuItem>
                             <MenuItem value="month">Once per month</MenuItem>
                             <MenuItem value="year">Once per year</MenuItem>
-                        </Select>
+                        </StyledSelect>
                     </FormControl>
                 }
             </ScheduledContainer>
@@ -134,7 +158,7 @@ const Info = (props: any) => {
                 <DescriptionContainer>
                     <Description>{props.description || 'No description.'}</Description>
                 </DescriptionContainer>
-                <Row>
+                <BottomInfoRow>
                     <BottomInfoCont>
                         <OwnerContainer>
                             <OwnerIcon />
@@ -142,12 +166,17 @@ const Info = (props: any) => {
                         </OwnerContainer>
                         <ScheduledMenu />
                     </BottomInfoCont>
-                    <BackupButton
-                        onClick={openBackupModal}
-                    >
-                        Backup
-                    </BackupButton>
-                </Row>
+                    <BackupButtonCont>
+                        <BackupButton
+                            onClick={openBackupModal}
+                            style={{
+                                borderRadius: 10
+                            }}
+                        >
+                            Backup
+                        </BackupButton>
+                    </BackupButtonCont>
+                </BottomInfoRow>
             </TextContainer>
             <StyledDialog
                 open={modalOpened}
@@ -167,9 +196,9 @@ const Info = (props: any) => {
                     </DialogContent>
                 </DialogContainer>
             </StyledDialog>
-            <UpgradeNeededDialog 
-                showDialog={showUpgradeDialog} 
-                setShowDialog={(showDialog: boolean) => setShowUpgradeDialog(showDialog)}/>
+            <UpgradeNeededDialog
+                showDialog={showUpgradeDialog}
+                setShowDialog={(showDialog: boolean) => setShowUpgradeDialog(showDialog)} />
         </Container>
     )
 }
@@ -237,7 +266,19 @@ const Column = styled.div`
     flex-grow: 1;
 `;
 
-const BottomInfoCont = styled(Column)``;
+const BottomInfoRow = styled(Row)`
+
+`;
+
+const BottomInfoCont = styled(Column)`
+
+`;
+
+/**
+ * Styling for this component uses "useStyles" above. Material-UI styled-components 
+ * needs some work.
+ */
+const StyledSelect = styled(Select)``;
 
 const OwnerContainer = styled.div`
     display: flex;
@@ -268,11 +309,17 @@ const ScheduledCheckbox = styled(Checkbox)`
 `;
 
 const ScheduledFormLabel = styled(FormControlLabel)`
+    min-height: 3em;
+`;
 
+const BackupButtonCont = styled.div`
+    display: flex;
+    flex-direction: column-reverse;
 `;
 
 const BackupButton = styled(Button)`
     background-color: ${colors.PRIMARY_ACCENT};
+    padding-top: .5em;
     padding-left: 1em;
     padding-right: 1em;
     font-size: 18px;

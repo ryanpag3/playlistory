@@ -92,7 +92,7 @@ const NavBar = () => {
                                 </StyledListItemText>
                             </ListItem>
                             <ListItem button
-                                onClick={() => navToRoute('/accounts')}
+                                onClick={() => navToRoute('/connections')}
                             >
                                 <StyledListItemText>
                                     Music Connections
