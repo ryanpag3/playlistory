@@ -61,8 +61,6 @@ export const getMyPlaylists = async (user: User, offset: number = 0, limit: numb
             logger.info(scheduledBackup);
             // @ts-ignore
             playlist.scheduledBackup = scheduledBackup;
-        } else {
-            logger.info('scheduled backup not found.');
         }
 
         const [backup] = await prisma.backup.findMany({

@@ -76,7 +76,6 @@ export const updateEmail = async (request: FastifyRequest, reply: FastifyReply) 
         // @ts-ignore
         logger.debug(`user ${request.user.id} email has been updated.`);
         const token = AuthService.createJWT(email);
-        logger.debug(`token is ${token}`);
         reply
             .cookie(CookieNames.PLAYLISTORY_TOKEN, token, { httpOnly: true, path: '/' })
             .cookie(CookieNames.TOKEN_EXISTS, 'true', { httpOnly: false, path: '/' })

@@ -29,6 +29,7 @@ const Info = (props: any) => {
     const [interval, setInterval] = useState(props.scheduledBackup ? props.scheduledBackup.interval : 'day');
     const [scheduledChecked, setScheduledChecked] = useState(props.scheduledBackup !== undefined ? true : false);
     const [me, setMe] = useState();
+    const [backupName, setBackupName] = useState();
 
     const classes = useStyles();
 
@@ -76,8 +77,14 @@ const Info = (props: any) => {
             await axios.post('/backup', {
                 playlistId: props.id,
                 platform: props.platform,
+                backupName,
                 interval: (scheduledChecked === true && runNow === false) ? interval : undefined
             });
+            
+            // scheduled
+            if (!runNow)
+                return;
+
             props.triggerRefetch();
             setModalOpened(false);
         } catch (e) {
@@ -188,6 +195,8 @@ const Info = (props: any) => {
                     <DialogContent>
                         <BackupNameTextField
                             placeholder="Optional backup name"
+                            // @ts-ignore
+                            onChange={ (e) => { setBackupName(e.target.value)} }
                         />
                         <SubmitButtonCont>
                             <SubmitButton

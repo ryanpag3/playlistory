@@ -101,7 +101,6 @@ export default class SpotifyApi {
 
     async getMyPlaylists(offset: number = 0, limit: number = 50): Promise<GetMyPlaylistsResult> {
         await this.refreshAccessToken();
-        logger.info('getting playlists');
         if (!this.me) {
             this.me = await this.getMe();
         }

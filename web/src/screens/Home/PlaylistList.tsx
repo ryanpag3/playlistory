@@ -1,3 +1,4 @@
+import { CircularProgress } from '@material-ui/core';
 import useAxios from 'axios-hooks';
 import React, { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -59,7 +60,11 @@ const PlaylistList = (props: any) => {
                 dataLength={loadedData.length}
                 next={() => fetchMoreData()}
                 hasMore={hasMore}
-                loader={<h4>loading...</h4>}
+                loader={
+                <ProgressCont>
+                    <StyledProgress/>
+                </ProgressCont>
+                }
             >
                 <ChildContainer>
                     <ListHeader>
@@ -119,6 +124,17 @@ const TotalTracks = styled(ListHeaderText)`
 
 const LastBackupText = styled(ListHeaderText)`
     padding-right: 3.5em;
+`;
+
+const ProgressCont = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1em;
+`;
+
+const StyledProgress = styled(CircularProgress)`
+    color: ${colors.PRIMARY_ACCENT};
 `;
 
 export default PlaylistList
