@@ -72,3 +72,14 @@ export const getMe = (user: User) => {
         isSubscribed: user.isSubscribed
     }
 }
+
+export const updateEmail = async (user: User, newEmail: string) => {
+    await prisma.user.update({
+        where: {
+            id: user.id
+        },
+        data: {
+            email: newEmail
+        }
+    });
+}

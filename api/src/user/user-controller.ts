@@ -13,8 +13,8 @@ export const createUser = async (request: FastifyRequest, reply: FastifyReply) =
         const user = await UserService.create(body as any);
         const token = AuthService.createJWT(user.email);
         reply
-            .cookie(CookieNames.PLAYLISTORY_TOKEN, token, { httpOnly: true })
-            .cookie(CookieNames.TOKEN_EXISTS, 'true', { httpOnly: false })
+            .cookie(CookieNames.PLAYLISTORY_TOKEN, token, { httpOnly: true, path: '/' })
+            .cookie(CookieNames.TOKEN_EXISTS, 'true', { httpOnly: false, path: '/' })
             .send();
     } catch (e) {
         if (e.message.toLowerCase().includes('unique constraint')) {
@@ -61,6 +61,28 @@ export const getMe = async (request: FastifyRequest, reply: FastifyReply) => {
         reply.code(200).send(JSON.stringify(metadata));
     } catch (e) {
         logger.error(`Error while getting current user metadata.`, e);
+        reply.code(500).send();
+    }
+}
+
+export const updateEmail = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        const { email } = request.body;
+        
+        // @ts-ignore
+        await UserService.updateEmail(request.user, email);
+
+        // @ts-ignore
+        logger.debug(`user ${request.user.id} email has been updated.`);
+        const token = AuthService.createJWT(email);
+        logger.debug(`token is ${token}`);
+        reply
+            .cookie(CookieNames.PLAYLISTORY_TOKEN, token, { httpOnly: true, path: '/' })
+            .cookie(CookieNames.TOKEN_EXISTS, 'true', { httpOnly: false, path: '/' })
+            .send();
+    } catch (e) {
+        logger.error(`Error while updating user email.`, e);
         reply.code(500).send();
     }
 }

@@ -92,7 +92,38 @@ const routes = [
             server.validateJWT
         ]),
         handler: UserController.getMe
-    }
+    },
+    {
+        method: 'PUT',
+        url: '/user/email',
+        schema: {
+            description: 'Update users email address.',
+            body: {
+                type: 'object',
+                properties: {
+                    email: {
+                        type: 'string'
+                    }
+                }
+            },
+            response: {
+                200: {
+                    type: 'string',
+                    description: 'Updated successfully.'
+                },
+                500: {
+                    type: 'string',
+                    description: 'An internal server error occured.'
+                }
+            }
+        },
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ]),
+        handler: UserController.updateEmail
+    },
 ];
 
 export default routes;
