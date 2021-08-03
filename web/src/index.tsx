@@ -4,12 +4,15 @@ import { StylesProvider } from '@material-ui/core/styles';
 import App from './App';
 import GlobalStyle from './GlobalStyle';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter } from 'react-router-dom';
 
 ReactDOM.render(
   <React.StrictMode>
     <StylesProvider injectFirst>
       <GlobalStyle/>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </StylesProvider>
   </React.StrictMode>,
   document.getElementById('root')
