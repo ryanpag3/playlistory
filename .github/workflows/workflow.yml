@@ -63,6 +63,10 @@ jobs:
           docker tag ryanpage/playlistory-web:latest ryanpage/playlistory-web:$branchName-${{ github.run_number }}
           docker push ryanpage/playlistory-api:$branchName-${{ github.run_number }}
           docker push ryanpage/playlistory-web:$branchName-${{ github.run_number }}
+          docker tag ryanpage/playlistory-api:latest ryanpage/playlistory-api:$branchName-latest
+          docker tag ryanpage/playlistory-web:latest ryanpage/playlistory-web:$branchName-latest
+          docker push ryanpage/playlistory-api:$branchName-latest
+          docker push ryanpage/playlistory-web:$branchName-latest
       - name: push to latest
         run: docker-compose push
         if: |
