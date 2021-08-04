@@ -1,4 +1,3 @@
-import useAxios from 'axios-hooks';
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import NavBar from '../../components/NavBar';

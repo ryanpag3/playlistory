@@ -4,7 +4,7 @@ import moment from 'moment';
 import { Button, Divider, Menu, MenuItem, Tooltip } from '@material-ui/core';
 import { FaEllipsisH } from 'react-icons/fa';
 import colors from '../../constants/colors';
-import axios from 'axios';
+import axios from '../../util/axios';
 
 const BackupListRow = (props: any) => {
     const [anchorEl, setAnchorEl] = useState(null);

@@ -4,8 +4,7 @@ import { AppBar, CircularProgress, IconButton, Link, List, ListItem, ListItemTex
 import { FaBars } from 'react-icons/fa';
 import colors from '../constants/colors';
 import { useHistory } from 'react-router';
-import axios from 'axios';
-import useAxios from 'axios-hooks';
+import axios, { useAxios } from '../util/axios';
 
 const NavBar = () => {
     const history = useHistory();

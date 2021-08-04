@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { Redirect, useHistory } from 'react-router';
-import useAxios from 'axios-hooks';
 import styled from 'styled-components'
 import Screen from '../../components/Screen';
 import colors from '../../constants/colors';
@@ -8,8 +7,8 @@ import { useQuery } from '../../util/query';
 import { getCredentials } from '../../util/spotify';
 import AccountBox from './AccountBox';
 import NavBar from '../../components/NavBar';
-import axios from 'axios';
 import { handleError } from '../../util/axios-error-handler';
+import axios, { useAxios } from '../../util/axios';
 
 const AccountLink = () => {
     const query = useQuery();

@@ -1,9 +1,9 @@
 import { CircularProgress, Divider } from '@material-ui/core';
-import useAxios from 'axios-hooks';
 import React, { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component';
 import styled from 'styled-components';
 import colors from '../../constants/colors';
+import { useAxios } from '../../util/axios';
 import BackupListRow from './BackupListRow';
 
 const BackupList = (props: any) => {

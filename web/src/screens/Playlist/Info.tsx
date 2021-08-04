@@ -3,9 +3,8 @@ import styled from 'styled-components';
 import { IoMdPerson } from 'react-icons/io';
 import { Button, Checkbox, Dialog, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, makeStyles, MenuItem, Select, TextField, Tooltip } from '@material-ui/core';
 import colors from '../../constants/colors';
-import axios from 'axios';
-import useAxios from 'axios-hooks';
 import UpgradeNeededDialog from './UpgradeNeededDialog';
+import axios, { useAxios } from '../../util/axios';
 
 const useStyles = makeStyles((theme: any) => ({
     select: {

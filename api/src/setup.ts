@@ -22,6 +22,7 @@ export async function setupServer(server: FastifyInstance) {
     logger.debug(`setting up cors`);
     await server.register(require('fastify-cors'), {
         credentials: true,
+        origin: process.env.REACT_APP_HOST || 'http://localhost:8080',
         exposedHeaders: true
     });
 

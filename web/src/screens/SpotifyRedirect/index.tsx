@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '../../util/axios';
 import React, { useEffect } from 'react'
 import styled from 'styled-components';
 import Screen from '../../components/Screen';

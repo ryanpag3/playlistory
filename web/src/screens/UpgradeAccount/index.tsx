@@ -2,14 +2,14 @@
  * Copyright (C) Ryan Page - All Rights Reserved
  * For more information, refer to LICENSE file.
  */
-import axios from 'axios';
-import useAxios from 'axios-hooks';
+import axios from '../../util/axios';
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components';
 import Button from '../../components/Button';
 import NavBar from '../../components/NavBar';
 import Screen from '../../components/Screen';
 import colors from '../../constants/colors';
+import { useAxios } from '../../util/axios';
 import AccountTierBox from './AccountTierBox';
 
 const UpgradeAccount = () => {
