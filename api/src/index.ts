@@ -11,7 +11,7 @@ const port = process.env.NODE_ENV === 'test' ? 0 : process.env.API_PORT || 3000;
 
 setupServer(server)
     .then(() => server.listen(port, address, (err, address) => {
-        logger.info(`Playlistory API server has been started on ${address}`);
+        logger.info(`Playlistory API server has been started on ${address} :)`);
     }));
 
 process.on('SIGTERM', async () => {
