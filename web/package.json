@@ -51,7 +51,7 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:3000",
+  "proxy": "http://api:3000",
   "devDependencies": {
     "@types/react-infinite-scroll-component": "^5.0.0",
     "@types/react-router-dom": "^5.1.7"
