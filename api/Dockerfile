@@ -13,4 +13,4 @@ COPY . .
 RUN npx prisma generate \
  && npx tsc -p tsconfig.production.json
 
-CMD ["node", "./dist/index.js"]
+CMD ["yarn", "migrate", "&&", "node", "./dist/index.js"]
