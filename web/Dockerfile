@@ -16,6 +16,10 @@ COPY --from=build /opt/playlistory/web/build /usr/share/nginx/html
 
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
+COPY ./env.sh .
+
+COPY .env .
+
 EXPOSE 80
 
 CMD ["/bin/sh", "-c", "/usr/share/nginx/html/env.sh && nginx -g \"daemon off;\""]
