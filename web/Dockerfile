@@ -16,9 +16,9 @@ COPY --from=build /opt/playlistory/web/build /usr/share/nginx/html
 
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY ./env.sh .
+COPY ./env.sh /usr/share/nginx/html
 
-COPY .env .
+COPY .env /usr/share/nginx/html
 
 EXPOSE 80
 
