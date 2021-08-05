@@ -12,6 +12,8 @@ RUN yarn build
 
 FROM nginx:stable-alpine
 
+RUN apk update && apk add bash
+
 COPY --from=build /opt/playlistory/web/build /usr/share/nginx/html
 
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
