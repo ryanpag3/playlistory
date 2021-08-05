@@ -26,4 +26,4 @@ COPY .env /usr/share/nginx/html
 
 EXPOSE 80
 
-CMD ["/bin/sh", "-c", "/usr/share/nginx/html/env.sh && nginx -g \"daemon off;\""]
+CMD ["/bin/sh", "-c", "cd /usr/share/nginx/html/ && ./env.sh && nginx -g \"daemon off;\""]
