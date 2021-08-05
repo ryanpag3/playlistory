@@ -38,7 +38,7 @@ const AccountLink = () => {
             onClickLink: async () => {
                 const data = await getCredentials();
                 // @ts-ignore
-                const oauthUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${data.clientId}&scope=${encodeURIComponent(data.scopes.join(" "))}&redirect_uri=${encodeURIComponent(process.env.REACT_APP_SPOTIFY_REDIRECT_URI)}`;
+                const oauthUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${data.clientId}&scope=${encodeURIComponent(data.scopes.join(" "))}&redirect_uri=${encodeURIComponent(window._env_.REACT_APP_SPOTIFY_REDIRECT_URI)}`;
                 const w: any = window.open(oauthUrl, 'newWindow', 'height=500,width=300');
                 const timer = setInterval(() => {
                     if (w.closed) {
