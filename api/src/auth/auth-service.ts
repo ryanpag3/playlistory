@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { FastifyRequest } from 'fastify';
 import CookieNames from '../util/CookieNames';
+import logger from '../util/logger';
 
 export const createJWT = (email: string): string => {
     return jwt.sign({ email }, process.env.JWT_SECRET as any);

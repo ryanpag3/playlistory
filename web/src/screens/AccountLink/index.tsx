@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { Redirect, useHistory } from 'react-router';
-import useAxios from 'axios-hooks';
 import styled from 'styled-components'
 import Screen from '../../components/Screen';
 import colors from '../../constants/colors';
@@ -8,8 +7,8 @@ import { useQuery } from '../../util/query';
 import { getCredentials } from '../../util/spotify';
 import AccountBox from './AccountBox';
 import NavBar from '../../components/NavBar';
-import axios from 'axios';
 import { handleError } from '../../util/axios-error-handler';
+import axios, { useAxios } from '../../util/axios';
 
 const AccountLink = () => {
     const query = useQuery();
@@ -39,7 +38,7 @@ const AccountLink = () => {
             onClickLink: async () => {
                 const data = await getCredentials();
                 // @ts-ignore
-                const oauthUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${data.clientId}&scope=${encodeURIComponent(data.scopes.join(" "))}&redirect_uri=${encodeURIComponent(process.env.REACT_APP_SPOTIFY_REDIRECT_URI)}`;
+                const oauthUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${data.clientId}&scope=${encodeURIComponent(data.scopes.join(" "))}&redirect_uri=${encodeURIComponent(window._env_.REACT_APP_SPOTIFY_REDIRECT_URI)}`;
                 const w: any = window.open(oauthUrl, 'newWindow', 'height=500,width=300');
                 const timer = setInterval(() => {
                     if (w.closed) {

@@ -103,7 +103,9 @@ const TrackCount = styled.span``;
 const LastBackupContainer = styled.div`
     display: flex;
     align-items: center;
+    justify-content: center;
     padding-left: 1em; 
+    min-width: 7em;
 `;
 
 const LastBackup = styled.span`

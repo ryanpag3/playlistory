@@ -60,6 +60,7 @@ export const logout = async (request: FastifyRequest, reply: FastifyReply) => {
             }
         });
         reply.clearCookie(CookieNames.PLAYLISTORY_TOKEN);
+        reply.clearCookie(CookieNames.TOKEN_EXISTS);
         reply.code(200).send();
     } catch (e) {
         logger.error(e);

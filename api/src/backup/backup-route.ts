@@ -19,13 +19,17 @@ const routes = [
                     backupName: {
                         type: 'string',
                         require: false
+                    },
+                    interval: {
+                        type: 'string',
+                        require: false
                     }
                 }
             },
             response: {
                 200: {
                     type: 'string',
-                    description: 'Backup started.'
+                    description: 'Backup has been created and optionally started depending on if scheduled.'
                 }
             }
         },
@@ -85,6 +89,31 @@ const routes = [
             server.validateJWT
         ]),
         handler: BackupController.deleteBackup
+    },
+    {
+        method: 'DELETE',
+        url: '/backup/scheduled',
+        schema: {
+            description: 'Delete a scheduled backup or backups.',
+            querystring: {
+                playlistId: {
+                    type: 'string',
+                    description: 'playlist ID of backup to be deleted.'
+                }
+            },
+            response: {
+                200: {
+                    type: 'boolean',
+                    description: 'Backup(s) were deleted'
+                }
+            }
+        },
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ]),
+        handler: BackupController.deleteScheduledBackup
     }
 ];
 

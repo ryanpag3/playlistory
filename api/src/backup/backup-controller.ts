@@ -1,70 +1,26 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import logger from '../util/logger';
 import * as BackupService from './backup-service';
-import * as MusicService from '../music/music-service';
-import Platforms from '../util/Platforms';
-import prisma from '../util/prisma';
 
 export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
         // @ts-ignore
-        let { playlistId, backupName, platform } = request.body;
+        let { playlistId, backupName, platform, interval } = request.body;
 
         if (!backupName) {
             backupName = `Playlistory Backup | ${new Date().toLocaleDateString()}`;
         }
-        
-        const mostRecentBackup = await BackupService.getMostRecentBackup(playlistId);
-        // @ts-ignore
-        const playlist = await MusicService.getPlaylist(request.user, platform, playlistId);
-
-        if (!playlist)
-            throw new Error(`Playlist not found.`);
 
         // @ts-ignore
-        let currentBackup = await BackupService.createBackup(request.user, {
-            name: backupName,
-            playlistId: playlist.id,
-            playlistName: playlist.name,
-            playlistDescription: playlist.description,
-            imageUrl: playlist.imageUrl as any,
-            contentHash: playlist.snapshotId,
-            followers: playlist.followers as any,
-            tracks: playlist.tracks.items.map(i => {
-                return {
-                    id: i.id,
-                    uri: i.uri
-                }
-            }),
-            // @ts-ignore
-            platform: Platforms.SPOTIFY,
-            // @ts-ignore
-            createdById: request.user.id
-        });
-
-        if (mostRecentBackup?.playlist.contentHash === currentBackup.playlist.contentHash) {
-            logger.debug(`skipping diff generation as the contents of the playlist [${playlist.id}] hasn't changed.`);
-            currentBackup = await prisma.backup.update({
-                where: {
-                    id: currentBackup.id
-                },
-                data: {
-                    manifest: {
-                        added: [],
-                        removed: []
-                    }
-                },
-                include: {
-                    playlist: true,
-                    createdBy: true
-                }
-            });
-            return reply.send(JSON.stringify(currentBackup));
+        const isBackupPermitted = await BackupService.isBackupPermitted(request.user, playlistId, interval);
+        if (!isBackupPermitted) {
+            logger.debug(`Cannot create backup. Not permitted.`);
+            return reply.code(403).send(`You are not permitted to create a backup. Please consider upgrading to premium to remove this limit.`);
         }
 
-        const withManifest = await BackupService.generateManifest(mostRecentBackup, currentBackup);
-
-        reply.send(JSON.stringify(withManifest));
+        // @ts-ignore
+        const backup = await BackupService.runBackup(request.user, playlistId, backupName, platform, interval);
+        reply.send(JSON.stringify(backup));
     } catch (e) {
         logger.error(e);
         reply.code(500).send();
@@ -85,7 +41,21 @@ export const getBackups = async (request: FastifyRequest, reply: FastifyReply) =
 export const deleteBackup = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
         // @ts-ignore
-        const res = await BackupService.deleteBackup(request.query.id);
+        const { id } = request.query;
+        const res = await BackupService.deleteBackup(id);
+        reply.send(JSON.stringify(res));
+    } catch (e) {
+        logger.error(e);
+        reply.code(500).send();
+    }
+}
+
+export const deleteScheduledBackup = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        const { playlistId } = request.query;
+        // @ts-ignore
+        const res = await BackupService.deleteScheduledBackupsByPlaylistId(request.user?.id, playlistId);
         reply.send(JSON.stringify(res));
     } catch (e) {
         logger.error(e);

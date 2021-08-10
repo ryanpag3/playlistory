@@ -3,7 +3,93 @@ import { chunk } from '../util/array';
 import logger from '../util/logger';
 import { getNormSpotifyTrack } from '../util/normalizer';
 import prisma from '../util/prisma';
+import { scheduleJobs } from '../util/scheduler';
 import SpotifyApi from '../util/spotify-api';
+import * as MusicService from '../music/music-service';
+import Platforms from '../util/Platforms';
+
+export const runBackup = async (user: User, playlistId: string, backupName: string, platform: string, interval?: string) => {
+    const mostRecentBackup = await getMostRecentBackup(user.id, playlistId);
+        // @ts-ignore
+        const playlist = await MusicService.getPlaylist(user, platform, playlistId);
+
+        if (!playlist)
+            throw new Error(`Playlist not found.`);
+        
+        let cronSchedule;
+        if (interval) {
+            cronSchedule = getCronSchedule(interval);
+            const existingScheduledBackup = await prisma.backup.findMany({
+                where: {
+                    createdById: user.id,
+                    playlist: {
+                        playlistId
+                    },
+                    scheduled: true
+                },
+                include: {
+                    playlist: true
+                }
+            });
+            if (existingScheduledBackup) {
+                logger.debug(`deleting existing scheduled backups for playlist.`);
+                for (const bu of existingScheduledBackup) {
+                    await deleteBackup(bu.id);
+                }
+            }
+        }
+
+        // @ts-ignore
+        let currentBackup = await createBackup(user, {
+            name: backupName,
+            playlistId: playlist.id,
+            playlistName: playlist.name,
+            playlistDescription: playlist.description,
+            imageUrl: playlist.imageUrl as any,
+            contentHash: playlist.snapshotId,
+            followers: playlist.followers as any,
+            // @ts-ignore
+            tracks: playlist.tracks.items.map(i => {
+                return {
+                    id: i.id,
+                    uri: i.uri
+                }
+            }),
+            // @ts-ignore
+            platform: Platforms.SPOTIFY,
+            // @ts-ignore
+            createdById: user.id,
+            scheduled: cronSchedule ? true : false,
+            cronSchedule
+        });
+
+        if (interval) {
+            scheduleJobs();
+        }
+
+        if (mostRecentBackup?.playlist.contentHash === currentBackup.playlist.contentHash || cronSchedule !== undefined) {
+            logger.debug(`skipping diff generation as the contents of the playlist [${playlist.id}] hasn't changed.`);
+            currentBackup = await prisma.backup.update({
+                where: {
+                    id: currentBackup.id
+                },
+                data: {
+                    manifest: {
+                        added: [],
+                        removed: []
+                    }
+                },
+                include: {
+                    playlist: true,
+                    createdBy: true
+                }
+            });
+            
+            return currentBackup;
+        }
+
+        return generateManifest(mostRecentBackup, currentBackup);
+}
 
 export const createBackup = async (user: User, opts: {
     platform: string;
@@ -16,6 +102,8 @@ export const createBackup = async (user: User, opts: {
     followers: number;
     imageUrl: string;
     createdById: string;
+    scheduled: boolean;
+    cronSchedule?: string;
 }) => {
     const playlist = await prisma.playlist.create({
         data: {
@@ -38,7 +126,9 @@ export const createBackup = async (user: User, opts: {
         data: {
             createdById: user.id,
             name: opts.name,
-            playlistId: playlist.id
+            playlistId: playlist.id,
+            scheduled: opts.scheduled,
+            cronSchedule: opts.cronSchedule || null
         },
         include: {
             playlist: true,
@@ -50,10 +140,14 @@ export const createBackup = async (user: User, opts: {
 export const generateManifest = async (mostRecentBackup: (Backup & { playlist: Playlist; }) | null, 
                                             currentBackup: (Backup & { playlist: Playlist; }) | null) => {
     // @ts-ignore
-    const diffAdded = currentBackup.playlist.tracks.filter(x => !mostRecentBackup?.playlist.tracks.includes(x));
+    const diffAdded = currentBackup.playlist.tracks.filter(x => !mostRecentBackup?.playlist.tracks.some((t) => {
+        return x.id === t.id;
+    }));
 
     // @ts-ignore
-    const diffRemoved = mostRecentBackup?.playlist.tracks.filter(x => !currentBackup.playlist.tracks.includes(x));
+    const diffRemoved = mostRecentBackup?.playlist.tracks.filter(x => !currentBackup.playlist.tracks.some((t) => {
+        return x.id === t.id;
+    }));
 
     // @ts-ignore
     const backup = await prisma.backup.update({
@@ -75,9 +169,10 @@ export const generateManifest = async (mostRecentBackup: (Backup & { playlist: P
     return backup;
 }
 
-export const getMostRecentBackup = async (playlistId: string) => {
+export const getMostRecentBackup = async (createdById: string, playlistId: string) => {
     return prisma.backup.findFirst({
         where: {
+            createdById,
             playlist: {
                 playlistId
             }
@@ -103,7 +198,9 @@ export const getBackups = async (user: User, playlistId: string) => {
             playlist: {
                 playlistId
             },
-            createdById: user.id
+            createdById: user.id,
+            // we want backups that have been executed, not scheduled
+            scheduled: false
         },
         orderBy: {
             createdAt: 'desc'
@@ -162,7 +259,7 @@ const resolveManifestSpotify = async (user: User, manifest: any) => {
 }
 
 export const deleteBackup = async (id: string) => {
-    logger.info(`deleting backup ${id}`);
+    logger.debug(`deleting backup ${id}`);
     const backup = await prisma.backup.findUnique({
         where: {
             id
@@ -183,4 +280,99 @@ export const deleteBackup = async (id: string) => {
     ]);
 
     return res;
+}
+
+export const deleteScheduledBackupsByPlaylistId = async (createdById: string, playlistId: string) => {
+    logger.debug(`deleting scheduled backups by playlist id ${playlistId}`);
+    const backups = await prisma.backup.findMany({
+        where: {
+            createdById,
+            playlist: {
+                playlistId
+            },
+            scheduled: true
+        }
+    });
+    
+    const promises = [];
+    for (const backup of backups) {
+        promises.push(deleteBackup(backup.id));
+    }
+
+    return Promise.all(promises);
+}
+
+export const isBackupPermitted = async (user: User, playlistId: string, interval?: string) => {
+    if (user.isSubscribed) {
+        logger.debug(`user is premium tier, backup is permitted.`);
+        return true;
+    }
+
+    const uniquePlaylists = await prisma.playlist.findMany({
+        where: {
+            createdById: user.id
+        },
+        distinct: [ 'playlistId' ]
+    });
+
+    const backupAmt = await prisma.backup.count({
+        where: {
+            createdById: user.id,
+            playlist: {
+                playlistId
+            }
+        }
+    });
+
+    return (backupAmt < 3 || uniquePlaylists.length < 3) && interval === undefined;
+}
+
+const ONCE_PER_HOUR  = '0 * * * *';
+const ONCE_PER_DAY   = '0 0 * * *';
+const ONCE_PER_WEEK  = '0 0 * * 0';
+const ONCE_PER_MONTH = '0 0 1 * *';
+const ONCE_PER_YEAR  = '0 0 1 1 *';
+
+/**
+ * This is very rudimentary but our choices for scheduling are also rudimentary.
+ * We support:
+ * Once per hour
+ * Once per day
+ * Once per week
+ * Once per month
+ * Once per year
+ * 
+ * Times are hardcoded and cannot be changed, jobs are buffered using a queue so no point allowing scheduled times.
+ */
+export const getCronSchedule = (interval: string) => {
+
+    switch (interval) {
+        case 'hour':
+            return ONCE_PER_HOUR;
+        case 'day':
+            return ONCE_PER_DAY;
+        case 'week':
+            return ONCE_PER_WEEK;
+        case 'month':
+            return ONCE_PER_MONTH;
+        case 'year':
+            return ONCE_PER_YEAR;
+        default:
+            throw new Error(`Invalid cron expression provided.`);
+    }
+}
+
+export const getIntervalFromCronSchedule = (schedule: string) => {
+    switch(schedule) {
+        case ONCE_PER_HOUR:
+            return 'hour';
+        case ONCE_PER_DAY:
+            return 'day';
+        case ONCE_PER_WEEK:
+            return 'week';
+        case ONCE_PER_MONTH:
+            return 'month';
+        case ONCE_PER_YEAR:
+            return 'year';
+    }
 }

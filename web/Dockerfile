@@ -12,9 +12,18 @@ RUN yarn build
 
 FROM nginx:stable-alpine
 
+RUN apk update && apk add bash
+
 COPY --from=build /opt/playlistory/web/build /usr/share/nginx/html
 
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
+COPY env.sh /usr/share/nginx/html/env.sh
+
+RUN chmod +x /usr/share/nginx/html/env.sh
+
+COPY .env /usr/share/nginx/html
+
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+
+CMD ["/bin/sh", "-c", "cd /usr/share/nginx/html/ && ./env.sh && nginx -g \"daemon off;\""]

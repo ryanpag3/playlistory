@@ -20,7 +20,8 @@ it('should create a backup', async () => {
         contentHash: '1',
         tracks: ['1'],
         followers: 1,
-        createdById: user.id
+        createdById: user.id,
+        scheduled: false
     });
     expect(backup).not.toBeNull();
     expect(backup.playlist).not.toBeNull();
@@ -41,7 +42,8 @@ it('should get the most recent backup', async () => {
         contentHash: '1',
         tracks: ['1'],
         followers: 1,
-        createdById: user.id
+        createdById: user.id,
+        scheduled: false
     });
     const backup = await createBackup(user, {
         platform: Platforms.SPOTIFY,
@@ -53,9 +55,10 @@ it('should get the most recent backup', async () => {
         contentHash: '1',
         tracks: ['1'],
         followers: 1,
-        createdById: user.id
+        createdById: user.id,
+        scheduled: false
     });
-    const recent = await getMostRecentBackup('1234');
+    const recent = await getMostRecentBackup(user.id, '1234');
     expect(recent?.id).toBe(backup.id);
 });
 
@@ -84,7 +87,8 @@ const generateBackup = async () => {
         contentHash: getRandomString(),
         tracks: [getRandomString()],
         followers: 0,
-        createdById: user.id
+        createdById: user.id,
+        scheduled: false
     });
 
     return backup;

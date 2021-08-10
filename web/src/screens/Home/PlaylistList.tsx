@@ -1,9 +1,10 @@
-import useAxios from 'axios-hooks';
+import { CircularProgress } from '@material-ui/core';
 import React, { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import colors from '../../constants/colors';
+import { useAxios } from '../../util/axios';
 import PlaylistRow from './PlaylistRow';
 
 const PlaylistList = (props: any) => {
@@ -24,20 +25,22 @@ const PlaylistList = (props: any) => {
 
     useEffect(() => {
         if (data === undefined || 
-                data.length === undefined)
+                data.length === undefined && loading)
             return;
 
-        if (data.length === 0) {
+        setLoadedData([...loadedData, ...data] as any);
+
+        if (data.length === 0 || data.length < limit) {
             console.log('setting hasMore to false');
             setHasMore(false);
             return;
         }
 
-        setLoadedData([...loadedData, ...data] as any);
-    }, [data]);
+    }, [ data ]);
 
     useEffect(() => {
         console.log(`loaded data is now ${loadedData.length}`);
+
     }, [ loadedData ]);
 
     async function navToPlaylistPage(playlist: any) {
@@ -46,6 +49,7 @@ const PlaylistList = (props: any) => {
     }
 
     async function fetchMoreData() {
+        console.log('fetching more data');
         const newOffset = offset + limit;
         setOffset(newOffset);
     }
@@ -54,9 +58,13 @@ const PlaylistList = (props: any) => {
         <Container>
             <InfiniteScroll
                 dataLength={loadedData.length}
-                next={fetchMoreData}
+                next={() => fetchMoreData()}
                 hasMore={hasMore}
-                loader={<h4>loading...</h4>}
+                loader={
+                <ProgressCont>
+                    <StyledProgress/>
+                </ProgressCont>
+                }
             >
                 <ChildContainer>
                     <ListHeader>
@@ -80,6 +88,7 @@ const PlaylistList = (props: any) => {
 const Container = styled.div`
     display: flex;
     background-color: ${colors.MEDIUM};
+    flex-grow: 1;
 `;
 
 const ChildContainer = styled.div`
@@ -115,6 +124,17 @@ const TotalTracks = styled(ListHeaderText)`
 
 const LastBackupText = styled(ListHeaderText)`
     padding-right: 3.5em;
+`;
+
+const ProgressCont = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1em;
+`;
+
+const StyledProgress = styled(CircularProgress)`
+    color: ${colors.PRIMARY_ACCENT};
 `;
 
 export default PlaylistList

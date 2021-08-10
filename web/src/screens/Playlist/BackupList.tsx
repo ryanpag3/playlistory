@@ -1,15 +1,15 @@
-import { Divider } from '@material-ui/core';
-import useAxios from 'axios-hooks';
+import { CircularProgress, Divider } from '@material-ui/core';
 import React, { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component';
 import styled from 'styled-components';
 import colors from '../../constants/colors';
+import { useAxios } from '../../util/axios';
 import BackupListRow from './BackupListRow';
 
 const BackupList = (props: any) => {
     const [backups, setBackups] = useState([] as any);
 
-    const [{ data, loading, error}, refetch] = useAxios({
+    const [{ data, loading, error }, refetch] = useAxios({
         method: 'GET',
         url: '/backup',
         params: {
@@ -24,13 +24,26 @@ const BackupList = (props: any) => {
     useEffect(() => {
         if (!data)
             return;
-        setBackups([ ...data ]);
-    }, [ data ]);
+        setBackups([...data]);
+    }, [data]);
 
     async function handleOnDeleted(index: number) {
-        console.log(index);
         backups.splice(index, 1);
-        setBackups([ ...backups ]);
+        setBackups([...backups]);
+    }
+
+    function Backups() {
+        if (loading) {
+            return (
+                <ProgressCont>
+                    <StyledProgress />
+                </ProgressCont>
+            );
+        } else if (!backups || !backups.length) {
+            return <NoBackupsCont>No backups created yet :(</NoBackupsCont>;
+        } else {
+            return backups.map((d: any, index: number) => <BackupListRow {...d} key={index} index={index} onDeleted={(index: number) => handleOnDeleted(index)} />);
+        }
     }
 
     return (
@@ -52,15 +65,14 @@ const BackupList = (props: any) => {
                     </HeaderText>
                 </TracksContainer>
             </HeaderContainer>
-            <StyledDivider/>
+            <StyledDivider />
             <InfiniteScroll
-                dataLength={(data ? data.length: 0)}
+                dataLength={(data ? data.length : 0)}
                 next={() => console.log('hmm')}
                 hasMore={false}
                 loader={<div></div>}
             >
-                {(!backups || !backups.length) ? <NoBackupsCont>No backups created yet :(</NoBackupsCont> 
-                    : backups.map((d: any, index: number) => <BackupListRow {...d } key={index} index={index} onDeleted={(index: number) => handleOnDeleted(index)}/>)}
+                <Backups />
             </InfiniteScroll>
         </Container>
     )
@@ -77,6 +89,7 @@ const HeaderContainer = styled.div`
     width: 100%;
     background-color: ${colors.MEDIUM_DARK};
     padding-top: .1em;
+    cursor: default;
 `;
 
 const HeaderText = styled.text`
@@ -117,6 +130,17 @@ const NoBackupsCont = styled.div`
     padding-top: 3em;
     align-items: center;
     justify-content: center;
+`;
+
+const ProgressCont = styled.div`
+    display: flex;
+    height: 5em;
+    justify-content: center;
+    align-items: center;
+`;
+
+const StyledProgress = styled(CircularProgress)`
+    color: ${colors.PRIMARY_ACCENT};
 `;
 
 export default BackupList

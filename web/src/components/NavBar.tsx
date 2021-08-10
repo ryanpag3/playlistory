@@ -1,14 +1,26 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { AppBar, IconButton, Link, List, ListItem, ListItemText, SwipeableDrawer, Toolbar } from '@material-ui/core';
+import { AppBar, CircularProgress, IconButton, Link, List, ListItem, ListItemText, SwipeableDrawer, Toolbar } from '@material-ui/core';
 import { FaBars } from 'react-icons/fa';
 import colors from '../constants/colors';
 import { useHistory } from 'react-router';
-import axios from 'axios';
+import axios, { useAxios } from '../util/axios';
 
 const NavBar = () => {
     const history = useHistory();
     const [openMenu, setOpenMenu] = useState(false);
+    const [me, setMe] = useState();
+
+    const [getMeObj, refetch] = useAxios({
+        method: 'GET',
+        url: '/user/me'
+    });
+
+    useEffect(() => {
+        if (!getMeObj || !getMeObj.data)
+            return;
+        setMe(getMeObj.data);
+    }, [getMeObj.data])
 
     function toggleMenu() {
         setOpenMenu(!openMenu);
@@ -31,6 +43,29 @@ const NavBar = () => {
         }
     }
 
+    function Upgrade() {
+        if (getMeObj.loading) {
+            return <StyledProgress size={25}/>;
+        // @ts-ignore
+        } else if (history.location.pathname !== '/upgrade' && me && !me.isSubscribed) {
+            return (
+                <UpgradeAccountLinkContainer
+                    onClick={() => {
+                        const path = '/upgrade';
+                        if (history.location.pathname === path) {
+                            return;
+                        }
+                        history.push(path);
+                    }}
+                >
+                    <UpgradeAccountLink>Upgrade Account</UpgradeAccountLink>
+                </UpgradeAccountLinkContainer>
+            )
+        }
+
+        return null;
+    }
+
     return (
         <AppBar position="static">
             <StyledToolbar>
@@ -39,7 +74,7 @@ const NavBar = () => {
                         onClick={toggleMenu}
                     >
                         {/* @ts-ignore */}
-                        <MenuIcon/>
+                        <MenuIcon />
                     </MenuIconContainer>
                     <StyledDrawer
                         anchor="left"
@@ -56,10 +91,25 @@ const NavBar = () => {
                                 </StyledListItemText>
                             </ListItem>
                             <ListItem button
-                                onClick={() => navToRoute('/accounts')}
+                                onClick={() => navToRoute('/settings')}
                             >
                                 <StyledListItemText>
-                                    Accounts
+                                    Account Settings
+                                </StyledListItemText>
+                            </ListItem>
+                            <ListItem button
+                                onClick={() => navToRoute('/connections')}
+                            >
+                                <StyledListItemText>
+                                    Music Connections
+                                </StyledListItemText>
+                            </ListItem>
+
+                            <ListItem button
+                                onClick={() => navToRoute('/upgrade')}
+                            >
+                                <StyledListItemText>
+                                    Manage Subscription
                                 </StyledListItemText>
                             </ListItem>
                             <ListItem button
@@ -72,6 +122,8 @@ const NavBar = () => {
                         </StyledList>
                     </StyledDrawer>
                 </Fragment>
+                <EmptySpace />
+                <Upgrade/>
             </StyledToolbar>
         </AppBar>
     )
@@ -106,6 +158,23 @@ const StyledListItemText = styled(ListItemText)`
     padding-right: 10px;
     color: ${colors.LIGHT};
     font-size: 16px;
+`;
+
+const EmptySpace = styled.div`
+    flex-grow: 1;
+`;
+
+const UpgradeAccountLinkContainer = styled.div`
+
+`;
+
+const UpgradeAccountLink = styled.h2`
+    font-size: .8em;
+    cursor: pointer;
+`;
+
+const StyledProgress = styled(CircularProgress)`
+    color: ${colors.MEDIUM};
 `;
 
 export default NavBar

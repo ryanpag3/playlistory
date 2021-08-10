@@ -18,3 +18,68 @@ export const create = async (body: {
     logger.info(`created new user with email ${user.email}`);
     return user;
 }
+
+/**
+ * TODO: this is a temporary stub to validate 
+ * premium-gated functionality before the stripe
+ * integration is complete.
+ */
+export const subscribeUser = async (user: User) => {
+    logger.debug(`subscribing user`);
+    return await prisma.user.update({
+        where: {
+            id: user.id
+        },
+        data: {
+            isSubscribed: true
+        }
+    });
+}
+
+/**
+ * TODO: this is a temporary stub to validate 
+ * premium-gated functionality before the stripe
+ * integration is complete.
+ */
+export const unsubscribeUser = async (user: User) => {
+    logger.debug(`unsubscribing user`);
+    return await prisma.user.update({
+        where: {
+            id: user.id
+        },
+        data: {
+            isSubscribed: false
+        }
+    });
+}
+
+/**
+ * TODO: this is a temporary stub to validate 
+ * premium-gated functionality before the stripe
+ * integration is complete.
+ */
+export const isUserSubscribed = async (user: User) => {
+    return user.isSubscribed === true;
+}
+
+/**
+ * Nothing super fancy here, just whitelist any properties you want available.
+ * 
+ * User object comes from JWT auth flow.
+ */
+export const getMe = (user: User) => {
+    return {
+        isSubscribed: user.isSubscribed
+    }
+}
+
+export const updateEmail = async (user: User, newEmail: string) => {
+    await prisma.user.update({
+        where: {
+            id: user.id
+        },
+        data: {
+            email: newEmail
+        }
+    });
+}
