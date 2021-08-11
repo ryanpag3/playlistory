@@ -6,6 +6,8 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import colors from '../../constants/colors';
 import SignUpDialog from './SignUpDialog';
+import { Snackbar } from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
 
 const SignUpLoginForm = (props: {
     formType?: string;
@@ -17,6 +19,7 @@ const SignUpLoginForm = (props: {
     const [password, setPassword] = useState();
     const [error, setError] = useState(undefined as any);
     const [showSignUpDialog, setShowSignUpDialog] = useState(false);
+    const [showLoginFailed, setShowLoginFailed] = useState(false);
 
     useEffect(() => {
         if (email !== confirmEmail && (email && confirmEmail)) {
@@ -76,10 +79,8 @@ const SignUpLoginForm = (props: {
                 history.push('/');
             }
         } catch (e) {
-            if (e.response.status === 409) {
-                return setError(`Email already in use.`);
-            }
             console.error(e);
+            setShowLoginFailed(true);
         }
     }
 
@@ -89,6 +90,10 @@ const SignUpLoginForm = (props: {
         } else {
             setFormType('sign-up');
         }
+    }
+
+    function onLoginFailedClose() {
+        setShowLoginFailed(false);   
     }
 
     return (
@@ -131,6 +136,9 @@ const SignUpLoginForm = (props: {
                 <ErrorMsg>{error}</ErrorMsg>
             }
             <SignUpDialog modalOpened={showSignUpDialog} onClosedModal={() => console.log('closed')} />
+            <Snackbar open={showLoginFailed} autoHideDuration={3500} onClose={onLoginFailedClose}>
+                <Alert severity="error" elevation={6} variant="filled">Invalid login attempt.</Alert>
+            </Snackbar>
         </Container>
     )
 }
