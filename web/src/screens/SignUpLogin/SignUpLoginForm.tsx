@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import colors from '../../constants/colors';
+import SignUpDialog from './SignUpDialog';
 
 const SignUpLoginForm = (props: {
     formType?: string;
@@ -15,6 +16,7 @@ const SignUpLoginForm = (props: {
     const [confirmEmail, setConfirmEmail] = useState();
     const [password, setPassword] = useState();
     const [error, setError] = useState(undefined as any);
+    const [showSignUpDialog, setShowSignUpDialog] = useState(false);
 
     useEffect(() => {
         if (email !== confirmEmail && (email && confirmEmail)) {
@@ -48,7 +50,7 @@ const SignUpLoginForm = (props: {
             });
 
             if (res.status === 200) {
-                console.log('success');
+                setShowSignUpDialog(true);
             }
         } catch (e) {
             if (e.response.status === 409) {
@@ -71,7 +73,6 @@ const SignUpLoginForm = (props: {
             });
 
             if (res.status === 200) {
-                console.log('we gucci');
                 history.push('/');
             }
         } catch (e) {
@@ -122,13 +123,14 @@ const SignUpLoginForm = (props: {
                 <LoginAnchor
                     onClick={toggleFormType}
                 >
-                    {formType === 'sign-up' ? `Login Instead` : `Sign-In Instead`}
+                    {formType === 'sign-up' ? `Login Instead` : `Create an Account`}
                 </LoginAnchor>
             </SubmitContainer>
             {
                 error &&
                 <ErrorMsg>{error}</ErrorMsg>
             }
+            <SignUpDialog modalOpened={showSignUpDialog} onClosedModal={() => console.log('closed')} />
         </Container>
     )
 }
@@ -185,6 +187,7 @@ const LoginAnchor = styled.a`
     margin-top: 20px;
     margin-bottom: 20px;
     font-size: 16px;
+    cursor: pointer;
 `;
 
 const ErrorMsg = styled.div`
