@@ -65,6 +65,7 @@ const PlaylistList = (props: any) => {
                     <StyledProgress/>
                 </ProgressCont>
                 }
+                
             >
                 <ChildContainer>
                     <ListHeader>
@@ -87,7 +88,7 @@ const PlaylistList = (props: any) => {
 
 const Container = styled.div`
     display: flex;
-    background-color: ${colors.MEDIUM};
+    background-color: ${colors.LIGHT};
     flex-grow: 1;
 `;
 
@@ -101,8 +102,10 @@ const ListHeader = styled.div`
     display: flex;
     flex-direction: row;
     width: 100%;
-    background-color: ${colors.SECONDARY_ACCENT};
-    border-bottom: .3em solid ${colors.MEDIUM};
+    background-color: ${colors.LIGHT};
+    border-bottom: .15em solid ${colors.DARK};
+    padding-top: .2em;
+    cursor: default;
 `;
 
 const ListHeaderText = styled.div`

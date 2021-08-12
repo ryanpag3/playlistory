@@ -21,7 +21,7 @@ const SignUpDialog = (props: any) => {
                     <StyledDialogTitle>Sign Up Successful.</StyledDialogTitle>
                     <DialogContent>
                         <Description>
-                            You will receive an email to verify your account. Press the button below to continue to Playlistory.
+                            {/* You will receive an email to verify your account. */ } Press the button below to continue to Playlistory.
                         </Description>
                         <ContinueButtonContainer>
                             <ContinueButton
