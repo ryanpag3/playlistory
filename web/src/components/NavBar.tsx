@@ -5,6 +5,7 @@ import { FaBars } from 'react-icons/fa';
 import colors from '../constants/colors';
 import { useHistory } from 'react-router';
 import axios, { useAxios } from '../util/axios';
+import { truncate } from 'fs';
 
 const NavBar = () => {
     const history = useHistory();
@@ -28,10 +29,13 @@ const NavBar = () => {
 
     function navToRoute(path: string) {
         if (history.location.pathname === path) {
+            history.go(0);
             toggleMenu();
             return;
         }
-        history.push(path);
+        history.push(path, {
+            refresh: true
+        });
     }
 
     async function logout() {
