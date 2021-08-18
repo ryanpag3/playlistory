@@ -210,14 +210,17 @@ const normalizeSpotifyPlaylist = (spotifyPlaylist: SpotifyPlaylist): Playlist =>
         snapshotId: spotifyPlaylist.snapshot_id,
         tracks: {
             // @ts-ignore
-            items: spotifyPlaylist.tracks.items.map(i => normalizeSpotifyTrack(i.track)),
+            items: spotifyPlaylist.tracks.items.map(i => normalizeSpotifyTrack(i.track)).filter(i => i !== undefined),
             total: spotifyPlaylist.tracks.total
         },
         followers: spotifyPlaylist.followers.total
     }
 }
 
-const normalizeSpotifyTrack = (sTrack: SpotifyTrack): Track => {
+const normalizeSpotifyTrack = (sTrack: SpotifyTrack): Track|undefined => {
+    if (!sTrack)
+        return undefined;
+    
     return {
         platform: Platforms.SPOTIFY,
         id: sTrack.id,
