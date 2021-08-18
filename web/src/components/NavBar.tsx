@@ -5,6 +5,8 @@ import { FaBars } from 'react-icons/fa';
 import colors from '../constants/colors';
 import { useHistory } from 'react-router';
 import axios, { useAxios } from '../util/axios';
+import { truncate } from 'fs';
+import BetaBadge from './BetaBadge';
 
 const NavBar = () => {
     const history = useHistory();
@@ -28,10 +30,13 @@ const NavBar = () => {
 
     function navToRoute(path: string) {
         if (history.location.pathname === path) {
+            history.go(0);
             toggleMenu();
             return;
         }
-        history.push(path);
+        history.push(path, {
+            refresh: true
+        });
     }
 
     async function logout() {
@@ -76,6 +81,7 @@ const NavBar = () => {
                         {/* @ts-ignore */}
                         <MenuIcon />
                     </MenuIconContainer>
+                    <BetaBadge/>
                     <StyledDrawer
                         anchor="left"
                         open={openMenu}
@@ -142,6 +148,9 @@ const MenuIcon = styled(FaBars)`
     color: ${colors.LIGHT};
     font-size: 1em;
 `;
+
+
+
 
 const StyledDrawer = styled(SwipeableDrawer)`
 

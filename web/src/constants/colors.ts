@@ -6,6 +6,7 @@ export default {
     LIGHT: '#eeeeee',
     PRIMARY_ACCENT: '#00adb5',
     SECONDARY_ACCENT: '#aad8d3',
+    TERTIARY_ACCENT: '#4472CA',
     ERROR_RED: '#b85462',
     SUCCESS_GREEN: '#65946a'
 }

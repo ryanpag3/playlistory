@@ -56,7 +56,7 @@ const UpgradeAccount = () => {
                 />
                 <AccountTierBox
                     accountTitle="Premium"
-                    price="$3/month"
+                    price="$0/month (during beta)"
                     features={[
                         "Backup unlimited playlists.",
                         "Run backups as often as you'd like.",

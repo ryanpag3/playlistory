@@ -170,7 +170,8 @@ const getNormalSpotifyMyPlaylistResult = (result: GetMyPlaylistsResult): Playlis
             imageUrl: item.images[0]?.url,
             owner: {
                 id: item.owner.id,
-                name: item.owner.display_name
+                name: item.owner.display_name,
+                url: item.owner.external_urls.spotify
             },
             snapshotId: item.snapshot_id,
             tracks: {
@@ -210,14 +211,17 @@ const normalizeSpotifyPlaylist = (spotifyPlaylist: SpotifyPlaylist): Playlist =>
         snapshotId: spotifyPlaylist.snapshot_id,
         tracks: {
             // @ts-ignore
-            items: spotifyPlaylist.tracks.items.map(i => normalizeSpotifyTrack(i.track)),
+            items: spotifyPlaylist.tracks.items.map(i => normalizeSpotifyTrack(i.track)).filter(i => i !== undefined),
             total: spotifyPlaylist.tracks.total
         },
         followers: spotifyPlaylist.followers.total
     }
 }
 
-const normalizeSpotifyTrack = (sTrack: SpotifyTrack): Track => {
+const normalizeSpotifyTrack = (sTrack: SpotifyTrack): Track|undefined => {
+    if (!sTrack)
+        return undefined;
+    
     return {
         platform: Platforms.SPOTIFY,
         id: sTrack.id,

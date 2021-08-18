@@ -5,6 +5,10 @@ import styled from 'styled-components';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import colors from '../../constants/colors';
+import SignUpDialog from './SignUpDialog';
+import { Snackbar } from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
+import BetaBadge from '../../components/BetaBadge';
 
 const SignUpLoginForm = (props: {
     formType?: string;
@@ -15,6 +19,8 @@ const SignUpLoginForm = (props: {
     const [confirmEmail, setConfirmEmail] = useState();
     const [password, setPassword] = useState();
     const [error, setError] = useState(undefined as any);
+    const [showSignUpDialog, setShowSignUpDialog] = useState(false);
+    const [showLoginFailed, setShowLoginFailed] = useState(false);
 
     useEffect(() => {
         if (email !== confirmEmail && (email && confirmEmail)) {
@@ -48,7 +54,7 @@ const SignUpLoginForm = (props: {
             });
 
             if (res.status === 200) {
-                console.log('success');
+                setShowSignUpDialog(true);
             }
         } catch (e) {
             if (e.response.status === 409) {
@@ -71,14 +77,11 @@ const SignUpLoginForm = (props: {
             });
 
             if (res.status === 200) {
-                console.log('we gucci');
                 history.push('/');
             }
         } catch (e) {
-            if (e.response.status === 409) {
-                return setError(`Email already in use.`);
-            }
             console.error(e);
+            setShowLoginFailed(true);
         }
     }
 
@@ -90,10 +93,17 @@ const SignUpLoginForm = (props: {
         }
     }
 
+    function onLoginFailedClose() {
+        setShowLoginFailed(false);   
+    }
+
     return (
         <Container>
             <TitleContainer>
                 <Title>Playlistory</Title>
+                <BetaBadgeContainer>
+                    <BetaBadge/>
+                </BetaBadgeContainer>
             </TitleContainer>
             <EmailInput
                 placeholder="email"
@@ -122,13 +132,17 @@ const SignUpLoginForm = (props: {
                 <LoginAnchor
                     onClick={toggleFormType}
                 >
-                    {formType === 'sign-up' ? `Login Instead` : `Sign-In Instead`}
+                    {formType === 'sign-up' ? `Login Instead` : `Create an Account`}
                 </LoginAnchor>
             </SubmitContainer>
             {
                 error &&
                 <ErrorMsg>{error}</ErrorMsg>
             }
+            <SignUpDialog modalOpened={showSignUpDialog} onClosedModal={() => console.log('closed')} />
+            <Snackbar open={showLoginFailed} autoHideDuration={3500} onClose={onLoginFailedClose}>
+                <Alert severity="error" elevation={6} variant="filled">Invalid login attempt.</Alert>
+            </Snackbar>
         </Container>
     )
 }
@@ -142,8 +156,14 @@ const Container = styled.div`
     align-items: center;
 `;
 
-const TitleContainer = styled.div`
+const BetaBadgeContainer = styled.div`
+    position: absolute;
+    top: 65px;
+    right: 25px;
+`;
 
+const TitleContainer = styled.div`
+    position: relative;
 `;
 
 const Title = styled.h1`
@@ -185,6 +205,7 @@ const LoginAnchor = styled.a`
     margin-top: 20px;
     margin-bottom: 20px;
     font-size: 16px;
+    cursor: pointer;
 `;
 
 const ErrorMsg = styled.div`

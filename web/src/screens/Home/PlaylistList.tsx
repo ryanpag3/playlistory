@@ -1,10 +1,11 @@
 import { CircularProgress } from '@material-ui/core';
 import React, { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { resolveTypeReferenceDirective } from 'typescript';
 import colors from '../../constants/colors';
-import { useAxios } from '../../util/axios';
+import axios, { useAxios } from '../../util/axios';
 import PlaylistRow from './PlaylistRow';
 
 const PlaylistList = (props: any) => {
@@ -12,36 +13,52 @@ const PlaylistList = (props: any) => {
     const [offset, setOffset] = useState(0);
     const [loadedData, setLoadedData] = useState([]);
     const [hasMore, setHasMore] = useState(true);
-    const [{ data, loading, error }, refetch] = useAxios({
-        url: '/me/playlists',
-        method: 'GET',
-        params: {
-            platform: 'SPOTIFY',
-            offset,
-            limit
-        }
-    });
+    const [isLoading, setIsLoading] = useState(false);
+    const [isInit, setIsInit] = useState(false);
     const history = useHistory();
 
     useEffect(() => {
-        if (data === undefined || 
-                data.length === undefined && loading)
-            return;
+        fetchData(0);
+        setIsInit(true);
+    }, [ isInit === false ]);
 
-        setLoadedData([...loadedData, ...data] as any);
+    useEffect(() => {
+        if (hasMore === false)
+            return;
+        
+        fetchData(offset);
+    }, [ offset ]);
+
+    useEffect(() => {
+        console.log(history.location.state);
+        // @ts-ignore
+        if (history.location.state?.refresh === true)
+            refreshData();
+    }, [ history.location.state ]);
+
+    async function refreshData() {
+        setLoadedData([]  as any);
+        fetchData(0);
+    }
+
+    async function fetchData(offset: number) {
+        const { data } = await axios({
+            url: '/me/playlists',
+            method: 'GET',
+            params: {
+                platform: 'SPOTIFY',
+                offset,
+                limit
+            }
+        });
+
+        setLoadedData([ ...loadedData, ...data ] as any);
 
         if (data.length === 0 || data.length < limit) {
-            console.log('setting hasMore to false');
             setHasMore(false);
             return;
         }
-
-    }, [ data ]);
-
-    useEffect(() => {
-        console.log(`loaded data is now ${loadedData.length}`);
-
-    }, [ loadedData ]);
+    }
 
     async function navToPlaylistPage(playlist: any) {
         console.log(`/playlist/${playlist.id}`)
@@ -65,6 +82,7 @@ const PlaylistList = (props: any) => {
                     <StyledProgress/>
                 </ProgressCont>
                 }
+                
             >
                 <ChildContainer>
                     <ListHeader>
@@ -87,7 +105,7 @@ const PlaylistList = (props: any) => {
 
 const Container = styled.div`
     display: flex;
-    background-color: ${colors.MEDIUM};
+    background-color: ${colors.LIGHT};
     flex-grow: 1;
 `;
 
@@ -101,8 +119,10 @@ const ListHeader = styled.div`
     display: flex;
     flex-direction: row;
     width: 100%;
-    background-color: ${colors.SECONDARY_ACCENT};
-    border-bottom: .3em solid ${colors.MEDIUM};
+    background-color: ${colors.LIGHT};
+    border-bottom: .15em solid ${colors.DARK};
+    padding-top: .2em;
+    cursor: default;
 `;
 
 const ListHeaderText = styled.div`

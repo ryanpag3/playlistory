@@ -37,6 +37,7 @@ const PlaylistRow = (props: any) => {
                     </MenuButton>
                 </MenuContainer>
             </Container>
+            <Divider/>
         </ParentContainer>
     )
 }
@@ -45,7 +46,6 @@ const ParentContainer = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
-    margin-bottom: .25em;
     cursor: pointer;
 `;
 
@@ -72,7 +72,7 @@ const ImageContainer = styled.div`
 const Image = styled.img`
     width: 2.5em;
     height: 2.5em;
-    border-radius: 1.5em;
+    border-radius: .4em;
     object-fit: cover;
 `;
 

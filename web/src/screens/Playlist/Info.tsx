@@ -103,8 +103,6 @@ const Info = (props: any) => {
         setModalOpened(false);
     }
 
-
-
     function ScheduledMenu() {
         // @ts-ignore
         if (getMeObj.loading || (me && me.isSubscribed === false))
@@ -159,7 +157,9 @@ const Info = (props: any) => {
                         {props.platform}
                     </Platform>
                 </PlatformContainer>
-                <TitleContainer>
+                <TitleContainer
+                    onClick={() => window.open(props.url, '_blank')}
+                >
                     <Title>{props.name}</Title>
                 </TitleContainer>
                 <DescriptionContainer>
@@ -167,7 +167,9 @@ const Info = (props: any) => {
                 </DescriptionContainer>
                 <BottomInfoRow>
                     <BottomInfoCont>
-                        <OwnerContainer>
+                        <OwnerContainer
+                            onClick={() => window.open(props.owner.url, '_blank')}
+                        >
                             <OwnerIcon />
                             <Owner>{props.owner?.name}</Owner>
                         </OwnerContainer>
@@ -253,6 +255,7 @@ const TitleContainer = styled.div`
 `;
 
 const Title = styled.h3`
+    cursor: pointer;
     margin-top: .1em;
 `;
 
@@ -296,6 +299,7 @@ const OwnerContainer = styled.div`
     align-items: center;
     padding-top: .5em;
     flex-grow: 1;
+    cursor: pointer;
 `;
 
 const OwnerIcon = styled(IoMdPerson)`
