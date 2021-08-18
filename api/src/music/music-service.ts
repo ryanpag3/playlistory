@@ -170,7 +170,8 @@ const getNormalSpotifyMyPlaylistResult = (result: GetMyPlaylistsResult): Playlis
             imageUrl: item.images[0]?.url,
             owner: {
                 id: item.owner.id,
-                name: item.owner.display_name
+                name: item.owner.display_name,
+                url: item.owner.external_urls.spotify
             },
             snapshotId: item.snapshot_id,
             tracks: {
