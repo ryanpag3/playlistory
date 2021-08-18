@@ -22,7 +22,6 @@ const useStyles = makeStyles((theme: any) => ({
 }));
 
 const Info = (props: any) => {
-    console.log(props);
     const [isInit, setIsInit] = useState(false);
     const [modalOpened, setModalOpened] = useState(false);
     const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
