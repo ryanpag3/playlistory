@@ -8,6 +8,7 @@ import colors from '../../constants/colors';
 import SignUpDialog from './SignUpDialog';
 import { Snackbar } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
+import BetaBadge from '../../components/BetaBadge';
 
 const SignUpLoginForm = (props: {
     formType?: string;
@@ -100,6 +101,9 @@ const SignUpLoginForm = (props: {
         <Container>
             <TitleContainer>
                 <Title>Playlistory</Title>
+                <BetaBadgeContainer>
+                    <BetaBadge/>
+                </BetaBadgeContainer>
             </TitleContainer>
             <EmailInput
                 placeholder="email"
@@ -152,8 +156,14 @@ const Container = styled.div`
     align-items: center;
 `;
 
-const TitleContainer = styled.div`
+const BetaBadgeContainer = styled.div`
+    position: absolute;
+    top: 65px;
+    right: 25px;
+`;
 
+const TitleContainer = styled.div`
+    position: relative;
 `;
 
 const Title = styled.h1`

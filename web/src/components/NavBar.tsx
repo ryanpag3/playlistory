@@ -6,6 +6,7 @@ import colors from '../constants/colors';
 import { useHistory } from 'react-router';
 import axios, { useAxios } from '../util/axios';
 import { truncate } from 'fs';
+import BetaBadge from './BetaBadge';
 
 const NavBar = () => {
     const history = useHistory();
@@ -80,6 +81,7 @@ const NavBar = () => {
                         {/* @ts-ignore */}
                         <MenuIcon />
                     </MenuIconContainer>
+                    <BetaBadge/>
                     <StyledDrawer
                         anchor="left"
                         open={openMenu}
@@ -146,6 +148,9 @@ const MenuIcon = styled(FaBars)`
     color: ${colors.LIGHT};
     font-size: 1em;
 `;
+
+
+
 
 const StyledDrawer = styled(SwipeableDrawer)`
 
