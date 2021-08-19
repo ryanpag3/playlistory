@@ -4,11 +4,13 @@ import styled from 'styled-components';
 import Screen from '../../components/Screen';
 import colors from '../../constants/colors';
 import { useQuery } from '../../util/query';
+import { useHistory } from 'react-router-dom';
 
 
 const SpotifyRedirect = () => {
+    const history = useHistory();
     const query = useQuery();
-    
+
     useEffect(() => {
         console.log(query.get('code'));
         const code = query.get('code');
@@ -21,16 +23,20 @@ const SpotifyRedirect = () => {
     });
 
     async function finishAuth(code: string) {
-        const res = await axios('/spotify', {
-            method: 'POST',
-            data: {
-                token: code
-            } as any,
-            headers: {
-                'content-type': 'application/json'
-            }
-        });
-        return res;
+        try {
+            const res = await axios('/spotify', {
+                method: 'POST',
+                data: {
+                    token: code
+                } as any,
+                headers: {
+                    'content-type': 'application/json'
+                }
+            });
+            return res;
+        } catch (e) {
+            history.replace('/error');
+        }
     }
 
     return (

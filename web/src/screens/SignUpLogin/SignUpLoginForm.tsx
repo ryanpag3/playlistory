@@ -59,6 +59,8 @@ const SignUpLoginForm = (props: {
         } catch (e) {
             if (e.response.status === 409) {
                 return setError(`Email already in use.`);
+            } else {
+                history.replace('/error');
             }
         }
     }
@@ -80,7 +82,6 @@ const SignUpLoginForm = (props: {
                 history.push('/');
             }
         } catch (e) {
-            console.error(e);
             setShowLoginFailed(true);
         }
     }

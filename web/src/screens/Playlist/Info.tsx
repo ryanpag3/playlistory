@@ -5,6 +5,7 @@ import { Button, Checkbox, Dialog, DialogContent, DialogTitle, FormControl, Form
 import colors from '../../constants/colors';
 import UpgradeNeededDialog from './UpgradeNeededDialog';
 import axios, { useAxios } from '../../util/axios';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: any) => ({
     select: {
@@ -22,6 +23,7 @@ const useStyles = makeStyles((theme: any) => ({
 }));
 
 const Info = (props: any) => {
+    const history = useHistory();
     const [isInit, setIsInit] = useState(false);
     const [modalOpened, setModalOpened] = useState(false);
     const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
@@ -36,6 +38,10 @@ const Info = (props: any) => {
         method: 'GET',
         url: '/user/me'
     });
+
+    if (getMeObj.error) {
+        history.replace('/error');
+    }
 
     useEffect(() => {
         if (!getMeObj || !getMeObj.data)
@@ -64,11 +70,16 @@ const Info = (props: any) => {
     }
 
     async function cleanupScheduledBackups() {
-        await axios.delete('/backup/scheduled', {
-            params: {
-                playlistId: props.id
-            }
-        })
+        try {
+            await axios.delete('/backup/scheduled', {
+                params: {
+                    playlistId: props.id
+                }
+            })
+        } catch (e) {
+            history.replace('/error');
+        }
+
     }
 
     async function submitBackup(runNow: boolean = true) {
@@ -90,6 +101,8 @@ const Info = (props: any) => {
             if (e.toString().includes('403')) {
                 setModalOpened(false);
                 setTimeout(() => setShowUpgradeDialog(true), 25);
+            } else {
+                history.replace('/error');
             }
         }
     }

@@ -5,49 +5,71 @@ import { Button, Divider, Menu, MenuItem, Tooltip } from '@material-ui/core';
 import { FaEllipsisH } from 'react-icons/fa';
 import colors from '../../constants/colors';
 import axios from '../../util/axios';
+import { useHistory } from 'react-router-dom';
 
 const BackupListRow = (props: any) => {
+    const history = useHistory();
     const [anchorEl, setAnchorEl] = useState(null);
 
     async function undoAdded() {
-        const res = await axios({
-            method: 'PUT',
-            url: '/playlist/revert/added',
-            params: {
-                backupId: props.id
-            }
-        });
+        try {
+            const res = await axios({
+                method: 'PUT',
+                url: '/playlist/revert/added',
+                params: {
+                    backupId: props.id
+                }
+            });
+        } catch (e) {
+            history.replace('/error');
+        }
+
     }
 
     async function undoRemoved() {
-        const res = await axios({
-            method: 'PUT',
-            url: '/playlist/revert/removed',
-            params: {
-                backupId: props.id
-            }
-        });
+        try {
+            const res = await axios({
+                method: 'PUT',
+                url: '/playlist/revert/removed',
+                params: {
+                    backupId: props.id
+                }
+            });
+        } catch (e) {
+            history.replace('/error');
+        }
+
     }
 
     async function restoreToThisPoint() {
-        const res = await axios({
-            method: 'PUT',
-            url: '/playlist/restore',
-            params: {
-                backupId: props.id
-            }
-        });
+        try {
+            const res = await axios({
+                method: 'PUT',
+                url: '/playlist/restore',
+                params: {
+                    backupId: props.id
+                }
+            });
+        } catch (e) {
+            history.replace('/error');
+        }
+
     }
 
     async function deleteBackup() {
-        const res = await axios({
-            method: 'DELETE',
-            url: '/backup',
-            params: {
-                id: props.id
-            }
-        });
-        props.onDeleted(props.index);
+        try {
+            const res = await axios({
+                method: 'DELETE',
+                url: '/backup',
+                params: {
+                    id: props.id
+                }
+            });
+            props.onDeleted(props.index);
+        } catch (e) {
+            history.replace('/error');
+        }
+
     }
 
     return (
@@ -68,7 +90,7 @@ const BackupListRow = (props: any) => {
                     // @ts-ignore
                     onClick={(event: any) => setAnchorEl(event.currentTarget)}
                 >
-                    <MenuIcon/>
+                    <MenuIcon />
                 </MenuContainer>
                 <StyledMenu
                     id="row-menu"
@@ -94,7 +116,7 @@ const BackupListRow = (props: any) => {
                     >Delete Backup</StyledMenuItem>
                 </StyledMenu>
             </Container>
-            <StyledDivider/>
+            <StyledDivider />
         </Fragment>
     )
 }

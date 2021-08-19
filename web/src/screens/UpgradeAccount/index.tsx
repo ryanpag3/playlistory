@@ -11,8 +11,10 @@ import Screen from '../../components/Screen';
 import colors from '../../constants/colors';
 import { useAxios } from '../../util/axios';
 import AccountTierBox from './AccountTierBox';
+import { useHistory } from 'react-router-dom';
 
 const UpgradeAccount = () => {
+    const history = useHistory();
     // TODO: query this ahead of time to allow for new sessions w/ upgraded users
     const [isUpgraded, setIsUpgraded] = useState(false);
 
@@ -21,24 +23,36 @@ const UpgradeAccount = () => {
         url: '/user/me'
     });
 
+    if (getMeObj.error) {
+        history.replace('/error');
+    }
+
     useEffect(() => {
         if (!getMeObj.data)
             return;
         setIsUpgraded(getMeObj.data.isSubscribed);
-    }, [ getMeObj.loading ])
+    }, [getMeObj.loading])
 
     async function subscribeUser() {
-        await axios('/user/subscribe', {
-            method: 'POST'
-        })
-        setIsUpgraded(true);
+        try {
+            await axios('/user/subscribe', {
+                method: 'POST'
+            })
+            setIsUpgraded(true);
+        } catch (e) {
+            history.replace('/error');
+        }
     }
 
     async function unsubscribeUser() {
-        await axios('/user/unsubscribe', {
-            method: 'POST'
-        })
-        setIsUpgraded(false);
+        try {
+            await axios('/user/unsubscribe', {
+                method: 'POST'
+            })
+            setIsUpgraded(false);
+        } catch (e) {
+            history.replace('/error');
+        }
     }
 
     return (
@@ -64,7 +78,7 @@ const UpgradeAccount = () => {
                         "Schedule backups to run automatically."
                     ]}
                     SubmitButton={UpgradeButton}
-                    buttonText={!isUpgraded ? 'Subscribe' : 'Unsubscribe' }
+                    buttonText={!isUpgraded ? 'Subscribe' : 'Unsubscribe'}
                     onSubmit={!isUpgraded ? subscribeUser : unsubscribeUser}
                     loading={getMeObj.loading}
                 />

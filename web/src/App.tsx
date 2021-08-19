@@ -6,6 +6,8 @@ import {
   Redirect,
   useHistory
 } from 'react-router-dom';
+import styled from 'styled-components';
+
 import cookies from './util/cookies';
 import CookieNames from './util/CookieNames';
 import SignUpLogin from './screens/SignUpLogin';
@@ -15,8 +17,8 @@ import Home from './screens/Home';
 import Playlist from './screens/Playlist';
 import UpgradeAccount from './screens/UpgradeAccount';
 import Settings from './screens/Settings';
-import styled from 'styled-components';
 import colors from './constants/colors';
+import Error from './screens/Error';
 
 function App() {
   const history = useHistory();
@@ -37,6 +39,7 @@ function App() {
     <Switch>
       <Route path="/sign-up" children={<SignUpLogin formType="sign-up"/>}/>
       <Route path="/login" children={<SignUpLogin formType="login"/>}/>
+      <Route path="/error" children={<Error/>}/>
       <PrivateRoute path="/playlist/:id" children={<Playlist/>}/>
       <PrivateRoute path="/spotify" children={<SpotifyRedirect/>}/>
       <PrivateRoute path="/connections" children={<AccountLink/>}/>
