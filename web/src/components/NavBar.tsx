@@ -18,6 +18,10 @@ const NavBar = () => {
         url: '/user/me'
     });
 
+    if (getMeObj?.error) {
+        history.replace('/error');
+    }
+
     useEffect(() => {
         if (!getMeObj || !getMeObj.data)
             return;
@@ -44,7 +48,7 @@ const NavBar = () => {
             await axios.post('/logout');
             history.replace('/login');
         } catch (e) {
-            // noop
+            history.replace('/error');
         }
     }
 

@@ -7,8 +7,10 @@ import NavBar from '../../components/NavBar';
 import Screen from '../../components/Screen';
 import colors from '../../constants/colors';
 import UpdateEmailSetting from './UpdateEmailSetting';
+import { useHistory } from 'react-router-dom';
 
 const Settings = () => {
+    const history = useHistory();
     const [email, setEmail] = useState();
 
     async function submit() {
@@ -20,18 +22,22 @@ const Settings = () => {
     }
 
     async function submitEmail() {
-        await axios({
-            method: 'PUT',
-            url: '/user/email',
-            data: {
-                email
-            }
-        });
+        try {
+            await axios({
+                method: 'PUT',
+                url: '/user/email',
+                data: {
+                    email
+                }
+            });
+        } catch (e) {
+            history.replace('/error');
+        }
     }
-    
+
     return (
         <Container>
-            <NavBar/>
+            <NavBar />
             <SettingsContainer>
                 <UpdateEmailSetting
                     setEmail={(email: any) => setEmail(email)}

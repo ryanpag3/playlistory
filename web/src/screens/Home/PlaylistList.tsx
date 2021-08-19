@@ -20,44 +20,50 @@ const PlaylistList = (props: any) => {
     useEffect(() => {
         fetchData(0);
         setIsInit(true);
-    }, [ isInit === false ]);
+    }, [isInit === false]);
 
     useEffect(() => {
         if (hasMore === false)
             return;
-        
+
         fetchData(offset);
-    }, [ offset ]);
+    }, [offset]);
 
     useEffect(() => {
         console.log(history.location.state);
         // @ts-ignore
         if (history.location.state?.refresh === true)
             refreshData();
-    }, [ history.location.state ]);
+    }, [history.location.state]);
 
     async function refreshData() {
-        setLoadedData([]  as any);
+        setLoadedData([] as any);
         fetchData(0);
     }
 
     async function fetchData(offset: number) {
-        const { data } = await axios({
-            url: '/me/playlists',
-            method: 'GET',
-            params: {
-                platform: 'SPOTIFY',
-                offset,
-                limit
+
+        try {
+            const { data } = await axios({
+                url: '/me/playlists',
+                method: 'GET',
+                params: {
+                    platform: 'SPOTIFY',
+                    offset,
+                    limit
+                }
+            });
+
+            setLoadedData([...loadedData, ...data] as any);
+
+            if (data.length === 0 || data.length < limit) {
+                setHasMore(false);
+                return;
             }
-        });
-
-        setLoadedData([ ...loadedData, ...data ] as any);
-
-        if (data.length === 0 || data.length < limit) {
-            setHasMore(false);
-            return;
+        } catch (e) {
+            history.replace('/error');
         }
+
     }
 
     async function navToPlaylistPage(playlist: any) {
@@ -78,11 +84,11 @@ const PlaylistList = (props: any) => {
                 next={() => fetchMoreData()}
                 hasMore={hasMore}
                 loader={
-                <ProgressCont>
-                    <StyledProgress/>
-                </ProgressCont>
+                    <ProgressCont>
+                        <StyledProgress />
+                    </ProgressCont>
                 }
-                
+
             >
                 <ChildContainer>
                     <ListHeader>
@@ -96,7 +102,7 @@ const PlaylistList = (props: any) => {
                             Last Backed Up
                         </LastBackupText>
                     </ListHeader>
-                    {loadedData.map((d: any, index: number) => <PlaylistRow key={index} { ...d }/>)}
+                    {loadedData.map((d: any, index: number) => <PlaylistRow key={index} {...d} />)}
                 </ChildContainer>
             </InfiniteScroll>
         </Container>

@@ -11,18 +11,15 @@ import { handleError } from '../../util/axios-error-handler';
 import axios, { useAxios } from '../../util/axios';
 
 const AccountLink = () => {
-    const query = useQuery();
     const history = useHistory();
-    const [spotifyIsAuthReq, refetch] = useAxios({
+    const [spotifyIsAuthReq] = useAxios({
         url: '/spotify/is-auth',
         method: 'GET'
     });
 
-    useEffect(() => {
-        console.log(spotifyIsAuthReq.loading);
-        console.log(spotifyIsAuthReq.data);
-        console.log(spotifyIsAuthReq.error);
-    }, [spotifyIsAuthReq])
+    if (spotifyIsAuthReq.error) {
+        history.replace('/error');
+    }
 
     useEffect(() => {
         if (!spotifyIsAuthReq.error)
@@ -54,7 +51,7 @@ const AccountLink = () => {
                     const res = await axios.delete(`/spotify`);
                     Boxes[0].isLinked = false;
                 } catch (e) {
-                    // noop
+                    history.replace('/error');
                 }
             }
         }

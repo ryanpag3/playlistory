@@ -139,15 +139,28 @@ export const createBackup = async (user: User, opts: {
 
 export const generateManifest = async (mostRecentBackup: (Backup & { playlist: Playlist; }) | null, 
                                             currentBackup: (Backup & { playlist: Playlist; }) | null) => {
+
+    const isFirstBackup = !mostRecentBackup;
+
     // @ts-ignore
-    const diffAdded = currentBackup.playlist.tracks.filter(x => !mostRecentBackup?.playlist.tracks.some((t) => {
+    let diffAdded = currentBackup.playlist.tracks.filter(x => !mostRecentBackup?.playlist.tracks.some((t) => {
         return x.id === t.id;
     }));
 
     // @ts-ignore
-    const diffRemoved = mostRecentBackup?.playlist.tracks.filter(x => !currentBackup.playlist.tracks.some((t) => {
+    let diffRemoved = mostRecentBackup?.playlist.tracks.filter(x => !currentBackup.playlist.tracks.some((t) => {
         return x.id === t.id;
     }));
+
+    /**
+     * This is zeroed out to avoid giving the implication that
+     * the application is creating a backup against an existing
+     * playlist with 0 songs in it.
+     */
+    if (isFirstBackup) {
+        diffAdded = [];
+        diffRemoved = [];
+    }
 
     // @ts-ignore
     const backup = await prisma.backup.update({
