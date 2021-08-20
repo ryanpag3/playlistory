@@ -1,8 +1,9 @@
 import moment from 'moment';
-import React from 'react'
+import React, { useState } from 'react'
 import { FaAngleDown, FaAngleUp, FaEllipsisH } from 'react-icons/fa';
 import styled from 'styled-components';
 import ColorsNew from '../../constants/colors-new';
+import BackupDiffTracks from './BackupDiffTracks';
 
 moment.locale('en', {
     relativeTime: {
@@ -24,6 +25,7 @@ moment.locale('en', {
 });
 
 const BackupDiffRow = (props: any) => {
+    const [displayTracks, setDisplayTracks] = useState(props.displayTracks);
 
     function getDiffText() {
         if (props.type === "add") {
@@ -35,31 +37,39 @@ const BackupDiffRow = (props: any) => {
     }
 
     return (
-        <OuterContainer>
+        <OuterContainer
+            onClick={() => setDisplayTracks(!displayTracks)}
+        >
             <TopRowContainer>
                 <DateContainer>
                     <DateText>{moment(props.createdAt).fromNow()}</DateText>
                 </DateContainer>
-                <DiffTextContainer>
-                    <DiffText>{getDiffText()}</DiffText>
-                    <EmptySpace />
-                    <IconCont>
-                        <MenuContainer>
-                            <MenuIcon size={25} />
-                        </MenuContainer>
-                        <ExpandContainer>
-                            <ExpandIconDown size={25} />
-                        </ExpandContainer>
-                    </IconCont>
-                </DiffTextContainer>
+                <ColumnContainer>
+                    <DiffTextContainer>
+                        <DiffText>{getDiffText()}</DiffText>
+                        <EmptySpace />
+                        <IconCont>
+                            <MenuContainer>
+                                <MenuIcon size={20} />
+                            </MenuContainer>
+                        </IconCont>
+                    </DiffTextContainer>
+                    {
+                            displayTracks &&
+                            <BackupDiffTracks />
+                    }
+                </ColumnContainer>
             </TopRowContainer>
         </OuterContainer>
     )
 }
 
 const OuterContainer = styled.div`
+    display: flex;
+    flex-direction: column;
     margin-top: .5em;
     cursor: default;
+    cursor: pointer;
 `;
 
 const TopRowContainer = styled.div`
@@ -71,7 +81,7 @@ const DateContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    min-width: 1.5em;
+    min-width: 2em;
     margin-right: .5em;
     font-weight: lighter;
 `;
@@ -80,10 +90,16 @@ const DateText = styled.div`
     color: ${ColorsNew.MEDIUM};
 `;
 
+const ColumnContainer = styled.div`
+    display: flex;
+    background-color: ${ColorsNew.BACKGROUND_SECONDARY};
+    flex-direction: column;
+    flex-grow: 1;
+`;
+
 const DiffTextContainer = styled.div`
     display: flex;
     flex-direction: row;
-    background-color: ${ColorsNew.BACKGROUND_SECONDARY};
     padding: .4em;
     padding-left: 1em;
     padding-right: 1em;
@@ -95,6 +111,7 @@ const DiffText = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: .9em;
 `;
 
 const EmptySpace = styled.div`

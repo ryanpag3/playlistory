@@ -12,6 +12,7 @@ const BackupList = (props: any) => {
     const [backups, setBackups] = useState([] as any[]);
     const [hasMore, setHasMore] = useState(true);
     const [isInit, setIsInit] = useState(false);
+    const [displayAllTracks, setDisplayAllTracks] = useState(false);
 
     useEffect(() => {
         if (hasMore === false)
@@ -60,6 +61,7 @@ const BackupList = (props: any) => {
 
     return (
         <Container>
+
             <InfiniteScroll
                 dataLength={backups.length}
                 next={() => fetchMoreData()}
@@ -69,11 +71,11 @@ const BackupList = (props: any) => {
                 {backups.map((b, i) => {
                     const res: any = [];
                     if (b.manifest.added.length > 0) {
-                        res.push(<BackupDiffRow { ...b } key={i} type="add"/>);
+                        res.push(<BackupDiffRow { ...b } key={i} displayTracks={displayAllTracks} type="add"/>);
                     }
                     
                     if (b.manifest.removed.length > 0) {
-                        res.push(<BackupDiffRow { ...b } key={i} type="remove"/>);
+                        res.push(<BackupDiffRow { ...b } key={i} displayTracks={displayAllTracks} type="remove"/>);
                     }
                     return res;
                 })}
@@ -83,7 +85,9 @@ const BackupList = (props: any) => {
 }
 
 const Container = styled.div`
-    
+
 `;
+
+const TopRow = styled.div``;
 
 export default BackupList;
