@@ -81,7 +81,7 @@ const BackupList = (props: any) => {
 }
 
 const Container = styled.div`
-
+    max-width: 100%;
 `;
 
 const TopRow = styled.div``;

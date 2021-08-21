@@ -65,6 +65,7 @@ const BackupDiffRow = (props: any) => {
 }
 
 const OuterContainer = styled.div`
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     margin-top: .5em;
@@ -80,7 +81,7 @@ const TopRowContainer = styled.div`
 const DateContainer = styled.div`
     display: flex;
     justify-content: center;
-    align-items: center;
+    padding-top: .6em;
     min-width: 2em;
     margin-right: .5em;
     font-weight: lighter;
@@ -88,6 +89,7 @@ const DateContainer = styled.div`
 
 const DateText = styled.div`
     color: ${ColorsNew.MEDIUM};
+    font-size: .85em;
 `;
 
 const ColumnContainer = styled.div`

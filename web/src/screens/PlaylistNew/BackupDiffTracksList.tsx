@@ -41,7 +41,7 @@ const Container = styled.div`
 const StyledDivider = styled(Divider)`
     background-color: ${ColorsNew.LIGHT};
     width: 100%;
-    opacity: 50%;
+    opacity: 20%;
 `;
 
 export default BackupDiffTracksList;
