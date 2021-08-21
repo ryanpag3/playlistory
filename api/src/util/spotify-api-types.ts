@@ -152,6 +152,7 @@ export interface SpotifyTrack {
     track_number:      number;
     type:              TrackType;
     uri:               string;
+    images:            any[];
 }
 
 export interface Album {

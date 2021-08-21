@@ -30,4 +30,6 @@ export interface Track {
     }[];
     uri: string;
     url: string;
+    imageUrl?: string;
+    albumName?: string;
 }

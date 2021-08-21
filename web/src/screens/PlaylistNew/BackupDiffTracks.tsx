@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components';
+import axios from '../../util/axios';
 
-const BackupDiffTracks = () => {
+const BackupDiffTracks = (props: any) => {
+    console.log('songs');
+    console.log(props.songs);
     return (
         <Container>
-            diff
+            
         </Container>
     )
 }

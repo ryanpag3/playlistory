@@ -26,10 +26,6 @@ const BackupList = (props: any) => {
         setIsInit(true);
     }, [ isInit === false ]);
 
-    useEffect(() => {
-        console.log(backups);
-    }, [ backups ])
-
     function fetchMoreData() {
         const newOff = offset + limit;
         setOffset(newOff);

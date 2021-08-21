@@ -25,6 +25,8 @@ moment.locale('en', {
 });
 
 const BackupDiffRow = (props: any) => {
+    console.log(props);
+
     const [displayTracks, setDisplayTracks] = useState(props.displayTracks);
 
     function getDiffText() {
@@ -56,7 +58,7 @@ const BackupDiffRow = (props: any) => {
                     </DiffTextContainer>
                     {
                             displayTracks &&
-                            <BackupDiffTracks />
+                            <BackupDiffTracks songs={ props.type === "add" ? props.manifest.added : props.manifest.removed } platform={ props.playlist.platform } />
                     }
                 </ColumnContainer>
             </TopRowContainer>
