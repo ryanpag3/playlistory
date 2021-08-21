@@ -15,18 +15,16 @@ moment.locale('en', {
         mm: '%dm',
         h: '%dh',
         hh: '%dh',
-        d: 'a day',
+        d: '1d',
         dd: '%dd',
-        M: 'a month',
+        M: '1M',
         MM: '%dM',
-        y: 'a year',
+        y: '1Y',
         yy: '%dY'
     }
 });
 
 const BackupDiffRow = (props: any) => {
-    console.log(props);
-
     const [displayTracks, setDisplayTracks] = useState(props.displayTracks);
 
     function getDiffText() {
@@ -58,7 +56,7 @@ const BackupDiffRow = (props: any) => {
                     </DiffTextContainer>
                     {
                             displayTracks &&
-                            <BackupDiffTracks songs={ props.type === "add" ? props.manifest.added : props.manifest.removed } platform={ props.playlist.platform } />
+                            <BackupDiffTracks tracks={ props.type === "add" ? props.manifest.added : props.manifest.removed } platform={ props.playlist.platform } />
                     }
                 </ColumnContainer>
             </TopRowContainer>
@@ -95,6 +93,7 @@ const DateText = styled.div`
 const ColumnContainer = styled.div`
     display: flex;
     background-color: ${ColorsNew.BACKGROUND_SECONDARY};
+    border-radius: .25em;
     flex-direction: column;
     flex-grow: 1;
 `;
@@ -105,7 +104,6 @@ const DiffTextContainer = styled.div`
     padding: .4em;
     padding-left: 1em;
     padding-right: 1em;
-    border-radius: .25em;
     flex-grow: 1;
 `;
 
