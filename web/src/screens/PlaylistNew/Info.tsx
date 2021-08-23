@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import PlatformIcon from '../../components/PlatformIcon';
 import ColorsNew from '../../constants/colors-new';
 import axios from '../../util/axios';
+import ScheduleMenu from './ScheduleMenu';
 
 const Info = (props: any) => {
     const history = useHistory();
@@ -28,6 +29,18 @@ const Info = (props: any) => {
             }
         }
         setIsSubmittingBackup(false);
+    }
+
+    async function cleanupScheduledBackups() {
+        try {
+            await axios.delete('/backup/scheduled', {
+                params: {
+                    playlistId: props.id
+                }
+            })
+        } catch (e) {
+            history.replace('/error');
+        }
     }
 
     return (
@@ -62,7 +75,20 @@ const Info = (props: any) => {
                     </BackupButton>
                     <SwitchCont>
                         <SwitchLabel>Scheduled</SwitchLabel>
-                        <ScheduledSwitch checked={scheduledChecked} onChange={() => setScheduledChecked(!scheduledChecked)} />
+                        <ScheduledSwitch checked={scheduledChecked} onChange={(e) => {
+                            setScheduledChecked(e.target.checked);
+                            if (e.target.checked === false) {
+                                cleanupScheduledBackups();
+                            }
+                        }} />
+                        {
+                            scheduledChecked &&
+                            <ScheduleMenu
+                                id={props.id}
+                                platform={props.platform}
+                                isScheduled={scheduledChecked}
+                            />
+                        }
                     </SwitchCont>
                 </BottomContainer>
             </InnerContainer>
