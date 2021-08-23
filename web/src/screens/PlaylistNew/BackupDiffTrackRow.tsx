@@ -12,7 +12,9 @@ const BackupDiffTrackRow = (props: any) => {
                 <Image src={props.imageUrl} />
             </ImageContainer>
             <InfoContainer>
-                <SongTitle>
+                <SongTitle
+                    onClick={() => window.open(props.url, '_blank')}
+                >
                     {props.name}
                 </SongTitle>
                 <SubInfoContainer>
@@ -55,6 +57,7 @@ const Container = styled.div`
     flex-direction: row;
     align-items: center;
     padding: .35em;
+    cursor: default;
 `;
 
 const ImageContainer = styled.div`
@@ -78,12 +81,15 @@ const InfoContainer = styled.div`
 const SongTitle = styled.div`
     flex-grow: 1;
     margin-bottom: .5em;
+    font-weight: lighter;
+    cursor: pointer;
 `;
 
 const SubInfoContainer = styled.div`
     display: flex;
     flex-direction: row;
     max-width: 33em;
+    font-size: .9em;
 `;
 
 const StyledArtistMarquee = styled(Marquee)`

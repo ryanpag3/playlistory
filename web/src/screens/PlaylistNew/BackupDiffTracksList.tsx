@@ -13,7 +13,7 @@ const BackupDiffTracksList = (props: any) => {
                 Everything is alreaedy loaded into the query
                 We just care about the virtualization at this point
             */}
-            <InfiniteScroll
+            <StyledScroll
                 dataLength={props.tracks?.length}
                 next={() => null}
                 hasMore={false}
@@ -29,13 +29,18 @@ const BackupDiffTracksList = (props: any) => {
                         )
                     })
                 }
-            </InfiniteScroll>
+            </StyledScroll>
         </Container>
     )
 }
 
 const Container = styled.div`
     width: 100%;
+`;
+
+// @ts-ignore
+const StyledScroll = styled(InfiniteScroll)`
+    max-height: 25em;
 `;
 
 const StyledDivider = styled(Divider)`

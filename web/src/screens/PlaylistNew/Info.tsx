@@ -35,13 +35,17 @@ const Info = (props: any) => {
                 <Image src={ props.imageUrl }/>
             </ImageContainer>
             <InnerContainer>
-                <OwnerContainer>
+                <OwnerContainer
+                    onClick={() => window.open(props.owner.url, '_blank')}
+                >
                     <StyledPlatformIcon platform={ props.platform } />
                     <OwnerText>
                         { props.owner?.name }
                     </OwnerText>
                 </OwnerContainer>
-                <TitleText>
+                <TitleText
+                    onClick={() => window.open(props.url, '_blank')}
+                >
                     { props.name }
                 </TitleText>
                 <DescriptionCont>
@@ -87,6 +91,7 @@ const OwnerContainer = styled.div`
     display: flex;
     flex-direction: row;
     color: ${ColorsNew.LIGHT};
+    cursor: pointer;
 `;
 
 const StyledPlatformIcon = styled(PlatformIcon)`
@@ -102,6 +107,7 @@ const TitleText = styled.div`
     font-size: 2em;
     font-weight: bold;
     text-overflow: ellipsis;
+    cursor: pointer;
 `;
 
 const DescriptionCont = styled.div`

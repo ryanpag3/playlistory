@@ -235,7 +235,7 @@ const normalizeSpotifyTrack = (spotifyTrack: SpotifyTrack): Track|undefined => {
         }),
         uri: spotifyTrack.uri,
         url: spotifyTrack.external_urls.spotify,
-        imageUrl: spotifyTrack.images[0]?.url 
+        imageUrl: spotifyTrack.images ? spotifyTrack.images[0]?.url : undefined
     }
 }
 
