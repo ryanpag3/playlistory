@@ -66,7 +66,7 @@ const BackupList = (props: any) => {
     }
 
     function onDeleted(index: number) {
-        console.log('on deleted?');
+        console.log('on deleted?' + index);
         backups.splice(index, 1);
         setBackups([...backups]);
     }
@@ -88,7 +88,7 @@ const BackupList = (props: any) => {
                                 key={i}
                                 displayTracks={displayAllTracks}
                                 type="first-backup"
-                                onDeleted={(index: number) => onDeleted(index)}
+                                onDeleted={() => onDeleted(i)}
                             />);  
                             return res;
                     }
@@ -98,7 +98,7 @@ const BackupList = (props: any) => {
                             key={i}
                             displayTracks={displayAllTracks}
                             type="add"
-                            onDeleted={(index: number) => onDeleted(index)}
+                            onDeleted={() => onDeleted(i)}
                         />);
                     }
 
@@ -107,7 +107,7 @@ const BackupList = (props: any) => {
                             key={i}
                             displayTracks={displayAllTracks}
                             type="remove"
-                            onDeleted={(index: number) => onDeleted(index)}
+                            onDeleted={() => onDeleted(i)}
                         />);
                     }
                     return res;
