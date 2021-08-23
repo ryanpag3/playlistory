@@ -4,6 +4,7 @@ import { FaAngleDown, FaAngleUp, FaEllipsisH } from 'react-icons/fa';
 import styled from 'styled-components';
 import ColorsNew from '../../constants/colors-new';
 import BackupDiffTracks from './BackupDiffTracks';
+import BackupMenu from './BackupMenu';
 
 moment.locale('en', {
     relativeTime: {
@@ -26,6 +27,8 @@ moment.locale('en', {
 
 const BackupDiffRow = (props: any) => {
     const [displayTracks, setDisplayTracks] = useState(props.displayTracks);
+    const [displayMenu, setDisplayMenu] = useState(false);
+    const [anchor, setAnchor] = useState(null);
 
     function getDiffText() {
         if (props.type === "add") {
@@ -49,7 +52,14 @@ const BackupDiffRow = (props: any) => {
                         <DiffText>{getDiffText()}</DiffText>
                         <EmptySpace />
                         <IconCont>
-                            <MenuContainer>
+                            <MenuContainer
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    // @ts-ignore
+                                    setAnchor(e.currentTarget);
+                                    setDisplayMenu(true);
+                                }}
+                            >
                                 <MenuIcon size={20} />
                             </MenuContainer>
                         </IconCont>
@@ -60,6 +70,15 @@ const BackupDiffRow = (props: any) => {
                     }
                 </ColumnContainer>
             </TopRowContainer>
+            <BackupMenu 
+                id={props.id}
+                onDeleted={(index: number) => props.onDeleted(index)}
+                anchor={anchor} 
+                open={displayMenu} 
+                setOpen={(open: boolean) => {
+                setAnchor(null);
+                setDisplayMenu(open)
+            }} />
         </OuterContainer>
     )
 }
@@ -131,6 +150,7 @@ const MenuContainer = styled.div`
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    z-index: 1;
 `;
 
 const MenuIcon = styled(FaEllipsisH)`

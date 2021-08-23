@@ -21,7 +21,7 @@ const PlaylistNew = () => {
             <NavBar/>
             <InnerContainer>
                 <Info {...state } triggerRefresh={triggerRefresh} />
-                <BackupList {...state } />
+                <BackupList {...state } refresh={refresh} />
             </InnerContainer>
         </Container>
     )
