@@ -26,11 +26,11 @@ const BackupList = (props: any) => {
     useEffect(() => {
         fetchBackups(0);
         setIsInit(true);
-    }, [ isInit === false ]);
+    }, [isInit === false]);
 
     useEffect(() => {
         fetchBackups(0);
-    }, [ props.refresh ])
+    }, [props.refresh])
 
     function fetchMoreData() {
         const newOff = offset + limit;
@@ -52,7 +52,7 @@ const BackupList = (props: any) => {
             });
 
             if (refresh) {
-                setBackups([ ...data ]);
+                setBackups([...data]);
             } else {
                 setBackups([...backups, ...data]);
             }
@@ -68,7 +68,7 @@ const BackupList = (props: any) => {
     function onDeleted(index: number) {
         console.log('on deleted?');
         backups.splice(index, 1);
-        setBackups([ ...backups ]);
+        setBackups([...backups]);
     }
 
     return (
@@ -78,26 +78,37 @@ const BackupList = (props: any) => {
                 dataLength={backups.length}
                 next={() => fetchMoreData()}
                 hasMore={hasMore}
-                loader={<ProgressCont><StyledProgress/></ProgressCont>}
+                loader={<ProgressCont><StyledProgress /></ProgressCont>}
             >
                 {backups.map((b, i) => {
                     const res: any = [];
-                    if (b.manifest.added.length > 0) {
-                        res.push(<BackupDiffRow { ...b } 
-                                key={i} 
-                                displayTracks={displayAllTracks} 
-                                type="add"
+                    if (hasMore === false && 
+                        i === backups.length-1) {
+                            res.push(<BackupDiffRow {...b}
+                                key={i}
+                                displayTracks={displayAllTracks}
+                                type="first-backup"
                                 onDeleted={(index: number) => onDeleted(index)}
-                            />);
+                            />);  
+                            return res;
                     }
                     
+                    if (b.manifest.added.length > 0) {
+                        res.push(<BackupDiffRow {...b}
+                            key={i}
+                            displayTracks={displayAllTracks}
+                            type="add"
+                            onDeleted={(index: number) => onDeleted(index)}
+                        />);
+                    }
+
                     if (b.manifest.removed.length > 0) {
-                        res.push(<BackupDiffRow { ...b } 
-                                key={i} 
-                                displayTracks={displayAllTracks} 
-                                type="remove"
-                                onDeleted={(index: number) => onDeleted(index)}
-                            />);
+                        res.push(<BackupDiffRow {...b}
+                            key={i}
+                            displayTracks={displayAllTracks}
+                            type="remove"
+                            onDeleted={(index: number) => onDeleted(index)}
+                        />);
                     }
                     return res;
                 })}

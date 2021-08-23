@@ -31,7 +31,9 @@ const BackupDiffRow = (props: any) => {
     const [anchor, setAnchor] = useState(null);
 
     function getDiffText() {
-        if (props.type === "add") {
+        if (props.type === "first-backup") {
+            return `First backup! ✨ ${props.playlist.tracks.length} songs saved.`;
+        } else if (props.type === "add") {
             return `${props.manifest.added.length} songs added`;
         } else if (props.type === "remove") {
             return `${props.manifest.removed.length} songs removed.`;
