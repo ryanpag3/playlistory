@@ -1,4 +1,4 @@
-import { Button } from '@material-ui/core';
+import { Button, Switch, withStyles } from '@material-ui/core';
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
@@ -10,6 +10,7 @@ const Info = (props: any) => {
     const history = useHistory();
     const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
     const [isSubmittingBackup, setIsSubmittingBackup] = useState(false);
+    const [scheduledChecked, setScheduledChecked] = useState(props.scheduledBackup || false);
 
     async function backupNow() {
         try {
@@ -59,6 +60,10 @@ const Info = (props: any) => {
                     >
                         Backup
                     </BackupButton>
+                    <SwitchCont>
+                        <SwitchLabel>Scheduled</SwitchLabel>
+                        <ScheduledSwitch checked={scheduledChecked} onChange={() => setScheduledChecked(!scheduledChecked)} />
+                    </SwitchCont>
                 </BottomContainer>
             </InnerContainer>
         </Container>
@@ -136,5 +141,32 @@ const BackupButton = styled(Button)`
         background-color: ${ColorsNew.BUTTON_PRIMARY_HOVER};
     }
 `;
+
+const SwitchCont = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-left: 1em;
+`;
+
+const SwitchLabel = styled.span`
+    font-size: .8em;
+`;
+
+
+const ScheduledSwitch = withStyles({
+    switchBase: {
+      color: ColorsNew.LIGHT,
+      '&$checked': {
+        color: ColorsNew.BUTTON_PRIMARY_HOVER,
+      },
+      '&$checked + $track': {
+        backgroundColor: ColorsNew.LIGHT,
+      },
+    },
+    checked: {},
+    track: {},
+})(Switch);
 
 export default Info;
