@@ -1,7 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components';
+import Marquee from "react-fast-marquee";
 
 const BackupDiffTrackRow = (props: any) => {
+    const [marqueeArtistName, setMarqueeArtistName] = useState(false);
+    const [marqueeAlbumName, setMarqueeAlbumName] = useState(false);
+
     return (
         <Container>
             <ImageContainer>
@@ -12,13 +16,34 @@ const BackupDiffTrackRow = (props: any) => {
                     {props.name}
                 </SongTitle>
                 <SubInfoContainer>
-                    <ArtistsNames>
-                        {props.artists.map((a: any) => a.name).join(', ')}
-                    </ArtistsNames>
+                    <div
+                        onMouseEnter={() => setMarqueeArtistName(true)}
+                        onMouseLeave={() => setMarqueeArtistName(false)}
+                    >
+                        <StyledArtistMarquee
+                            gradient={false}
+                            play={marqueeArtistName}
+                        >
+                            <ArtistsNames>
+                                {props.artists.map((a: any) => a.name).join(', ')} &nbsp;
+                            </ArtistsNames>
+                        </StyledArtistMarquee>
+                        
+                    </div>
                     &nbsp; • &nbsp;
-                    <AlbumName>
-                        {props.albumName}
-                    </AlbumName>
+                    <div
+                        onMouseEnter={() => setMarqueeAlbumName(true)}
+                        onMouseLeave={() => setMarqueeAlbumName(false)}
+                    >
+                        <StyledAlbumNameMarquee
+                            gradient={false}
+                            play={marqueeAlbumName}
+                        >
+                            <AlbumName>
+                                {props.albumName}
+                            </AlbumName>
+                        </StyledAlbumNameMarquee>
+                    </div>
                 </SubInfoContainer>
             </InfoContainer>
         </Container>
@@ -51,23 +76,30 @@ const InfoContainer = styled.div`
 `;
 
 const SongTitle = styled.div`
-
+    flex-grow: 1;
+    margin-bottom: .5em;
 `;
 
 const SubInfoContainer = styled.div`
     display: flex;
     flex-direction: row;
+    max-width: 33em;
+`;
+
+const StyledArtistMarquee = styled(Marquee)`
+    max-width: 7em;
 `;
 
 const ArtistsNames = styled.div`
-    max-width: 30%;
-    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 `;
 
+const StyledAlbumNameMarquee = styled(Marquee)`
+    max-width: 20em;
+`;
+
 const AlbumName = styled.div`
-    max-width: 30%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

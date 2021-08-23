@@ -22,9 +22,9 @@ const BackupDiffTracksList = (props: any) => {
                 {
                     props.tracks.map((track: any, i: number) => {
                         return (
-                            <Fragment>
+                            <Fragment key={i}>
                                 <StyledDivider/>
-                                <BackupDiffTrackRow {...track} key={i}/>
+                                <BackupDiffTrackRow {...track}/>
                             </Fragment>
                         )
                     })
