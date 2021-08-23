@@ -4,6 +4,8 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { useHistory } from 'react-router-dom';
 import axios from '../../util/axios';
 import BackupDiffRow from './BackupDiffRow';
+import { CircularProgress } from '@material-ui/core';
+import ColorsNew from '../../constants/colors-new';
 
 const BackupList = (props: any) => {
     const limit = 50;
@@ -76,7 +78,7 @@ const BackupList = (props: any) => {
                 dataLength={backups.length}
                 next={() => fetchMoreData()}
                 hasMore={hasMore}
-                loader={<div>loading</div>}
+                loader={<ProgressCont><StyledProgress/></ProgressCont>}
             >
                 {backups.map((b, i) => {
                     const res: any = [];
@@ -109,5 +111,17 @@ const Container = styled.div`
 `;
 
 const TopRow = styled.div``;
+
+const ProgressCont = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    padding: 1em;
+`;
+
+const StyledProgress = styled(CircularProgress)`
+    color: ${ColorsNew.LIGHT};
+`;
 
 export default BackupList;
