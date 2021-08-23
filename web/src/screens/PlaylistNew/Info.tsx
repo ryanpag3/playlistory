@@ -1,10 +1,10 @@
 import { Button, Switch, withStyles } from '@material-ui/core';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import PlatformIcon from '../../components/PlatformIcon';
 import ColorsNew from '../../constants/colors-new';
-import axios from '../../util/axios';
+import axios, { useAxios } from '../../util/axios';
 import ScheduleMenu from './ScheduleMenu';
 
 const Info = (props: any) => {
@@ -12,6 +12,18 @@ const Info = (props: any) => {
     const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
     const [isSubmittingBackup, setIsSubmittingBackup] = useState(false);
     const [scheduledChecked, setScheduledChecked] = useState(props.scheduledBackup || false);
+    const [me, setMe] = useState();
+
+    const [getMeObj, refetch] = useAxios({
+        method: 'GET',
+        url: '/user/me'
+    });
+
+    useEffect(() => {
+        if (!getMeObj || !getMeObj.data)
+            return;
+        setMe(getMeObj.data);
+    }, [getMeObj.data]);
 
     async function backupNow() {
         try {
@@ -46,25 +58,25 @@ const Info = (props: any) => {
     return (
         <Container>
             <ImageContainer>
-                <Image src={ props.imageUrl }/>
+                <Image src={props.imageUrl} />
             </ImageContainer>
             <InnerContainer>
                 <OwnerContainer
                     onClick={() => window.open(props.owner.url, '_blank')}
                 >
-                    <StyledPlatformIcon platform={ props.platform } />
+                    <StyledPlatformIcon platform={props.platform} />
                     <OwnerText>
-                        { props.owner?.name }
+                        {props.owner?.name}
                     </OwnerText>
                 </OwnerContainer>
                 <TitleText
                     onClick={() => window.open(props.url, '_blank')}
                 >
-                    { props.name }
+                    {props.name}
                 </TitleText>
                 <DescriptionCont>
                     <DescriptionText>
-                        { props.description || 'No description.' }
+                        {props.description || 'No description.'}
                     </DescriptionText>
                 </DescriptionCont>
                 <BottomContainer>
@@ -73,23 +85,28 @@ const Info = (props: any) => {
                     >
                         Backup
                     </BackupButton>
-                    <SwitchCont>
-                        <SwitchLabel>Scheduled</SwitchLabel>
-                        <ScheduledSwitch checked={scheduledChecked} onChange={(e) => {
-                            setScheduledChecked(e.target.checked);
-                            if (e.target.checked === false) {
-                                cleanupScheduledBackups();
+                    {
+                        // @ts-ignore
+                        (me && me?.isSubscribed) &&
+                        <SwitchCont>
+                            <SwitchLabel>Scheduled</SwitchLabel>
+                            <ScheduledSwitch checked={scheduledChecked} onChange={(e) => {
+                                setScheduledChecked(e.target.checked);
+                                if (e.target.checked === false) {
+                                    cleanupScheduledBackups();
+                                }
+                            }} />
+                            {
+                                scheduledChecked &&
+                                <ScheduleMenu
+                                    id={props.id}
+                                    platform={props.platform}
+                                    isScheduled={scheduledChecked}
+                                />
                             }
-                        }} />
-                        {
-                            scheduledChecked &&
-                            <ScheduleMenu
-                                id={props.id}
-                                platform={props.platform}
-                                isScheduled={scheduledChecked}
-                            />
-                        }
-                    </SwitchCont>
+                        </SwitchCont>
+                    }
+
                 </BottomContainer>
             </InnerContainer>
         </Container>
@@ -183,13 +200,13 @@ const SwitchLabel = styled.span`
 
 const ScheduledSwitch = withStyles({
     switchBase: {
-      color: ColorsNew.LIGHT,
-      '&$checked': {
-        color: ColorsNew.BUTTON_PRIMARY_HOVER,
-      },
-      '&$checked + $track': {
-        backgroundColor: ColorsNew.LIGHT,
-      },
+        color: ColorsNew.LIGHT,
+        '&$checked': {
+            color: ColorsNew.BUTTON_PRIMARY_HOVER,
+        },
+        '&$checked + $track': {
+            backgroundColor: ColorsNew.LIGHT,
+        },
     },
     checked: {},
     track: {},
