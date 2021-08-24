@@ -254,7 +254,7 @@ const resolveManifestSpotify = async (user: User, manifest: any) => {
     const chunks = chunk(trackIds, 50);
     let tracks: any[] = [];
     for (const chunk of chunks) {
-        const newTracks = await await spotifyApi.getTracks(chunk.map(c => c.id));
+        const newTracks = await spotifyApi.getTracks(chunk.map(c => c.id));
         tracks = [...tracks, ...newTracks];
     }
 

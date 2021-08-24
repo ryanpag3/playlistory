@@ -1,7 +1,9 @@
 import axios from 'axios';
 import moment from 'moment';
 import logger from './logger';
-import { GetMyPlaylistsResult, Item, Me, SpotifyPlaylist } from './spotify-api-types';
+import { GetMyPlaylistsResult, Item, Me, SpotifyPlaylist, SpotifyTrack } from './spotify-api-types';
+import * as Redis from './redis';
+import Platforms from './Platforms';
 
 export default class SpotifyApi {
     private refreshToken: string|null;
@@ -171,16 +173,78 @@ export default class SpotifyApi {
 
     async getTracks(ids: string[]) {
         await this.refreshAccessToken();
+
+        let tracks = [];
+        let toQueryIds = [];
+        for (const id of ids) {
+            const cached = await this.getCachedTrack(id);
+            if (cached) {
+                tracks.push(cached);
+            } else {
+                toQueryIds.push(id);
+            }
+        }
+
+        if (toQueryIds.length === 0)
+            return tracks.map((t: any) => {
+                delete t.createdAt;
+                return t;
+            });
+
         const { data } = await axios(`https://api.spotify.com/v1/tracks`, {
             method: 'GET',
             headers: {
                 ...this.getAuthHeader()
             },
             params: {
-                ids: ids.join(',')
+                ids: toQueryIds.join(',')
             }
         });
+
+        tracks = [ ...tracks, ...data.tracks ];
+
+        for (const t of data.tracks) {
+            await this.cacheTrack(t);
+        }
+
         return data.tracks;
+    }
+
+    async getCachedTrack(id: string): Promise<any|null> {
+        const daysToExpire = 7;
+        let track: any = await Redis.get(this.getCachedTrackId(id));
+
+        if (!track)
+            return null;
+
+        track = JSON.parse(track);
+
+        if (moment(track.createdAt).diff(moment(), 'days') >= daysToExpire) {
+            logger.debug(`invalidating cached track with id ${id}`);
+            await Redis.del(this.getCachedTrackId(id));
+            return null;
+        }
+        
+        return track;
+    }
+
+    async cacheTrack(track: SpotifyTrack) {
+        // @ts-ignore
+        track.createdAt = new Date();
+        logger.debug(`caching track with id ${track.id}`);
+        return Redis.set(this.getCachedTrackId(track.id), JSON.stringify(track));
+    }
+
+    async isCachedTrackValid(id: string) {
+
+    }
+
+    async invalidateCachedTrack(id: string) {
+
+    }
+
+    getCachedTrackId(id: string) {
+        return `${Platforms.SPOTIFY}-${id}`;
     }
 
     async addTracksToPlaylist(playlistId: string, trackUris: any[]) {
