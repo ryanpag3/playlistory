@@ -26,6 +26,16 @@ export const set = async (key: string, value: any): Promise<void> => {
     });
 }
 
+export const expire = async (key: string, ttlSecs: number): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        client.expire(key, ttlSecs, (err, reply) => {
+            if (err)
+                return reject(err);
+            return resolve(reply as any);
+        })
+    });
+}
+
 export const del = async (key: string): Promise<void> => {
     return new Promise((resolve, reject) => {
         client.del(key, (err, reply) => {

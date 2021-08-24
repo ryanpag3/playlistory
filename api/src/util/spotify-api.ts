@@ -211,36 +211,21 @@ export default class SpotifyApi {
     }
 
     async getCachedTrack(id: string): Promise<any|null> {
-        const daysToExpire = 7;
         let track: any = await Redis.get(this.getCachedTrackId(id));
 
         if (!track)
             return null;
 
         track = JSON.parse(track);
-
-        if (moment(track.createdAt).diff(moment(), 'days') >= daysToExpire) {
-            logger.debug(`invalidating cached track with id ${id}`);
-            await Redis.del(this.getCachedTrackId(id));
-            return null;
-        }
         
         return track;
     }
 
     async cacheTrack(track: SpotifyTrack) {
-        // @ts-ignore
-        track.createdAt = new Date();
         logger.debug(`caching track with id ${track.id}`);
-        return Redis.set(this.getCachedTrackId(track.id), JSON.stringify(track));
-    }
-
-    async isCachedTrackValid(id: string) {
-
-    }
-
-    async invalidateCachedTrack(id: string) {
-
+        const res = await Redis.set(this.getCachedTrackId(track.id), JSON.stringify(track));
+        await Redis.expire(this.getCachedTrackId(track.id), 7 * 24 * 60 * 60);
+        return res;
     }
 
     getCachedTrackId(id: string) {
