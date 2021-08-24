@@ -7,7 +7,7 @@ import ColorsNew from '../../constants/colors-new';
 import BackupList from './BackupList';
 import Info from './Info';
 
-const PlaylistNew = () => {
+const Playlist = () => {
     const { state } = useLocation();
 
     const [refresh, setRefresh] = useState(0);
@@ -37,4 +37,4 @@ const InnerContainer = styled.div`
     width: 40em;
 `;
 
-export default PlaylistNew;
+export default Playlist;

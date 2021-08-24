@@ -74,6 +74,7 @@ const BackupDiffRow = (props: any) => {
             </TopRowContainer>
             <BackupMenu 
                 id={props.id}
+                type={props.type}
                 onDeleted={(index: number) => props.onDeleted(index)}
                 anchor={anchor} 
                 open={displayMenu} 

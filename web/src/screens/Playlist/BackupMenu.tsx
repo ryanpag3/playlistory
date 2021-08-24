@@ -8,8 +8,19 @@ const BackupMenu = (props: any) => {
     const history = useHistory();
     const [anchorEl, setAnchorEl] = useState(null);
 
+    async function undo() {
+        if (props.type === "add") {
+            return undoAdded();
+        } else if (props.type === "remove") {
+            return undoRemoved();
+        }
+
+        return;
+    }
+
     async function undoAdded() {
         try {
+            console.log('added')
             const res = await axios({
                 method: 'PUT',
                 url: '/playlist/revert/added',
@@ -24,6 +35,7 @@ const BackupMenu = (props: any) => {
 
     async function undoRemoved() {
         try {
+            console.log('removed')
             const res = await axios({
                 method: 'PUT',
                 url: '/playlist/revert/removed',
@@ -78,21 +90,14 @@ const BackupMenu = (props: any) => {
             >
                 <Tooltip title="Remove the songs added in this backup." enterDelay={500}>
                     <StyledMenuItem
-                        onClick={undoAdded}
-                    >Undo Added</StyledMenuItem>
-
-                </Tooltip>
-                <Tooltip title="Add the songs removed in this backup." enterDelay={500}>
-
-                    <StyledMenuItem
-                        onClick={undoRemoved}
-                    >Undo Removed</StyledMenuItem>
+                        onClick={undo}
+                    >Undo Changes</StyledMenuItem>
                 </Tooltip>
                 <Tooltip title="Restore the playlist to this point in history." enterDelay={500}>
 
                     <StyledMenuItem
                         onClick={restore}
-                    >Restore</StyledMenuItem>
+                    >Revert To Here</StyledMenuItem>
                 </Tooltip>
                 <StyledMenuItem
                     onClick={deleteBackup}
