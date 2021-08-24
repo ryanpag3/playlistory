@@ -18,19 +18,23 @@ const PlaylistList = (props: any) => {
     const history = useHistory();
 
     useEffect(() => {
+        if (isInit)
+            return;
+        
         fetchData(0);
         setIsInit(true);
     }, [isInit === false]);
 
     useEffect(() => {
-        if (hasMore === false)
+        if (hasMore === false || !isInit)
             return;
 
         fetchData(offset);
     }, [offset]);
 
     useEffect(() => {
-        console.log(history.location.state);
+        if (!isInit)
+            return;
         // @ts-ignore
         if (history.location.state?.refresh === true)
             refreshData();
