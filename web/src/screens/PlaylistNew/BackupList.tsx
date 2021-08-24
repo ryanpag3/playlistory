@@ -17,20 +17,23 @@ const BackupList = (props: any) => {
     const [displayAllTracks, setDisplayAllTracks] = useState(false);
 
     useEffect(() => {
-        if (hasMore === false)
+        if (hasMore === false || !isInit)
             return;
-
         fetchBackups(offset, false);
-    }, [offset]);
+    }, [ offset ]);
 
     useEffect(() => {
+        if (isInit)
+            return;
         fetchBackups(0);
         setIsInit(true);
-    }, [isInit === false]);
+    }, [ isInit ]);
 
     useEffect(() => {
+        if (!isInit)
+            return;
         fetchBackups(0);
-    }, [props.refresh])
+    }, [ props.refresh ])
 
     function fetchMoreData() {
         const newOff = offset + limit;
@@ -39,8 +42,6 @@ const BackupList = (props: any) => {
 
     async function fetchBackups(offset: number, refresh: boolean = true) {
         try {
-            console.log('fetching backups');
-
             const { data } = await axios({
                 method: 'GET',
                 url: '/backup',
@@ -66,7 +67,6 @@ const BackupList = (props: any) => {
     }
 
     function onDeleted(index: number) {
-        console.log('on deleted?' + index);
         backups.splice(index, 1);
         setBackups([...backups]);
     }
