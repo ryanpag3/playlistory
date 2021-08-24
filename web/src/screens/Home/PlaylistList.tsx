@@ -3,9 +3,8 @@ import React, { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { resolveTypeReferenceDirective } from 'typescript';
 import colors from '../../constants/colors';
-import axios, { useAxios } from '../../util/axios';
+import axios from '../../util/axios';
 import PlaylistRow from './PlaylistRow';
 
 const PlaylistList = (props: any) => {

@@ -1,152 +1,138 @@
-import { CircularProgress, Divider } from '@material-ui/core';
 import React, { useEffect, useState } from 'react'
+import styled from 'styled-components';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useHistory } from 'react-router-dom';
-import styled from 'styled-components';
-import colors from '../../constants/colors';
-import { useAxios } from '../../util/axios';
-import BackupListRow from './BackupListRow';
+import axios from '../../util/axios';
+import BackupDiffRow from './BackupDiffRow';
+import { CircularProgress } from '@material-ui/core';
+import ColorsNew from '../../constants/colors-new';
 
 const BackupList = (props: any) => {
+    const limit = 50;
     const history = useHistory();
-    const [backups, setBackups] = useState([] as any);
+    const [offset, setOffset] = useState(0);
+    const [backups, setBackups] = useState([] as any[]);
+    const [hasMore, setHasMore] = useState(true);
+    const [isInit, setIsInit] = useState(false);
+    const [displayAllTracks, setDisplayAllTracks] = useState(false);
 
-    const [{ data, loading, error }, refetch] = useAxios({
-        method: 'GET',
-        url: '/backup',
-        params: {
-            playlistId: props.id
-        }
-    });
+    useEffect(() => {
+        if (hasMore === false || !isInit)
+            return;
+        fetchBackups(offset, false);
+    }, [ offset ]);
 
-    if (error) {
-        history.replace('/error');
+    useEffect(() => {
+        if (isInit)
+            return;
+        fetchBackups(0);
+        setIsInit(true);
+    }, [ isInit ]);
+
+    useEffect(() => {
+        if (!isInit)
+            return;
+        fetchBackups(0);
+    }, [ props.refresh ])
+
+    function fetchMoreData() {
+        const newOff = offset + limit;
+        setOffset(newOff);
     }
 
-    useEffect(() => {
-        refetch();
-    }, [props.refresh]);
+    async function fetchBackups(offset: number, refresh: boolean = true) {
+        try {
+            const { data } = await axios({
+                method: 'GET',
+                url: '/backup',
+                params: {
+                    playlistId: props.id,
+                    offset,
+                    limit
+                }
+            });
 
-    useEffect(() => {
-        if (!data)
-            return;
-        setBackups([...data]);
-    }, [data]);
+            if (refresh) {
+                setBackups([...data]);
+            } else {
+                setBackups([...backups, ...data]);
+            }
 
-    async function handleOnDeleted(index: number) {
+            if (data.length < limit) {
+                setHasMore(false);
+            }
+        } catch (e) {
+            history.replace('/error');
+        }
+    }
+
+    function onDeleted(index: number) {
         backups.splice(index, 1);
         setBackups([...backups]);
     }
 
-    function Backups() {
-        if (loading) {
-            return (
-                <ProgressCont>
-                    <StyledProgress />
-                </ProgressCont>
-            );
-        } else if (!backups || !backups.length) {
-            return <NoBackupsCont>No backups created yet :(</NoBackupsCont>;
-        } else {
-            return backups.map((d: any, index: number) => <BackupListRow {...d} key={index} index={index} onDeleted={(index: number) => handleOnDeleted(index)} />);
-        }
-    }
-
     return (
         <Container>
-            <HeaderContainer>
-                <DateCreatedCont>
-                    <HeaderText>
-                        Created
-                    </HeaderText>
-                </DateCreatedCont>
-                <NameContainer>
-                    <HeaderText>
-                        Name
-                    </HeaderText>
-                </NameContainer>
-                <TracksContainer>
-                    <HeaderText>
-                        Tracks
-                    </HeaderText>
-                </TracksContainer>
-            </HeaderContainer>
-            <StyledDivider />
+
             <InfiniteScroll
-                dataLength={(data ? data.length : 0)}
-                next={() => console.log('hmm')}
-                hasMore={false}
-                loader={<div></div>}
+                dataLength={backups.length}
+                next={() => fetchMoreData()}
+                hasMore={hasMore}
+                loader={<ProgressCont><StyledProgress /></ProgressCont>}
             >
-                <Backups />
+                {backups.map((b, i) => {
+                    const res: any = [];
+                    if (hasMore === false && 
+                        i === backups.length-1) {
+                            res.push(<BackupDiffRow {...b}
+                                key={i}
+                                displayTracks={displayAllTracks}
+                                type="first-backup"
+                                onDeleted={() => onDeleted(i)}
+                            />);  
+                            return res;
+                    }
+                    
+                    if (b.manifest.added.length > 0) {
+                        res.push(<BackupDiffRow {...b}
+                            key={i}
+                            displayTracks={displayAllTracks}
+                            type="add"
+                            onDeleted={() => onDeleted(i)}
+                        />);
+                    }
+
+                    if (b.manifest.removed.length > 0) {
+                        res.push(<BackupDiffRow {...b}
+                            key={i}
+                            displayTracks={displayAllTracks}
+                            type="remove"
+                            onDeleted={() => onDeleted(i)}
+                        />);
+                    }
+                    return res;
+                })}
             </InfiniteScroll>
         </Container>
     )
 }
 
 const Container = styled.div`
-
+    max-width: 100%;
 `;
 
-const HeaderContainer = styled.div`
-    display: flex;
-    flex-direction: row;
-    height: 1.3em;
-    width: 100%;
-    background-color: ${colors.MEDIUM_DARK};
-    padding-top: .1em;
-    cursor: default;
-`;
-
-const HeaderText = styled.text`
-    font-weight: bold;
-    font-size: 1.05em;
-`;
-
-const StyledDivider = styled(Divider)`
-    height: .15em;
-    background-color: ${colors.MEDIUM_DARK};
-    border: none;
-`;
-
-const HeaderSectionCont = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-`;
-
-const DateCreatedCont = styled(HeaderSectionCont)`
-    min-width: 8.5em;
-    padding-left: 1em;
-`;
-
-const NameContainer = styled(HeaderSectionCont)`
-    justify-content: left;
-    flex-grow: 1;
-`;
-
-const TracksContainer = styled(HeaderSectionCont)`
-    margin-right: 3em;
-`;
-
-const NoBackupsCont = styled.div`
-    width: 100%;
-    display: flex;
-    padding-top: 3em;
-    align-items: center;
-    justify-content: center;
-`;
+const TopRow = styled.div``;
 
 const ProgressCont = styled.div`
     display: flex;
-    height: 5em;
     justify-content: center;
     align-items: center;
+    width: 90%;
+    padding: 1em;
 `;
 
 const StyledProgress = styled(CircularProgress)`
-    color: ${colors.PRIMARY_ACCENT};
+    color: ${ColorsNew.LIGHT};
 `;
 
-export default BackupList
+export default BackupList;

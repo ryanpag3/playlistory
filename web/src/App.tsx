@@ -15,7 +15,6 @@ import AccountLink from './screens/AccountLink';
 import SpotifyRedirect from './screens/SpotifyRedirect';
 import Home from './screens/Home';
 import Playlist from './screens/Playlist';
-import PlaylistNew from './screens/PlaylistNew';
 import UpgradeAccount from './screens/UpgradeAccount';
 import Settings from './screens/Settings';
 import colors from './constants/colors';
@@ -42,7 +41,6 @@ function App() {
       <Route path="/login" children={<SignUpLogin formType="login"/>}/>
       <Route path="/error" children={<Error/>}/>
       <PrivateRoute path="/playlist/:id" children={<Playlist/>}/>
-      <PrivateRoute path="/playlist-new/:id" children={<PlaylistNew/>}/>
       <PrivateRoute path="/spotify" children={<SpotifyRedirect/>}/>
       <PrivateRoute path="/connections" children={<AccountLink/>}/>
       <PrivateRoute path="/upgrade" children={<UpgradeAccount/>}/>

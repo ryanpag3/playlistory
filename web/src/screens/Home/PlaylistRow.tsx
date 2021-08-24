@@ -11,7 +11,7 @@ const PlaylistRow = (props: any) => {
     const history = useHistory();
     
     function goToPlaylistScreen() {
-        history.push(`/playlist-new/${props.id}`, { ...props });
+        history.push(`/playlist/${props.id}`, { ...props });
     }
 
     return (
