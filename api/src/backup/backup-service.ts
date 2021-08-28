@@ -67,6 +67,7 @@ export const runBackup = async (user: User, playlistId: string, backupName: stri
             scheduleJobs();
         }
 
+
         if (mostRecentBackup?.playlist.contentHash === currentBackup.playlist.contentHash || cronSchedule !== undefined) {
             logger.debug(`skipping diff generation as the contents of the playlist [${playlist.id}] hasn't changed.`);
             currentBackup = await prisma.backup.update({
@@ -396,12 +397,14 @@ export const getBackupEvents = async (user: User, offset: number = 0, limit: num
     const backupEvents = await prisma.backupEvent.findMany({
         orderBy: [
             {
-                finishedAt: 'desc'
+                createdAt: 'desc'
             },
             {
-                createdAt: 'desc'
+                finishedAt: 'desc'
             }
         ],
+        skip: offset,
+        take: limit,
         include: {
             backup: true
         },
@@ -414,3 +417,12 @@ export const getBackupEvents = async (user: User, offset: number = 0, limit: num
 
     return backupEvents;
 }
+
+export const createBackupEvent = async (backup: Backup) => {
+    return prisma.backupEvent.create({
+        data: {
+            backupId: backup.id
+        }
+    })
+}
+

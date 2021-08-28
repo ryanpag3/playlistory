@@ -20,6 +20,10 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
 
         // @ts-ignore
         const backup = await BackupService.runBackup(request.user, playlistId, backupName, platform, interval);
+        
+        // TODO: turn this endpoint into an "enqueue" endpoint
+        await BackupService.createBackupEvent(backup);
+
         reply.send(JSON.stringify(backup));
     } catch (e) {
         logger.error(e);
@@ -70,7 +74,7 @@ export const getScheduledBackup = async (request: FastifyRequest, reply: Fastify
         const { user } = request;
         // @ts-ignore
         const { offset, limit } = request.query;
-        
+
         const backupEvents = await BackupService.getBackupEvents(user, offset, limit);
         reply.send(JSON.stringify(backupEvents));
     } catch (e) {
