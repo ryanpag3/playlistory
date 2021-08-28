@@ -9,4 +9,4 @@ CREATE TABLE "BackupEvent" (
 );
 
 -- AddForeignKey
-ALTER TABLE "BackupEvent" ADD FOREIGN KEY ("backupId") REFERENCES "Backup"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "BackupEvent" ADD FOREIGN KEY ("backupId") REFERENCES "Backup"("id") ON DELETE SET NULL ON UPDATE CASCADE;

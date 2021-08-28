@@ -274,26 +274,11 @@ const resolveManifestSpotify = async (user: User, manifest: any) => {
 
 export const deleteBackup = async (id: string) => {
     logger.debug(`deleting backup ${id}`);
-    const backup = await prisma.backup.findUnique({
+    return prisma.backup.delete({
         where: {
             id
         }
     });
-    
-    const res = await prisma.$transaction([
-        prisma.backup.delete({
-            where: {
-                id: backup?.id
-            }
-        }),
-        prisma.playlist.delete({
-            where: {
-                id: backup?.playlistId
-            }
-        })
-    ]);
-
-    return res;
 }
 
 export const deleteScheduledBackupsByPlaylistId = async (createdById: string, playlistId: string) => {
@@ -422,7 +407,8 @@ export const createBackupEvent = async (backup: Backup) => {
     logger.debug(`creating backup event for backup ${backup.id}`);
     return prisma.backupEvent.create({
         data: {
-            backupId: backup.id
+            backupId: backup.id,
+            playlistId: backup.playlistId
         }
     })
 }
