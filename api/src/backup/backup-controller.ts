@@ -68,7 +68,7 @@ export const deleteScheduledBackup = async (request: FastifyRequest, reply: Fast
     }
 }
 
-export const getScheduledBackup = async (request: FastifyRequest, reply: FastifyReply) => {
+export const getScheduledBackupEvents = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
         // @ts-ignore
         const { user } = request;

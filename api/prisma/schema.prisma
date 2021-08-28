@@ -60,6 +60,7 @@ enum Status {
   PENDING
   STARTED
   COMPLETED
+  ERROR
 }
 
 model BackupEvent {

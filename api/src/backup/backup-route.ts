@@ -138,7 +138,7 @@ const routes = [
             // @ts-ignore
             server.validateJWT
         ]),
-        handler: BackupController.getScheduledBackup
+        handler: BackupController.getScheduledBackupEvents
     }
 ];
 

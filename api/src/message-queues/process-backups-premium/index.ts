@@ -8,8 +8,8 @@ export const name = 'process-backups-premium';
 const queueRef = getBullQueue(name);
 
 queueRef.process(async (job) => {
+    const { data } = job;
     try {
-        const { data } = job;
         const user = await prisma.user.findUnique({
             where: {
                 id: data.createdById
@@ -17,8 +17,14 @@ queueRef.process(async (job) => {
         });
         // @ts-ignore
         await BackupService.runBackup(user, data.playlist.playlistId, `Playlistory Scheduled Backup | ${new Date().toLocaleDateString()}`, data.playlist.platform);
+        await BackupService.setBackupEventCompleted(data.backupEventId);
         logger.debug(`ran scheduled backup for user ${user?.id} and playlist ${data.playlist.playlistId} for platform ${data.playlist.platform}`);
     } catch (e) {
+        try {
+            await BackupService.setBackupEventError(data.backupEventId);
+        } catch (e) {
+            // noop
+        }
         logger.error(`Error while running scheduled backup.`, e);
     }
 });

@@ -393,7 +393,7 @@ export const getIntervalFromCronSchedule = (schedule: string) => {
 
 export const getBackupEvents = async (user: User, offset: number = 0, limit: number = 50) => {
     logger.debug(`getting backup events for ${user.id}`);
-
+    // TODO: get upcoming events as well
     const backupEvents = await prisma.backupEvent.findMany({
         orderBy: [
             {
@@ -419,10 +419,47 @@ export const getBackupEvents = async (user: User, offset: number = 0, limit: num
 }
 
 export const createBackupEvent = async (backup: Backup) => {
+    logger.debug(`creating backup event for backup ${backup.id}`);
     return prisma.backupEvent.create({
         data: {
             backupId: backup.id
         }
     })
+}
+
+export const setBackupEventInProgress = async (backupEventId: string) => {
+    logger.debug(`setting backup event to in-progress ${backupEventId}`);
+    return prisma.backupEvent.update({
+        where: {
+            id: backupEventId
+        },
+        data: {
+            status: 'STARTED'
+        }
+    });
+}
+
+export const setBackupEventCompleted = async (backupEventId: string) => {
+    logger.debug(`setting backup event to completed ${backupEventId}`);
+    return prisma.backupEvent.update({
+        where: {
+            id: backupEventId
+        },
+        data: {
+            status: 'COMPLETED',
+            finishedAt: new Date()
+        }
+    });
+}
+
+export const setBackupEventError = async (backupEventId: string) => {
+    return prisma.backupEvent.update({
+        where: {
+            id: backupEventId
+        },
+        data: {
+            status: 'ERROR'
+        }
+    });
 }
 
