@@ -114,6 +114,31 @@ const routes = [
             server.validateJWT
         ]),
         handler: BackupController.deleteScheduledBackup
+    },
+    {
+        method: 'GET',
+        url: '/backup/scheduled',
+        schema: {
+            description: 'Get a list of past, present, and future scheduled backups.',
+            querystring: {
+                id: {
+                    type: 'string',
+                    description: 'ID of the entity the backup was created for.'
+                }
+            },
+            response: {
+                200: {
+                    type: 'object',
+                    description: 'An array of backups.'
+                }
+            }
+        },
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ]),
+        handler: BackupController.getScheduledBackup
     }
 ];
 

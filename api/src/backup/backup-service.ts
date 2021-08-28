@@ -389,3 +389,28 @@ export const getIntervalFromCronSchedule = (schedule: string) => {
             return 'year';
     }
 }
+
+export const getBackupEvents = async (user: User, offset: number = 0, limit: number = 50) => {
+    logger.debug(`getting backup events for ${user.id}`);
+
+    const backupEvents = await prisma.backupEvent.findMany({
+        orderBy: [
+            {
+                finishedAt: 'desc'
+            },
+            {
+                createdAt: 'desc'
+            }
+        ],
+        include: {
+            backup: true
+        },
+        where: {
+            backup: {
+                createdById: user.id
+            }
+        }
+    });
+
+    return backupEvents;
+}

@@ -63,3 +63,18 @@ export const deleteScheduledBackup = async (request: FastifyRequest, reply: Fast
         reply.code(500).send();
     }
 }
+
+export const getScheduledBackup = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        const { user } = request;
+        // @ts-ignore
+        const { offset, limit } = request.query;
+        
+        const backupEvents = await BackupService.getBackupEvents(user, offset, limit);
+        reply.send(JSON.stringify(backupEvents));
+    } catch (e) {
+        logger.error(e);
+        reply.code(500).send();
+    }  
+}

@@ -42,17 +42,35 @@ model JsonWebTokenBlacklist {
 }
 
 model Backup {
-  id           String   @id @default(uuid())
+  id           String        @id @default(uuid())
   name         String
   manifest     Json?
-  createdBy    User     @relation(fields: [createdById], references: [id])
+  createdBy    User          @relation(fields: [createdById], references: [id])
   createdById  String
-  playlist     Playlist @relation(fields: [playlistId], references: [id])
+  playlist     Playlist      @relation(fields: [playlistId], references: [id])
   playlistId   String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  scheduled    Boolean  @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  scheduled    Boolean       @default(false)
   cronSchedule String?
+  backupEvents BackupEvent[]
+}
+
+enum Status {
+  PENDING
+  STARTED
+  COMPLETED
+}
+
+model BackupEvent {
+  id         String    @id @default(uuid())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  finishedAt DateTime?
+  backup     Backup    @relation(fields: [backupId], references: [id])
+  backupId   String
+  status     Status    @default(PENDING)
+  progress   Decimal   @default(0)
 }
 
 model Playlist {
