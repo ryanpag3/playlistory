@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components';
+import BackupListRow from './BackupListRow';
 
 const BackupList = () => {
     const [isInit, setIsInit] = useState(false);
@@ -22,13 +23,14 @@ const BackupList = () => {
 
     return (
         <Container>
-            { backups.map((b: any) => <div>{JSON.stringify(b)}</div>)}
+            { backups.map((b: any) => <BackupListRow { ...b }/>)}
         </Container>
     )
 }
 
 const Container = styled.div`
-
+    width: 100%;
+    max-width: 35em;
 `;
 
 export default BackupList;

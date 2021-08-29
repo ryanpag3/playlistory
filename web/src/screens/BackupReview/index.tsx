@@ -15,7 +15,8 @@ const BackupReview = () => {
 }
 
 const Container = styled(Screen)`
-
+    display: flex;
+    align-items: center;
 `;
 
 export default BackupReview;
