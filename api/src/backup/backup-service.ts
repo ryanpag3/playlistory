@@ -403,14 +403,14 @@ export const getBackupEvents = async (user: User, offset: number = 0, limit: num
     return backupEvents;
 }
 
-export const createBackupEvent = async (backup: Backup) => {
-    logger.debug(`creating backup event for backup ${backup.id}`);
+export const createBackupEvent = async (playlistId: string, playlistName: string ) => {
+    logger.debug(`creating backup event for playlist ${playlistId}`);
     return prisma.backupEvent.create({
         data: {
-            backupId: backup.id,
-            playlistId: backup.playlistId
+            playlistId,
+            playlistName
         }
-    })
+    });
 }
 
 export const setBackupEventInProgress = async (backupEventId: string) => {

@@ -1,6 +1,8 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import logger from '../util/logger';
 import * as BackupService from './backup-service';
+import * as MusicService from '../music/music-service';
+import ProcessBackupsPremiumQueue from '../message-queues/process-backups-premium';
 
 export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
     try {
@@ -19,12 +21,27 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
         }
 
         // @ts-ignore
-        const backup = await BackupService.runBackup(request.user, playlistId, backupName, platform, interval);
+        // const backup = await BackupService.runBackup(request.user, playlistId, backupName, platform, interval);
         
-        // TODO: turn this endpoint into an "enqueue" endpoint
-        await BackupService.createBackupEvent(backup);
+        const playlist = await MusicService.getPlaylist(request.user, platform, playlistId);
 
-        reply.send(JSON.stringify(backup));
+        logger.info(playlist);
+
+        // TODO: turn this endpoint into an "enqueue" endpoint
+        const backupEvent = await BackupService.createBackupEvent(playlist.id, playlist.name);
+        await BackupService.setBackupEventInProgress(backupEvent.id);
+
+        await ProcessBackupsPremiumQueue.add({
+            backupEventId: backupEvent.id,
+            // @ts-ignore
+            createdById: request.user.id,
+            playlist: {
+                playlistId,
+                platform
+            }
+        });
+
+        reply.send();
     } catch (e) {
         logger.error(e);
         reply.code(500).send();
