@@ -425,7 +425,7 @@ export const setBackupEventInProgress = async (backupEventId: string) => {
     });
 }
 
-export const setBackupEventCompleted = async (backupEventId: string) => {
+export const setBackupEventCompleted = async (backupId: string, backupEventId: string) => {
     logger.debug(`setting backup event to completed ${backupEventId}`);
     return prisma.backupEvent.update({
         where: {
@@ -433,7 +433,8 @@ export const setBackupEventCompleted = async (backupEventId: string) => {
         },
         data: {
             status: 'COMPLETED',
-            finishedAt: new Date()
+            finishedAt: new Date(),
+            backupId
         }
     });
 }

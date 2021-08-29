@@ -18,8 +18,8 @@ queueRef.process(async (job) => {
             }
         });
         // @ts-ignore
-        await BackupService.runBackup(user, data.playlist.playlistId, `TODO: REMOVE THIS COLUMN | ${new Date().toLocaleDateString()}`, data.playlist.platform);
-        await BackupService.setBackupEventCompleted(data.backupEventId);
+        const backup = await BackupService.runBackup(user, data.playlist.playlistId, `TODO: REMOVE THIS COLUMN | ${new Date().toLocaleDateString()}`, data.playlist.platform);
+        await BackupService.setBackupEventCompleted(backup.id, data.backupEventId);
         logger.debug(`ran scheduled backup for user ${user?.id} and playlist ${data.playlist.playlistId} for platform ${data.playlist.platform}`);
     } catch (e) {
         try {

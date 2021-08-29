@@ -19,6 +19,11 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
             logger.debug(`Cannot create backup. Not permitted.`);
             return reply.code(403).send(`You are not permitted to create a backup. Please consider upgrading to premium to remove this limit.`);
         }
+
+        if (interval) {
+            // @ts-ignore
+            return BackupService.runBackup(request.user, playlistId, ``, platform, interval);
+        }
         
         const getAllTracks = false;
         // @ts-ignore
