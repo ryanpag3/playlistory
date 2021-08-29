@@ -181,12 +181,12 @@ const getNormalSpotifyMyPlaylistResult = (result: GetMyPlaylistsResult): Playlis
     });
 }
 
-export const getPlaylist = async (user: User, platform: Platform, id: string) => {
+export const getPlaylist = async (user: User, platform: Platform, id: string, queryAllTracks: boolean = true) => {
     let playlist;
     switch (platform) {
         case Platform.SPOTIFY:
             const spotifyApi = new SpotifyApi(user.spotifyRefreshToken);
-            playlist = normalizeSpotifyPlaylist(await spotifyApi.getPlaylistAndTracks(id))
+            playlist = normalizeSpotifyPlaylist(await spotifyApi.getPlaylist(id, queryAllTracks))
             break;
         default:
             throw new Error(`Valid platform not found.`);

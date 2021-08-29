@@ -19,18 +19,12 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
             logger.debug(`Cannot create backup. Not permitted.`);
             return reply.code(403).send(`You are not permitted to create a backup. Please consider upgrading to premium to remove this limit.`);
         }
-
-        // @ts-ignore
-        // const backup = await BackupService.runBackup(request.user, playlistId, backupName, platform, interval);
         
-        const playlist = await MusicService.getPlaylist(request.user, platform, playlistId);
-
-        logger.info(playlist);
-
-        // TODO: turn this endpoint into an "enqueue" endpoint
+        const getAllTracks = false;
+        // @ts-ignore
+        const playlist = await MusicService.getPlaylist(request.user, platform, playlistId, getAllTracks);
         const backupEvent = await BackupService.createBackupEvent(playlist.id, playlist.name);
         await BackupService.setBackupEventInProgress(backupEvent.id);
-
         await ProcessBackupsPremiumQueue.add({
             backupEventId: backupEvent.id,
             // @ts-ignore
@@ -40,7 +34,6 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
                 platform
             }
         });
-
         reply.send();
     } catch (e) {
         logger.error(e);

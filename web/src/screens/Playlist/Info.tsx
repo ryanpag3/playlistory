@@ -122,7 +122,7 @@ const Info = (props: any) => {
                     onClose={() => setShowEnqueued(false)}
                     severity="success"
                 >
-                    Backup has been queued.
+                    Backup has been queued. <WhatDoesThisMean>What does this mean?</WhatDoesThisMean>
                 </Alert>
             </Snackbar>
         </Container>
@@ -227,5 +227,11 @@ const ScheduledSwitch = withStyles({
     checked: {},
     track: {},
 })(Switch);
+
+const WhatDoesThisMean = styled.a`
+    font-style: italic;
+    text-decoration: underline;
+    cursor: pointer;
+`;
 
 export default Info;

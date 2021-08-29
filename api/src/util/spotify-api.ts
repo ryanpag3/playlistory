@@ -6,12 +6,12 @@ import * as Redis from './redis';
 import Platforms from './Platforms';
 
 export default class SpotifyApi {
-    private refreshToken: string|null;
+    private refreshToken: string | null;
     private accessToken?: string;
     private expiresOn?: moment.Moment;
     private me?: Me;
 
-    constructor(refreshToken: string|null, accessToken?: string) {
+    constructor(refreshToken: string | null, accessToken?: string) {
         this.refreshToken = refreshToken;
         this.accessToken = accessToken;
     }
@@ -129,7 +129,7 @@ export default class SpotifyApi {
         return data;
     }
 
-    async getPlaylistAndTracks(id: string) {
+    async getPlaylist(id: string, getAllTracks: boolean = true) {
         await this.refreshAccessToken();
 
         const { data }: {
@@ -145,12 +145,14 @@ export default class SpotifyApi {
 
         let offset = 0;
         const limit = 100;
-        let tracks: any = [];
-        while (offset < data.tracks.total) {
-            tracks = [...tracks, ...await this.getPlaylistTracks(id, offset, limit)];
-            offset += limit;
+        if (getAllTracks) {
+            let tracks: any = [];
+            while (offset < data.tracks.total) {
+                tracks = [...tracks, ...await this.getPlaylistTracks(id, offset, limit)];
+                offset += limit;
+            }
+            data.tracks.items = tracks;
         }
-        data.tracks.items = tracks;
         return data;
     }
 
@@ -201,7 +203,7 @@ export default class SpotifyApi {
             }
         });
 
-        tracks = [ ...tracks, ...data.tracks ];
+        tracks = [...tracks, ...data.tracks];
 
         for (const t of data.tracks) {
             await this.cacheTrack(t);
@@ -210,14 +212,14 @@ export default class SpotifyApi {
         return data.tracks;
     }
 
-    async getCachedTrack(id: string): Promise<any|null> {
+    async getCachedTrack(id: string): Promise<any | null> {
         let track: any = await Redis.get(this.getCachedTrackId(id));
 
         if (!track)
             return null;
 
         track = JSON.parse(track);
-        
+
         return track;
     }
 
@@ -267,18 +269,18 @@ export default class SpotifyApi {
     async createPlaylist(title: string, description: string) {
         await this.refreshAccessToken();
         const me = await this.getMe();
-        const { data } = await axios(`https://api.spotify.com/v1/users/${me.id}/playlists`, 
-        {
-            method: 'POST',
-            headers: {
-                ...this.getAuthHeader(),
-                'Content-Type': 'application/json'
-            },
-            data: {
-                name: title,
-                description
-            }
-        });
+        const { data } = await axios(`https://api.spotify.com/v1/users/${me.id}/playlists`,
+            {
+                method: 'POST',
+                headers: {
+                    ...this.getAuthHeader(),
+                    'Content-Type': 'application/json'
+                },
+                data: {
+                    name: title,
+                    description
+                }
+            });
         return data;
     }
 }
