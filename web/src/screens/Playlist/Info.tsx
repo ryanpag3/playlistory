@@ -114,7 +114,7 @@ const Info = (props: any) => {
             </InnerContainer>
             <Snackbar
                 open={showEnqueued}
-                autoHideDuration={3000}
+                autoHideDuration={5000}
                 onClose={() => setShowEnqueued(false)}
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
             >
