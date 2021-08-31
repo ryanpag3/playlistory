@@ -13,6 +13,7 @@ const BackupListRow = (props: any) => {
             case "STARTED":
                 break;
             case "PENDING":
+                message = `Queued to run`
                 break;
             case "ERROR":
                 break;
@@ -36,6 +37,7 @@ const BackupListRow = (props: any) => {
 
 const Container = styled.div`
     display: flex;
+    position: relative;
     flex-direction: row;
     color: ${ColorsNew.LIGHT};
     background-color: ${ColorsNew.BACKGROUND_SECONDARY};

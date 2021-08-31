@@ -8,9 +8,14 @@ export const name = 'process-backups-premium';
 const queueRef = getBullQueue(name);
 
 queueRef.process(async (job) => {
+
+    if (process.env.CONSUME_MSGS?.toString().toLowerCase() === 'false')
+        return;
+
     const { data } = job;
     try {
         logger.debug(`running backup for ${data.createdById}`);
+        await BackupService.setBackupEventInProgress(data.backupEventId);
 
         const user = await prisma.user.findUnique({
             where: {

@@ -28,7 +28,9 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
         const getAllTracks = false;
         // @ts-ignore
         const playlist = await MusicService.getPlaylist(request.user, platform, playlistId, getAllTracks);
-        const backupEvent = await BackupService.createBackupEvent(playlist.id, playlist.name);
+        
+        // @ts-ignore
+        const backupEvent = await BackupService.createBackupEvent(request.user.id, playlist.id, playlist.name);
         await BackupService.setBackupEventInProgress(backupEvent.id);
         await ProcessBackupsPremiumQueue.add({
             backupEventId: backupEvent.id,

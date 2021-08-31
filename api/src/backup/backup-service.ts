@@ -382,10 +382,7 @@ export const getBackupEvents = async (user: User, offset: number = 0, limit: num
     const backupEvents = await prisma.backupEvent.findMany({
         orderBy: [
             {
-                createdAt: 'desc'
-            },
-            {
-                finishedAt: 'desc'
+                status: 'asc'
             }
         ],
         skip: offset,
@@ -394,19 +391,18 @@ export const getBackupEvents = async (user: User, offset: number = 0, limit: num
             backup: true
         },
         where: {
-            backup: {
-                createdById: user.id
-            }
+            createdById: user.id
         }
     });
 
     return backupEvents;
 }
 
-export const createBackupEvent = async (playlistId: string, playlistName: string ) => {
-    logger.debug(`creating backup event for playlist ${playlistId}`);
+export const createBackupEvent = async (userId: string, playlistId: string, playlistName: string ) => {
+    logger.debug(`creating backup event for playlist ${playlistId} for user ${userId}`);
     return prisma.backupEvent.create({
         data: {
+            createdById: userId,
             playlistId,
             playlistName
         }

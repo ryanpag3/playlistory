@@ -35,8 +35,7 @@ export const scheduleJobs = async () => {
                 const lockTtl = 30000;
                 const lock = await redlock.lock(scheduledBackup.id, lockTtl);
                 // @ts-ignore
-                const backupEvent = await BackupService.createBackupEvent(scheduledBackup.playlist.playlistId, scheduledBackup.playlist.name);
-                await BackupService.setBackupEventInProgress(backupEvent.id);
+                const backupEvent = await BackupService.createBackupEvent(scheduledBackup.createdById, scheduledBackup.playlist.playlistId, scheduledBackup.playlist.name);
                 await ProcessBackupsPremiumQueue.add({
                     backupEventId: backupEvent.id,
                     ...scheduledBackup

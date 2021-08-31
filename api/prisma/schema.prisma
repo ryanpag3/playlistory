@@ -24,6 +24,7 @@ model User {
   spotifyRefreshToken   String?
   JsonWebTokenBlacklist JsonWebTokenBlacklist[]
   backups               Backup[]
+  backupEvents          BackupEvent[]
   playlists             Playlist[]
   stripeUserId          String?
   stripeSubscriptionId  String?
@@ -59,8 +60,8 @@ model Backup {
 enum Status {
   PENDING
   STARTED
-  COMPLETED
   ERROR
+  COMPLETED
 }
 
 model BackupEvent {
@@ -68,6 +69,8 @@ model BackupEvent {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   finishedAt   DateTime?
+  createdBy    User      @relation(fields: [createdById], references: [id])
+  createdById  String
   backup       Backup?   @relation(fields: [backupId], references: [id])
   backupId     String?
   playlistName String?
