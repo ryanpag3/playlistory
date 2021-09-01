@@ -7,6 +7,7 @@ import { scheduleJobs } from '../util/scheduler';
 import SpotifyApi from '../util/spotify-api';
 import * as MusicService from '../music/music-service';
 import Platforms from '../util/Platforms';
+import ProcessBackupsPremiumQueue from '../message-queues/process-backups-premium';
 
 export const runBackup = async (user: User, playlistId: string, backupName: string, platform: string, interval?: string) => {
     const mostRecentBackup = await getMostRecentBackup(user.id, playlistId);
@@ -376,17 +377,21 @@ export const getIntervalFromCronSchedule = (schedule: string) => {
     }
 }
 
-export const getBackupEvents = async (user: User, offset: number = 0, limit: number = 50) => {
+
+export const getBackupEvents = async (user: User, offset: number = 0, limit: number = 30) => {
     logger.debug(`getting backup events for ${user.id}`);
     // TODO: get upcoming events as well
-    const backupEvents = await prisma.backupEvent.findMany({
+    let backupEvents = await prisma.backupEvent.findMany({
         orderBy: [
             {
                 status: 'asc'
+            },
+            {
+                createdAt: 'desc'
             }
         ],
         skip: offset,
-        take: limit,
+        // take: limit,
         include: {
             backup: true
         },
@@ -394,6 +399,31 @@ export const getBackupEvents = async (user: User, offset: number = 0, limit: num
             createdById: user.id
         }
     });
+
+    backupEvents = await resolveQueueMetaData(backupEvents);
+
+    return backupEvents;
+}
+
+export const resolveQueueMetaData = async (backupEvents: any[]) => {
+
+    for (let i = 0; i < backupEvents.length; i++) {
+        let event: any = backupEvents[i];
+
+        if (event.status !== 'PENDING')
+            continue;
+
+        const waitingJobs = await ProcessBackupsPremiumQueue.getWaiting();
+
+        const foundJobIndex = waitingJobs.findIndex((j) => {
+            return j.id === event.jobId
+        });
+
+        event.jobPosition = foundJobIndex+1; // queue position is not 0 based
+        event.totalJobs = waitingJobs.length;
+
+        backupEvents[i] = event;
+    }
 
     return backupEvents;
 }

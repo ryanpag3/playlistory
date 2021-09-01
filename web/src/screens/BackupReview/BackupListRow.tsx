@@ -11,11 +11,13 @@ const BackupListRow = (props: any) => {
                 message = `Finished on ${new Date(props.finishedAt).toLocaleDateString()} at ${new Date(props.finishedAt).toLocaleTimeString()}`;
                 break;
             case "STARTED":
+                message = `Backup started at ${new Date(props.updatedAt).toLocaleDateString()} at ${new Date(props.updatedAt).toLocaleTimeString()}`
                 break;
             case "PENDING":
-                message = `Queued to run`
+                message = `Queued to run | Position ${props.jobPosition} of ${props.totalJobs}`;
                 break;
             case "ERROR":
+                message = `Error occured. Please try again.`
                 break;
         }
         
@@ -24,6 +26,7 @@ const BackupListRow = (props: any) => {
 
     return (
         <Container>
+
             <InfoContainer>
                 <PlaylistName>{props.playlistName}</PlaylistName>
                 <Status/>

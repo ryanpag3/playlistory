@@ -36,10 +36,21 @@ export const scheduleJobs = async () => {
                 const lock = await redlock.lock(scheduledBackup.id, lockTtl);
                 // @ts-ignore
                 const backupEvent = await BackupService.createBackupEvent(scheduledBackup.createdById, scheduledBackup.playlist.playlistId, scheduledBackup.playlist.name);
-                await ProcessBackupsPremiumQueue.add({
+                const job = await ProcessBackupsPremiumQueue.add({
                     backupEventId: backupEvent.id,
                     ...scheduledBackup
                 });
+
+                logger.debug(`setting job id to ${job.id}`);
+                await prisma.backupEvent.update({
+                    where: {
+                        id: backupEvent.id
+                    },
+                    data: {
+                        jobId: job.id as any
+                    }
+                });
+
                 await delay(5000);
                 await lock.unlock();
             } catch (e) {

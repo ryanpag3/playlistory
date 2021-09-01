@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "BackupEvent" ALTER COLUMN "jobId" SET DATA TYPE TEXT;

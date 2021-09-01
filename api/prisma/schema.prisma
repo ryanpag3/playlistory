@@ -77,6 +77,7 @@ model BackupEvent {
   playlistId   String
   status       Status    @default(PENDING)
   progress     Decimal   @default(0)
+  jobId        String?
 }
 
 model Playlist {
