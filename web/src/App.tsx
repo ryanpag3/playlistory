@@ -19,6 +19,7 @@ import UpgradeAccount from './screens/UpgradeAccount';
 import Settings from './screens/Settings';
 import colors from './constants/colors';
 import Error from './screens/Error';
+import BackupReview from './screens/BackupReview';
 
 function App() {
   const history = useHistory();
@@ -40,6 +41,7 @@ function App() {
       <Route path="/sign-up" children={<SignUpLogin formType="sign-up"/>}/>
       <Route path="/login" children={<SignUpLogin formType="login"/>}/>
       <Route path="/error" children={<Error/>}/>
+      <PrivateRoute path="/backups" children={<BackupReview/>}/>
       <PrivateRoute path="/playlist/:id" children={<Playlist/>}/>
       <PrivateRoute path="/spotify" children={<SpotifyRedirect/>}/>
       <PrivateRoute path="/connections" children={<AccountLink/>}/>

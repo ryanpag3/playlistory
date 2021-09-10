@@ -5,6 +5,7 @@ import { CronJob } from 'cron';
 import logger from './logger';
 import ProcessBackupsPremiumQueue from '../message-queues/process-backups-premium';
 import { delay } from 'bluebird';
+import * as BackupService from '../backup/backup-service';
 
 // @ts-ignore
 const client = Redis.createClient(process.env.REDIS_PORT || 6379, process.env.REDIS_HOST || '127.0.0.1');
@@ -33,9 +34,23 @@ export const scheduleJobs = async () => {
             try {
                 const lockTtl = 30000;
                 const lock = await redlock.lock(scheduledBackup.id, lockTtl);
-                await ProcessBackupsPremiumQueue.add({
+                // @ts-ignore
+                const backupEvent = await BackupService.createBackupEvent(scheduledBackup.createdById, scheduledBackup.playlist.playlistId, scheduledBackup.playlist.name);
+                const job = await ProcessBackupsPremiumQueue.add({
+                    backupEventId: backupEvent.id,
                     ...scheduledBackup
                 });
+
+                logger.debug(`setting job id to ${job.id}`);
+                await prisma.backupEvent.update({
+                    where: {
+                        id: backupEvent.id
+                    },
+                    data: {
+                        jobId: job.id as any
+                    }
+                });
+
                 await delay(5000);
                 await lock.unlock();
             } catch (e) {

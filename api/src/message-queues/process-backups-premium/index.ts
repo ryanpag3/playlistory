@@ -7,20 +7,33 @@ export const name = 'process-backups-premium';
 
 const queueRef = getBullQueue(name);
 
-queueRef.process(async (job) => {
-    try {
+if (process.env.CONSUME_MSGS?.toString().toLowerCase() !== 'false') {
+    queueRef.process(async (job) => {
+
         const { data } = job;
-        const user = await prisma.user.findUnique({
-            where: {
-                id: data.createdById
+        try {
+            logger.debug(`running backup for ${data.createdById}`);
+
+            await BackupService.setBackupEventInProgress(data.backupEventId);
+    
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: data.createdById
+                }
+            });
+            // @ts-ignore
+            const backup = await BackupService.runBackup(user, data.playlist.playlistId, `TODO: REMOVE THIS COLUMN | ${new Date().toLocaleDateString()}`, data.playlist.platform);
+            await BackupService.setBackupEventCompleted(backup.id, data.backupEventId);
+            logger.debug(`ran scheduled backup for user ${user?.id} and playlist ${data.playlist.playlistId} for platform ${data.playlist.platform}`);
+        } catch (e) {
+            try {
+                await BackupService.setBackupEventError(data.backupEventId);
+            } catch (e) {
+                // noop
             }
-        });
-        // @ts-ignore
-        await BackupService.runBackup(user, data.playlist.playlistId, `Playlistory Scheduled Backup | ${new Date().toLocaleDateString()}`, data.playlist.platform);
-        logger.debug(`ran scheduled backup for user ${user?.id} and playlist ${data.playlist.playlistId} for platform ${data.playlist.platform}`);
-    } catch (e) {
-        logger.error(`Error while running scheduled backup.`, e);
-    }
-});
+            logger.error(`Error while running scheduled backup.`, e);
+        }
+    });
+}
 
 export default queueRef;

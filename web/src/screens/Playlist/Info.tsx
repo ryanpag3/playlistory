@@ -1,4 +1,5 @@
-import { Button, Switch, withStyles } from '@material-ui/core';
+import { Button, Snackbar, Switch, withStyles } from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
 import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
@@ -6,6 +7,7 @@ import PlatformIcon from '../../components/PlatformIcon';
 import ColorsNew from '../../constants/colors-new';
 import axios, { useAxios } from '../../util/axios';
 import ScheduleMenu from './ScheduleMenu';
+import UpgradeNeededDialog from './UpgradeNeededDialog';
 
 const Info = (props: any) => {
     const history = useHistory();
@@ -13,6 +15,7 @@ const Info = (props: any) => {
     const [isSubmittingBackup, setIsSubmittingBackup] = useState(false);
     const [scheduledChecked, setScheduledChecked] = useState(props.scheduledBackup || false);
     const [me, setMe] = useState();
+    const [showEnqueued, setShowEnqueued] = useState(false);
 
     const [getMeObj, refetch] = useAxios({
         method: 'GET',
@@ -32,7 +35,8 @@ const Info = (props: any) => {
                 playlistId: props.id,
                 platform: props.platform
             });
-            props.triggerRefresh();
+            setShowEnqueued(true);
+            // props.triggerRefresh();
         } catch (e) {
             if (e.toString().includes('403')) {
                 setTimeout(() => setShowUpgradeDialog(true), 25);
@@ -109,6 +113,20 @@ const Info = (props: any) => {
 
                 </BottomContainer>
             </InnerContainer>
+            <Snackbar
+                open={showEnqueued}
+                autoHideDuration={5000}
+                onClose={() => setShowEnqueued(false)}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={() => setShowEnqueued(false)}
+                    severity="success"
+                >
+                    Backup has been queued. <CheckStatus onClick={() => history.push('/backups')}>Check Status</CheckStatus> <br/> <WhatDoesThisMean>What does this mean?</WhatDoesThisMean>
+                </Alert>
+            </Snackbar>
+            <UpgradeNeededDialog showDialog={showUpgradeDialog} setShowDialog={(s: boolean) => setShowUpgradeDialog(s)}/>
         </Container>
     )
 }
@@ -211,5 +229,19 @@ const ScheduledSwitch = withStyles({
     checked: {},
     track: {},
 })(Switch);
+
+const CheckStatus = styled.a`
+    font-style: italic;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: .5em;
+`;
+
+const WhatDoesThisMean = styled.a`
+    font-style: italic;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: .75em;
+`;
 
 export default Info;

@@ -2,6 +2,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { AppBar, CircularProgress, IconButton, Link, List, ListItem, ListItemText, SwipeableDrawer, Toolbar } from '@material-ui/core';
 import { FaBars } from 'react-icons/fa';
+import { MdQueueMusic } from 'react-icons/md';
 import colors from '../constants/colors';
 import { useHistory } from 'react-router';
 import axios, { useAxios } from '../util/axios';
@@ -133,6 +134,11 @@ const NavBar = () => {
                     </StyledDrawer>
                 </Fragment>
                 <EmptySpace />
+                <BackupStatusCont
+                    onClick={() => navToRoute('/backups')}
+                >
+                    <BackupStatusIcon size={25}/>
+                </BackupStatusCont>
                 <Upgrade/>
             </StyledToolbar>
         </AppBar>
@@ -177,8 +183,19 @@ const EmptySpace = styled.div`
     flex-grow: 1;
 `;
 
-const UpgradeAccountLinkContainer = styled.div`
+const BackupStatusCont = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+`;
 
+const BackupStatusIcon = styled(MdQueueMusic)`
+
+`;
+
+const UpgradeAccountLinkContainer = styled.div`
+    margin-left: 1em;
 `;
 
 const UpgradeAccountLink = styled.h2`
