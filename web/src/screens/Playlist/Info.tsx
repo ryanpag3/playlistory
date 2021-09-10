@@ -7,6 +7,7 @@ import PlatformIcon from '../../components/PlatformIcon';
 import ColorsNew from '../../constants/colors-new';
 import axios, { useAxios } from '../../util/axios';
 import ScheduleMenu from './ScheduleMenu';
+import UpgradeNeededDialog from './UpgradeNeededDialog';
 
 const Info = (props: any) => {
     const history = useHistory();
@@ -125,6 +126,7 @@ const Info = (props: any) => {
                     Backup has been queued. <CheckStatus onClick={() => history.push('/backups')}>Check Status</CheckStatus> <br/> <WhatDoesThisMean>What does this mean?</WhatDoesThisMean>
                 </Alert>
             </Snackbar>
+            <UpgradeNeededDialog showDialog={showUpgradeDialog} setShowDialog={(s: boolean) => setShowUpgradeDialog(s)}/>
         </Container>
     )
 }

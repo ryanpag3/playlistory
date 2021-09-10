@@ -315,16 +315,14 @@ export const isBackupPermitted = async (user: User, playlistId: string, interval
         distinct: [ 'playlistId' ]
     });
 
-    const backupAmt = await prisma.backup.count({
+    const backupEventAmt = await prisma.backupEvent.count({
         where: {
             createdById: user.id,
-            playlist: {
-                playlistId
-            }
+            playlistId
         }
     });
 
-    return (backupAmt < 3 || uniquePlaylists.length < 3) && interval === undefined;
+    return backupEventAmt < 3 && uniquePlaylists.length < 3 && interval === undefined;
 }
 
 const ONCE_PER_HOUR  = '0 * * * *';

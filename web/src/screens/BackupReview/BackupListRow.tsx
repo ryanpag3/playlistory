@@ -44,7 +44,7 @@ const Container = styled.div`
     flex-direction: row;
     color: ${ColorsNew.LIGHT};
     background-color: ${ColorsNew.BACKGROUND_SECONDARY};
-    margin-top: 1em;
+    margin-top: .6em;
     padding: .5em;
     border-radius: .3em;
     width: 100%;

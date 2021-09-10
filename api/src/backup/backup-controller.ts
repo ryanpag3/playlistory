@@ -15,6 +15,7 @@ export const backup = async (request: FastifyRequest, reply: FastifyReply) => {
 
         // @ts-ignore
         const isBackupPermitted = await BackupService.isBackupPermitted(request.user, playlistId, interval);
+        logger.info(`is backup permitted? ${isBackupPermitted}`);
         if (!isBackupPermitted) {
             logger.debug(`Cannot create backup. Not permitted.`);
             return reply.code(403).send(`You are not permitted to create a backup. Please consider upgrading to premium to remove this limit.`);
