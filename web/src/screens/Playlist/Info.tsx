@@ -122,7 +122,7 @@ const Info = (props: any) => {
                     onClose={() => setShowEnqueued(false)}
                     severity="success"
                 >
-                    Backup has been queued. <WhatDoesThisMean>What does this mean?</WhatDoesThisMean>
+                    Backup has been queued. <CheckStatus onClick={() => history.push('/backups')}>Check Status</CheckStatus> <br/> <WhatDoesThisMean>What does this mean?</WhatDoesThisMean>
                 </Alert>
             </Snackbar>
         </Container>
@@ -228,10 +228,18 @@ const ScheduledSwitch = withStyles({
     track: {},
 })(Switch);
 
+const CheckStatus = styled.a`
+    font-style: italic;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: .5em;
+`;
+
 const WhatDoesThisMean = styled.a`
     font-style: italic;
     text-decoration: underline;
     cursor: pointer;
+    font-size: .75em;
 `;
 
 export default Info;

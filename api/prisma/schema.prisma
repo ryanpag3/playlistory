@@ -60,10 +60,11 @@ model Backup {
 enum Status {
   PENDING
   STARTED
-  ERROR
   COMPLETED
+  ERROR
 }
 
+// Tracks scheduled backup runs
 model BackupEvent {
   id           String    @id @default(uuid())
   createdAt    DateTime  @default(now())

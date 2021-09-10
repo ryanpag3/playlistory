@@ -17,7 +17,7 @@ const BackupListRow = (props: any) => {
                 message = `Queued to run | Position ${props.jobPosition} of ${props.totalJobs}`;
                 break;
             case "ERROR":
-                message = `Error occured. Please try again.`
+                message = `Error occured at ${new Date(props.updatedAt).toLocaleDateString()} at ${new Date(props.updatedAt).toLocaleTimeString()} | Please try again.`
                 break;
         }
         

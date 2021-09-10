@@ -13,6 +13,7 @@ if (process.env.CONSUME_MSGS?.toString().toLowerCase() !== 'false') {
         const { data } = job;
         try {
             logger.debug(`running backup for ${data.createdById}`);
+
             await BackupService.setBackupEventInProgress(data.backupEventId);
     
             const user = await prisma.user.findUnique({
