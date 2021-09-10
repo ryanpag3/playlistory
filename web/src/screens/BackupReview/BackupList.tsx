@@ -12,6 +12,7 @@ const BackupList = () => {
         if (isInit)
             return;
         fetchBackups();
+        setIsInit(true);
     }, [isInit === false])
 
     async function fetchBackups(offset: number = 0) {
@@ -19,6 +20,8 @@ const BackupList = () => {
             method: 'get',
             url: '/backup/scheduled'
         });
+        if (!data)
+            return;
         setBackups([ ...data ]);
     }
 
