@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '../../util/axios';
 import React, { Fragment, useEffect, useState } from 'react'
 import styled from 'styled-components';
 import ColorsNew from '../../constants/colors-new';
