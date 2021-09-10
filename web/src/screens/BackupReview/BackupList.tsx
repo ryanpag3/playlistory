@@ -22,7 +22,7 @@ const BackupList = () => {
         });
         if (!data)
             return;
-        setBackups([ ...data ]);
+        setBackups(data);
     }
 
     // placeholder to identify first new type in the array
