@@ -19,7 +19,7 @@ const BackupList = () => {
             method: 'get',
             url: '/backup/scheduled'
         });
-        setBackups(data);
+        setBackups([ ...data ]);
     }
 
     // placeholder to identify first new type in the array
