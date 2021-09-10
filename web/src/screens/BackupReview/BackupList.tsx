@@ -22,6 +22,8 @@ const BackupList = () => {
         });
         if (!data)
             return;
+        console.log('backups fetched');
+        console.log(data);
         setBackups(data);
     }
 
