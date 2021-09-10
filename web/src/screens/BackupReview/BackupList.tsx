@@ -27,7 +27,7 @@ const BackupList = () => {
 
     return (
         <Container>
-            {backups.map((b: any) => {
+            {backups && backups.map((b: any) => {
                 let displayStatusId = false;
                 if (prevBackup?.status !== b.status) {
                     displayStatusId = true;
