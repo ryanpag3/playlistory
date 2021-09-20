@@ -78,7 +78,8 @@ export const runBackup = async (user: User, playlistId: string, backupName: stri
                 data: {
                     manifest: {
                         added: [],
-                        removed: []
+                        removed: [],
+                        tracks: currentBackup?.playlist.tracks
                     }
                 },
                 include: {
@@ -173,7 +174,8 @@ export const generateManifest = async (mostRecentBackup: (Backup & { playlist: P
         data: {
             manifest: {
                 added: diffAdded || [],
-                removed: diffRemoved || []
+                removed: diffRemoved || [],
+                tracks: currentBackup?.playlist.tracks
             }
         },
         include: {
@@ -450,7 +452,7 @@ export const setBackupEventInProgress = async (backupEventId: string) => {
 }
 
 export const setBackupEventCompleted = async (backupId: string, backupEventId: string) => {
-    logger.debug(`setting backup event to completed ${backupEventId}`);
+    logger.debug(`setting backup event to completed ${backupEventId} for ${backupId}`);
     return prisma.backupEvent.update({
         where: {
             id: backupEventId
