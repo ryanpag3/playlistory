@@ -55,3 +55,15 @@ export const restoreToBackup = async (request: FastifyRequest, reply: FastifyRep
         reply.code(500).send();   
     }
 }
+
+export const getSongs = async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // @ts-ignore
+        const { songIds, platform, offset, limit } = request.query;
+        const result = await MusicService.getSongs(songIds.split(','), platform, offset, limit);
+        reply.code(200).send(JSON.stringify(result));
+    } catch (e) {
+        logger.error(e);
+        reply.code(500).send();   
+    }
+}

@@ -57,8 +57,7 @@ export const getMyPlaylists = async (user: User, offset: number = 0, limit: numb
             logger.debug('including scheduled  backup');
             // @ts-ignore
             scheduledBackup.interval = getIntervalFromCronSchedule(scheduledBackup.cronSchedule);
-            
-            logger.info(scheduledBackup);
+
             // @ts-ignore
             playlist.scheduledBackup = scheduledBackup;
         }
@@ -182,12 +181,12 @@ const getNormalSpotifyMyPlaylistResult = (result: GetMyPlaylistsResult): Playlis
     });
 }
 
-export const getPlaylist = async (user: User, platform: Platform, id: string) => {
+export const getPlaylist = async (user: User, platform: Platform, id: string, queryAllTracks: boolean = true) => {
     let playlist;
     switch (platform) {
         case Platform.SPOTIFY:
             const spotifyApi = new SpotifyApi(user.spotifyRefreshToken);
-            playlist = normalizeSpotifyPlaylist(await spotifyApi.getPlaylistAndTracks(id))
+            playlist = normalizeSpotifyPlaylist(await spotifyApi.getPlaylist(id, queryAllTracks))
             break;
         default:
             throw new Error(`Valid platform not found.`);
@@ -218,15 +217,15 @@ const normalizeSpotifyPlaylist = (spotifyPlaylist: SpotifyPlaylist): Playlist =>
     }
 }
 
-const normalizeSpotifyTrack = (sTrack: SpotifyTrack): Track|undefined => {
-    if (!sTrack)
+const normalizeSpotifyTrack = (spotifyTrack: SpotifyTrack): Track|undefined => {
+    if (!spotifyTrack)
         return undefined;
     
     return {
         platform: Platforms.SPOTIFY,
-        id: sTrack.id,
-        name: sTrack.name,
-        artists: sTrack.artists.map(a => {
+        id: spotifyTrack.id,
+        name: spotifyTrack.name,
+        artists: spotifyTrack.artists.map(a => {
             return {
                 id: a.id as any,
                 name: a.display_name as any || a.name as any,
@@ -234,8 +233,9 @@ const normalizeSpotifyTrack = (sTrack: SpotifyTrack): Track|undefined => {
                 url: a.external_urls.spotify as any,
             }
         }),
-        uri: sTrack.uri,
-        url: sTrack.external_urls.spotify
+        uri: spotifyTrack.uri,
+        url: spotifyTrack.external_urls.spotify,
+        imageUrl: spotifyTrack.images ? spotifyTrack.images[0]?.url : undefined
     }
 }
 
@@ -422,5 +422,18 @@ const addRemovedFromBackup = async (user: User, backup: Backup, playlist: Playli
     for (const chunk of addChunks) {
         // @ts-ignore
         await addSongs(user, backup.playlist.platform, playlist.id, chunk);
+    }
+}
+
+export const getSongs = async (user: User, ids: string[], platform: string, offset: number = 0, limit: number = 50) => {
+    switch(platform) {
+        case Platforms.SPOTIFY: {
+            const spotifyApi = new SpotifyApi(user.spotifyRefreshToken);
+            const res = await spotifyApi.getTracks(ids);
+            logger.info(res);
+            return res;
+        }
+        default:
+            throw new Error(`Invalid platform provided.`);
     }
 }

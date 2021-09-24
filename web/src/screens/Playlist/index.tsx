@@ -1,47 +1,40 @@
-import { Divider, setRef } from '@material-ui/core';
-import React, { useRef, useState } from 'react'
-import { useHistory, useLocation, useParams } from 'react-router';
+import React, { useState } from 'react'
+import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import InnerContainer from '../../components/InnerContainer';
 import NavBar from '../../components/NavBar';
 import Screen from '../../components/Screen';
-import colors from '../../constants/colors';
+import ColorsNew from '../../constants/colors-new';
 import BackupList from './BackupList';
 import Info from './Info';
 
-const Playlist = (props: any) => {
+const Playlist = () => {
     const { state } = useLocation();
+
     const [refresh, setRefresh] = useState(0);
 
-    function triggerRefetch() {
+    function triggerRefresh() {
         setRefresh(refresh+1);
     }
 
     return (
-        <StyledScreen>
+        <Container>
             <NavBar/>
-            <StyledInnerContainer>
-                <Info { ...state } triggerRefetch={triggerRefetch}/>
-                <StyledDivider/>
-                <BackupList { ...state } refresh={refresh}/>
-            </StyledInnerContainer>
-        </StyledScreen>
+            <InnerContainer>
+                <Info {...state } triggerRefresh={triggerRefresh} />
+                <BackupList {...state } refresh={refresh} />
+            </InnerContainer>
+        </Container>
     )
 }
 
-const StyledScreen = styled(Screen)`
+const Container = styled(Screen)`
     display: flex;
-    flex-direction: column;
     align-items: center;
+    color: ${ColorsNew.LIGHT};
 `;
 
-const StyledInnerContainer = styled(InnerContainer)`
-    
+const InnerContainer = styled.div`
+    width: 40em;
 `;
 
-const StyledDivider = styled(Divider)`
-    height: 1.5px;
-    background-color: ${colors.MEDIUM_DARK};
-`;
-
-export default Playlist
+export default Playlist;

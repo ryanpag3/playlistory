@@ -37,11 +37,9 @@ const UpgradeNeededDialog = (props: any) => {
 }
 
 const Container = styled.div`
-
 `;
 
 const StyledDialog = styled(Dialog)`
-
 `;
 
 const Description = styled.div`

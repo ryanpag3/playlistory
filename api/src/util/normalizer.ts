@@ -1,6 +1,7 @@
 import { Platform } from '@prisma/client'
 import { Playlist, Track } from '../music/music-types'
 import logger from './logger'
+import Platforms from './Platforms'
 import { SpotifyPlaylist } from './spotify-api-types'
 
 
@@ -25,16 +26,32 @@ export const getNormSpotifyPlaylist = (spotifyPlaylist: SpotifyPlaylist): Playli
     }
 }
 
+/**
+ * Dupe of music-service.ts:normalizeSpotifyTrack()
+ * 
+ * TODO: remove dupe
+ */
 export const getNormSpotifyTrack = (spotifyTrack: any): Track|undefined => {
+
     if (!spotifyTrack) {
         return undefined;
     }
-    
+
     return {
-        platform: Platform.SPOTIFY,
+        platform: Platforms.SPOTIFY,
         id: spotifyTrack.id,
         name: spotifyTrack.name,
+        artists: spotifyTrack.artists.map((a: any) => {
+            return {
+                id: a.id as any,
+                name: a.display_name as any || a.name as any,
+                uri: a.uri as any,
+                url: a.external_urls.spotify as any,
+            }
+        }),
+        uri: spotifyTrack.uri,
         url: spotifyTrack.external_urls.spotify,
-        uri: spotifyTrack.uri
+        imageUrl: spotifyTrack.album?.images[0]?.url,
+        albumName: spotifyTrack.album.name
     }
 }

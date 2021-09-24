@@ -105,6 +105,40 @@ const routes = [
             // @ts-ignore
             server.validateJWT
         ])
+    },
+    {
+        url: '/songs',
+        method: 'GET',
+        schema: {
+            querystring: {
+                type: 'object',
+                required: ['songIds', 'platform'],
+                properties: {
+                    songIds: {
+                        type: 'string',
+                        description: 'The backup that is being acted upon.'
+                    },
+                    platform: {
+                        type: 'string',
+                        description: 'The platform of the songs.'
+                    },
+                    offset: {
+                        type: 'number',
+                        description: 'the query offset'
+                    },
+                    limit: {
+                        type: 'number',
+                        description: 'the limit of the query results'
+                    }
+                }
+            },
+        },
+        handler: MusicController.getSongs,
+        // @ts-ignore
+        preHandler: server.auth([
+            // @ts-ignore
+            server.validateJWT
+        ])
     }
 ];
 

@@ -24,6 +24,7 @@ model User {
   spotifyRefreshToken   String?
   JsonWebTokenBlacklist JsonWebTokenBlacklist[]
   backups               Backup[]
+  backupEvents          BackupEvent[]
   playlists             Playlist[]
   stripeUserId          String?
   stripeSubscriptionId  String?
@@ -42,21 +43,46 @@ model JsonWebTokenBlacklist {
 }
 
 model Backup {
-  id           String   @id @default(uuid())
+  id           String        @id @default(uuid())
   name         String
   manifest     Json?
-  createdBy    User     @relation(fields: [createdById], references: [id])
+  createdBy    User          @relation(fields: [createdById], references: [id])
   createdById  String
-  playlist     Playlist @relation(fields: [playlistId], references: [id])
+  playlist     Playlist      @relation(fields: [playlistId], references: [id])
   playlistId   String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  scheduled    Boolean  @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  scheduled    Boolean       @default(false)
   cronSchedule String?
+  backupEvents BackupEvent[]
+}
+
+enum Status {
+  PENDING
+  STARTED
+  COMPLETED
+  ERROR
+}
+
+// Tracks scheduled backup runs
+model BackupEvent {
+  id           String    @id @default(uuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  finishedAt   DateTime?
+  createdBy    User      @relation(fields: [createdById], references: [id])
+  createdById  String
+  backup       Backup?   @relation(fields: [backupId], references: [id])
+  backupId     String?
+  playlistName String?
+  playlistId   String
+  status       Status    @default(PENDING)
+  progress     Decimal   @default(0)
+  jobId        String?
 }
 
 model Playlist {
-  id          String   @id @default(uuid())
+  id          String        @id @default(uuid())
   platform    Platform
   playlistId  String
   name        String?
@@ -66,8 +92,8 @@ model Playlist {
   followers   Int?
   tracks      Json
   backup      Backup?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  createdBy   User          @relation(fields: [createdById], references: [id])
   createdById String
 }

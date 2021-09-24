@@ -7,6 +7,7 @@ import { scheduleJobs } from '../util/scheduler';
 import SpotifyApi from '../util/spotify-api';
 import * as MusicService from '../music/music-service';
 import Platforms from '../util/Platforms';
+import ProcessBackupsPremiumQueue from '../message-queues/process-backups-premium';
 
 export const runBackup = async (user: User, playlistId: string, backupName: string, platform: string, interval?: string) => {
     const mostRecentBackup = await getMostRecentBackup(user.id, playlistId);
@@ -67,6 +68,7 @@ export const runBackup = async (user: User, playlistId: string, backupName: stri
             scheduleJobs();
         }
 
+
         if (mostRecentBackup?.playlist.contentHash === currentBackup.playlist.contentHash || cronSchedule !== undefined) {
             logger.debug(`skipping diff generation as the contents of the playlist [${playlist.id}] hasn't changed.`);
             currentBackup = await prisma.backup.update({
@@ -76,7 +78,8 @@ export const runBackup = async (user: User, playlistId: string, backupName: stri
                 data: {
                     manifest: {
                         added: [],
-                        removed: []
+                        removed: [],
+                        tracks: currentBackup?.playlist.tracks
                     }
                 },
                 include: {
@@ -171,7 +174,8 @@ export const generateManifest = async (mostRecentBackup: (Backup & { playlist: P
         data: {
             manifest: {
                 added: diffAdded || [],
-                removed: diffRemoved || []
+                removed: diffRemoved || [],
+                tracks: currentBackup?.playlist.tracks
             }
         },
         include: {
@@ -254,7 +258,7 @@ const resolveManifestSpotify = async (user: User, manifest: any) => {
     const chunks = chunk(trackIds, 50);
     let tracks: any[] = [];
     for (const chunk of chunks) {
-        const newTracks = await await spotifyApi.getTracks(chunk.map(c => c.id));
+        const newTracks = await spotifyApi.getTracks(chunk.map(c => c.id));
         tracks = [...tracks, ...newTracks];
     }
 
@@ -273,26 +277,11 @@ const resolveManifestSpotify = async (user: User, manifest: any) => {
 
 export const deleteBackup = async (id: string) => {
     logger.debug(`deleting backup ${id}`);
-    const backup = await prisma.backup.findUnique({
+    return prisma.backup.delete({
         where: {
             id
         }
     });
-    
-    const res = await prisma.$transaction([
-        prisma.backup.delete({
-            where: {
-                id: backup?.id
-            }
-        }),
-        prisma.playlist.delete({
-            where: {
-                id: backup?.playlistId
-            }
-        })
-    ]);
-
-    return res;
 }
 
 export const deleteScheduledBackupsByPlaylistId = async (createdById: string, playlistId: string) => {
@@ -328,16 +317,14 @@ export const isBackupPermitted = async (user: User, playlistId: string, interval
         distinct: [ 'playlistId' ]
     });
 
-    const backupAmt = await prisma.backup.count({
+    const backupEventAmt = await prisma.backupEvent.count({
         where: {
             createdById: user.id,
-            playlist: {
-                playlistId
-            }
+            playlistId
         }
     });
 
-    return (backupAmt < 3 || uniquePlaylists.length < 3) && interval === undefined;
+    return backupEventAmt < 3 && uniquePlaylists.length < 3 && interval === undefined;
 }
 
 const ONCE_PER_HOUR  = '0 * * * *';
@@ -389,3 +376,103 @@ export const getIntervalFromCronSchedule = (schedule: string) => {
             return 'year';
     }
 }
+
+
+export const getBackupEvents = async (user: User, offset: number = 0, limit: number = 30) => {
+    logger.debug(`getting backup events for ${user.id}`);
+    // TODO: get upcoming events as well
+    let backupEvents = await prisma.backupEvent.findMany({
+        orderBy: [
+            {
+                status: 'asc'
+            },
+            {
+                createdAt: 'desc'
+            }
+        ],
+        skip: offset,
+        // take: limit,
+        include: {
+            backup: true
+        },
+        where: {
+            createdById: user.id
+        }
+    });
+
+    backupEvents = await resolveQueueMetaData(backupEvents);
+
+    return backupEvents;
+}
+
+export const resolveQueueMetaData = async (backupEvents: any[]) => {
+
+    for (let i = 0; i < backupEvents.length; i++) {
+        let event: any = backupEvents[i];
+
+        if (event.status !== 'PENDING')
+            continue;
+
+        const waitingJobs = await ProcessBackupsPremiumQueue.getWaiting();
+
+        const foundJobIndex = waitingJobs.findIndex((j) => {
+            return j.id === event.jobId
+        });
+
+        event.jobPosition = foundJobIndex+1; // queue position is not 0 based
+        event.totalJobs = waitingJobs.length;
+
+        backupEvents[i] = event;
+    }
+
+    return backupEvents;
+}
+
+export const createBackupEvent = async (userId: string, playlistId: string, playlistName: string ) => {
+    logger.debug(`creating backup event for playlist ${playlistId} for user ${userId}`);
+    return prisma.backupEvent.create({
+        data: {
+            createdById: userId,
+            playlistId,
+            playlistName
+        }
+    });
+}
+
+export const setBackupEventInProgress = async (backupEventId: string) => {
+    logger.debug(`setting backup event to in-progress ${backupEventId}`);
+    return prisma.backupEvent.update({
+        where: {
+            id: backupEventId
+        },
+        data: {
+            status: 'STARTED'
+        }
+    });
+}
+
+export const setBackupEventCompleted = async (backupId: string, backupEventId: string) => {
+    logger.debug(`setting backup event to completed ${backupEventId} for ${backupId}`);
+    return prisma.backupEvent.update({
+        where: {
+            id: backupEventId
+        },
+        data: {
+            status: 'COMPLETED',
+            finishedAt: new Date(),
+            backupId
+        }
+    });
+}
+
+export const setBackupEventError = async (backupEventId: string) => {
+    return prisma.backupEvent.update({
+        where: {
+            id: backupEventId
+        },
+        data: {
+            status: 'ERROR'
+        }
+    });
+}
+

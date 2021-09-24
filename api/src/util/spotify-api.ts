@@ -1,15 +1,17 @@
 import axios from 'axios';
 import moment from 'moment';
 import logger from './logger';
-import { GetMyPlaylistsResult, Item, Me, SpotifyPlaylist } from './spotify-api-types';
+import { GetMyPlaylistsResult, Item, Me, SpotifyPlaylist, SpotifyTrack } from './spotify-api-types';
+import * as Redis from './redis';
+import Platforms from './Platforms';
 
 export default class SpotifyApi {
-    private refreshToken: string|null;
+    private refreshToken: string | null;
     private accessToken?: string;
     private expiresOn?: moment.Moment;
     private me?: Me;
 
-    constructor(refreshToken: string|null, accessToken?: string) {
+    constructor(refreshToken: string | null, accessToken?: string) {
         this.refreshToken = refreshToken;
         this.accessToken = accessToken;
     }
@@ -127,7 +129,7 @@ export default class SpotifyApi {
         return data;
     }
 
-    async getPlaylistAndTracks(id: string) {
+    async getPlaylist(id: string, getAllTracks: boolean = true) {
         await this.refreshAccessToken();
 
         const { data }: {
@@ -143,12 +145,14 @@ export default class SpotifyApi {
 
         let offset = 0;
         const limit = 100;
-        let tracks: any = [];
-        while (offset < data.tracks.total) {
-            tracks = [...tracks, ...await this.getPlaylistTracks(id, offset, limit)];
-            offset += limit;
+        if (getAllTracks) {
+            let tracks: any = [];
+            while (offset < data.tracks.total) {
+                tracks = [...tracks, ...await this.getPlaylistTracks(id, offset, limit)];
+                offset += limit;
+            }
+            data.tracks.items = tracks;
         }
-        data.tracks.items = tracks;
         return data;
     }
 
@@ -171,16 +175,63 @@ export default class SpotifyApi {
 
     async getTracks(ids: string[]) {
         await this.refreshAccessToken();
+
+        let tracks = [];
+        let toQueryIds = [];
+        for (const id of ids) {
+            const cached = await this.getCachedTrack(id);
+            if (cached) {
+                tracks.push(cached);
+            } else {
+                toQueryIds.push(id);
+            }
+        }
+
+        if (toQueryIds.length === 0)
+            return tracks.map((t: any) => {
+                delete t.createdAt;
+                return t;
+            });
+
         const { data } = await axios(`https://api.spotify.com/v1/tracks`, {
             method: 'GET',
             headers: {
                 ...this.getAuthHeader()
             },
             params: {
-                ids: ids.join(',')
+                ids: toQueryIds.join(',')
             }
         });
+
+        tracks = [...tracks, ...data.tracks];
+
+        for (const t of data.tracks) {
+            await this.cacheTrack(t);
+        }
+
         return data.tracks;
+    }
+
+    async getCachedTrack(id: string): Promise<any | null> {
+        let track: any = await Redis.get(this.getCachedTrackId(id));
+
+        if (!track)
+            return null;
+
+        track = JSON.parse(track);
+
+        return track;
+    }
+
+    async cacheTrack(track: SpotifyTrack) {
+        logger.debug(`caching track with id ${track.id}`);
+        const res = await Redis.set(this.getCachedTrackId(track.id), JSON.stringify(track));
+        await Redis.expire(this.getCachedTrackId(track.id), 7 * 24 * 60 * 60);
+        return res;
+    }
+
+    getCachedTrackId(id: string) {
+        return `${Platforms.SPOTIFY}-${id}`;
     }
 
     async addTracksToPlaylist(playlistId: string, trackUris: any[]) {
@@ -218,18 +269,18 @@ export default class SpotifyApi {
     async createPlaylist(title: string, description: string) {
         await this.refreshAccessToken();
         const me = await this.getMe();
-        const { data } = await axios(`https://api.spotify.com/v1/users/${me.id}/playlists`, 
-        {
-            method: 'POST',
-            headers: {
-                ...this.getAuthHeader(),
-                'Content-Type': 'application/json'
-            },
-            data: {
-                name: title,
-                description
-            }
-        });
+        const { data } = await axios(`https://api.spotify.com/v1/users/${me.id}/playlists`,
+            {
+                method: 'POST',
+                headers: {
+                    ...this.getAuthHeader(),
+                    'Content-Type': 'application/json'
+                },
+                data: {
+                    name: title,
+                    description
+                }
+            });
         return data;
     }
 }

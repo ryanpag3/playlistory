@@ -17,10 +17,6 @@ const AccountLink = () => {
         method: 'GET'
     });
 
-    if (spotifyIsAuthReq.error) {
-        history.replace('/error');
-    }
-
     useEffect(() => {
         if (!spotifyIsAuthReq.error)
             return;
